@@ -16,9 +16,9 @@ class reddit(commands.Cog):
         self.memcache.start()
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(id):
+            if str(e["serverid"]) == str(g_id):
                 if e["reddit"]:
                     return True
                 else:
@@ -44,7 +44,7 @@ class reddit(commands.Cog):
             auth = auth.replace("/u", "u")
             authurl = "https://reddit.com/" + auth.replace("/u/", "user/")
             url = file["source"]
-            dict = {
+            dict_ = {
                 "success": True,
                 "title": tit,
                 "meme": iurl,
@@ -53,10 +53,10 @@ class reddit(commands.Cog):
                 "ups": u,
                 "auth_url": authurl,
             }
-            return dict
+            return dict_
         else:
-            dict = {"success": False, "error": file["message"]}
-            return dict
+            dict_ = {"success": False, "error": file["message"]}
+            return dict_
 
     async def sublist(self, sub):
         danklist = []

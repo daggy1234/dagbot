@@ -18,9 +18,9 @@ from utils.caching import caching
 
 
 async def get_prefix(bot, message):
-    id = message.guild.id
+    g_id = message.guild.id
     for e in bot.prefdict:
-        if e["server_id"] == str(id):
+        if e["server_id"] == str(g_id):
             prefix = e["command_prefix"]
             break
 

@@ -36,9 +36,9 @@ class animals(commands.Cog):
         self.client = client
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if e["serverid"] == id:
+            if e["serverid"] == g_id:
                 if e["animals"]:
                     return True
                 else:

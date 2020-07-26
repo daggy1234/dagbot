@@ -11,9 +11,9 @@ class Dagbothelp(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         ctx = self.context
         guild = ctx.guild
-        id = guild.id
+        g_id = guild.id
         for e in ctx.bot.prefdict:
-            if e["server_id"] == str(id):
+            if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
         embed = discord.Embed(color=guild.me.color)
@@ -24,7 +24,7 @@ class Dagbothelp(commands.HelpCommand):
         cog_moji = []
         cog_list = []
         for record in ctx.bot.cogdata:
-            if str(record["serverid"]) == str(id):
+            if str(record["serverid"]) == str(g_id):
                 for cog, state in zip(record.keys(), record.values()):
                     if cog != 'serverid' and state == True:
                         cog_list.append(cog)
@@ -68,9 +68,9 @@ class Dagbothelp(commands.HelpCommand):
         print('making help')
         sp = 15
         guild = ctx.guild
-        id = guild.id
+        g_id = guild.id
         for e in ctx.bot.prefdict:
-            if e["server_id"] == str(id):
+            if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
         print('prefix ready')
@@ -137,9 +137,9 @@ class Dagbothelp(commands.HelpCommand):
     async def send_cog_help(self, cog):
         ctx = self.context
         r = False
-        id = ctx.guild.id
+        g_id = ctx.guild.id
         for record in ctx.bot.cogdata:
-            if str(record["serverid"]) == str(id):
+            if str(record["serverid"]) == str(g_id):
                 for cogthing, state in zip(record.keys(), record.values()):
                     if cog.qualified_name == cogthing and state == True:
                         r = True
@@ -153,9 +153,9 @@ class Dagbothelp(commands.HelpCommand):
         ctx = self.context
         guild = ctx.guild
         ctx = self.context
-        id = guild.id
+        g_id = guild.id
         for e in ctx.bot.prefdict:
-            if e["server_id"] == str(id):
+            if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
         embed = discord.Embed(color=guild.me.color,)

@@ -38,9 +38,9 @@ class ai(commands.Cog):
         self.cleverbot.set_context(ac.DictContext(self.cleverbot))
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(id):
+            if str(e["serverid"]) == str(g_id):
                 if e["ai"]:
                     return True
                 else:

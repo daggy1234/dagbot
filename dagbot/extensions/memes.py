@@ -86,9 +86,9 @@ class memes(commands.Cog):
             raise commands.CheckFailure
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(id):
+            if str(e["serverid"]) == str(g_id):
                 if e["memes"]:
                     return True
                 else:

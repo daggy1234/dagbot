@@ -9,9 +9,9 @@ class tags(commands.Cog):
         self.bot = bot
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.bot.cogdata:
-            if str(e["serverid"]) == str(id):
+            if str(e["serverid"]) == str(g_id):
                 if e["tags"]:
                     return True
                 else:
@@ -66,8 +66,8 @@ class tags(commands.Cog):
             if len(y) == 0:
                 return await ctx.send("Tag does not exist")
             else:
-                id = y[0]["author"]
-                guy = self.bot.get_user(int(id))
+                auth_id = y[0]["author"]
+                guy = self.bot.get_user(int(auth_id))
                 embed = discord.Embed(
                     title="Tag: {}".format(name), color=guild.me.color
                 )
@@ -77,7 +77,7 @@ class tags(commands.Cog):
 
     @tag.command(cooldown_after_parsing=True)
     async def rename(self, ctx, name, newname):
-        id = ctx.author.id
+        auth_id = ctx.author.id
         sid = ctx.guild.id
         newname = newname.lower()
         name = name.lower()
@@ -95,7 +95,7 @@ class tags(commands.Cog):
 
             if len(y) == 0:
                 return await ctx.send("Tag does not exist")
-            elif (y[0]["author"]) == (id):
+            elif (y[0]["author"]) == (auth_id):
                 await self.bot.pg_con.execute(
                     """
         UPDATE taglist
@@ -110,7 +110,7 @@ class tags(commands.Cog):
 
     @tag.command(cooldown_after_parsing=True)
     async def update(self, ctx, name, *, content):
-        id = ctx.author.id
+        auth_id = ctx.author.id
         sid = ctx.guild.id
         name = name.lower()
         if "--" in (str(name) or str(content)):
@@ -127,7 +127,7 @@ class tags(commands.Cog):
 
             if len(y) == 0:
                 return await ctx.send("Tag does not exist")
-            elif (y[0]["author"]) == id:
+            elif (y[0]["author"]) == auth_id:
                 await self.bot.pg_con.execute(
                     """
         UPDATE taglist
@@ -142,7 +142,7 @@ class tags(commands.Cog):
 
     @tag.command(cooldown_after_parsing=True)
     async def delete(self, ctx, *, name):
-        id = ctx.author.id
+        auth_id = ctx.author.id
         sid = ctx.guild.id
         name = name.lower()
         if "--" in str(name):
@@ -159,7 +159,7 @@ class tags(commands.Cog):
 
             if len(y) == 0:
                 return await ctx.send("Tag does not exist")
-            elif (str(y[0]["author"])) == id:
+            elif (str(y[0]["author"])) == auth_id:
                 await self.bot.pg_con.execute(
                     """
         DELETE FROM taglist
@@ -188,14 +188,14 @@ class tags(commands.Cog):
 
     @tag.command(cooldown_after_parsing=True)
     async def list(self, ctx, member: discord.Member):
-        id = member.id
+        mem_id = member.id
         guild = ctx.guild
         sid = ctx.guild.id
         rep = await self.bot.pg_con.fetch(
             """
     SELECT * FROM taglist
     WHERE (server = $1 AND author = $2)""",
-            sid, id
+            sid, mem_id
         )
 
         tlist = ""

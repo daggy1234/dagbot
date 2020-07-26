@@ -47,7 +47,7 @@ class misc(commands.Cog):
         guild = ctx.guild
         fro = guild.name
         auth = ctx.author.display_name
-        id = ctx.author.id
+        auth_id = ctx.author.id
         embed = discord.Embed(
             title="DAGBOT SUGGESTION ADDED",
             description=f"```yaml\n{suggest}\n```\n**FROM:***{auth}\n**SERVER:**{fro}",

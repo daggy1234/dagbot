@@ -77,9 +77,9 @@ class fun(commands.Cog):
         self.client = client
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(id):
+            if str(e["serverid"]) == str(g_id):
                 if e["fun"]:
                     return True
                 else:
@@ -494,7 +494,7 @@ class fun(commands.Cog):
             bits = getrandbits(32)  # generates an integer with 32 random bits
             # instances an IPv4Address object from those bits
             addr = IPv4Address(bits)
-            a = str(addr)  # get the IPv4Address object's string representation
+            fake_ip = str(addr)  # get the IPv4Address object's string representation
         elif v == 6:
             # generates an integer with 128 random bits
             bits = getrandbits(128)
@@ -503,7 +503,7 @@ class fun(commands.Cog):
             # .compressed contains the short version of the IPv6 address
             # str(addr) always returns the short address
             # .exploded is the opposite of this, always returning the full address with all-zero groups and so on
-            a = addr.compressed
+            fake_ip = addr.compressed
 
         async def random_with_N_digits(n):
             range_start = 10 ** (n - 1)
@@ -516,51 +516,15 @@ class fun(commands.Cog):
         j = await random_with_N_digits(5)
         if j > 65535:
             j = 65535
+        hack_sequence = ('Member found!', 'Getting ip...',
+                         'ip found', f'ip={fake_ip}', 'Virus pushed to ip address',
+                         'Getting info...', f'email={b}{f}@gmail.com', 'password=******',
+                         'Deleting files...', 'Files deleted.', 'Closing connection...',
+                         'Connection closed.', f'Exited port {j}')
         message = await ctx.send("```css\nHacking...```")
-        await asyncio.sleep(2)
-        await message.edit(content="```css\nHacking...\nMember found!```")
-        await asyncio.sleep(2)
-        await message.edit(
-            content="```css\nHacking...\nMember found!\nGetting ip...```"
-        )
-        await asyncio.sleep(2)
-        await message.edit(
-            content="```css\nHacking...\nMember found!\nGetting ip...\nip found```"
-        )
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address```"
-        )
-        await asyncio.sleep(2)
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address\nGetting info...```"
-        )
-        await asyncio.sleep(2)
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address\nGetting info...\nemail={b}{f}@gmail.com```"
-        )
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address\nGetting info...\nemail={b}{f}@gmail.com\npassword=******```"
-        )
-        await asyncio.sleep(2)
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address\nGetting info...\nemail={b}{f}@gmail.com\npassword=******\nDeleting files...```"
-        )
-        await asyncio.sleep(2)
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address\nGetting info...\nemail={b}{f}@gmail.com\npassword=******\nDeleting files...\nFiles deleted.```"
-        )
-        await asyncio.sleep(2)
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address\nGetting info...\nemail={b}{f}@gmail.com\npassword=******\nDeleting files...\nFiles deleted.\nClosing Connection...```"
-        )
-        await asyncio.sleep(2)
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address\nGetting info...\nemail={b}{f}@gmail.com\npassword=******\nDeleting files...\nFiles deleted.\nClosing Connection...\nConnection Closed.```"
-        )
-        await message.edit(
-            content=f"```css\nHacking...\nMember found!\nGetting ip...\nip found\nip={a}\nVirus pushed to ip address\nGetting info...\nemail={b}{f}@gmail.com\npassword=******\nDeleting files...\nFiles deleted.\nClosing Connection...\nConnection Closed.\nExited port {j}```"
-        )
-        await asyncio.sleep(2)
+        for i in hack_sequence:
+            await message.edit(content=message.content + f'\n{i}')
+            await asyncio.sleep(2)
         return await ctx.send(f"Finished hacking user **{target.display_name}**.")
 
     @commands.command(cooldown_after_parsing=True)
