@@ -98,7 +98,46 @@ class Image(commands.Cog):
             embed = discord.Embed(color=ctx.guild.me.color)
             embed.set_image(url=y)
             return await ctx.send(embed=embed)
-
+    @commands.command(cooldown_after_parsing=True)
+    async def ascii(
+        self, ctx, *, source=None
+    ):
+        image_url = await ImageConverter().convert(ctx, source)
+        y = await self.client.dagpi.staticimage("ascii", image_url)
+        if isinstance(y, str):
+            embed = discord.Embed(color=ctx.guild.me.color)
+            embed.set_image(url=y)
+            return await ctx.send(embed=embed)
+    @commands.command(cooldown_after_parsing=True)
+    async def sobel(
+        self, ctx, *, source=None
+    ):
+        image_url = await ImageConverter().convert(ctx, source)
+        y = await self.client.dagpi.staticimage("sobel", image_url)
+        if isinstance(y, str):
+            embed = discord.Embed(color=ctx.guild.me.color)
+            embed.set_image(url=y)
+            return await ctx.send(embed=embed)
+    @commands.command(cooldown_after_parsing=True)
+    async def hog(
+        self, ctx, *, source=None
+    ):
+        image_url = await ImageConverter().convert(ctx, source)
+        y = await self.client.dagpi.staticimage("hog", image_url)
+        if isinstance(y, str):
+            embed = discord.Embed(color=ctx.guild.me.color)
+            embed.set_image(url=y)
+            return await ctx.send(embed=embed)
+    @commands.command(cooldown_after_parsing=True)
+    async def colors(
+        self, ctx, *, source=None
+    ):
+        image_url = await ImageConverter().convert(ctx, source)
+        y = await self.client.dagpi.staticimage("colors", image_url)
+        if isinstance(y, str):
+            embed = discord.Embed(color=ctx.guild.me.color)
+            embed.set_image(url=y)
+            return await ctx.send(embed=embed)
     @commands.command(cooldown_after_parsing=True)
     async def evil(
         self, ctx, *, source=None

@@ -90,10 +90,12 @@ class Dagbot(commands.AutoShardedBot):
         self.launch_time = datetime.utcnow()
 
         await self.caching.prefixcache()
-        await self.get_cog("reddit").memecache()
+        await asyncio.sleep(1)
         await self.caching.cogcache()
+        await asyncio.sleep(1)
         await self.caching.getkeydict()
-
+        await self.get_cog("reddit").memecache()
+        
     async def makesession(self):
         self.session = aiohttp.ClientSession()
         print('made session')

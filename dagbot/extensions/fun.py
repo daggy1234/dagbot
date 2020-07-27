@@ -540,3 +540,6 @@ class Fun(commands.Cog):
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.set_image(url=url)
         return await ctx.send(embed=embed)
+
+def setup(bot):
+    bot.add_cog(Fun(bot))

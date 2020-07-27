@@ -17,7 +17,7 @@
 """
 import os
 import traceback
-
+import datetime
 import discord
 from discord.ext import commands
 
@@ -125,8 +125,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     async def reload(self, ctx, *, extension: str):
         mst = ""
         if extension == '~':
-            files = [('extensions.' + f.replace('.py', ''))
-                     for f in os.listdir('./dagbot/extensions') if f.endswith('.py')]
+            files = [('extensions.' + f.replace('.py', ''))for f in os.listdir('./dagbot/extensions') if f.endswith('.py')]
             for file in files:
                 try:
                     self.bot.reload_extension(file)
@@ -135,7 +134,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
                     mst += f"<a:gifcross:734746864280404018> {file}\n"
         else:
             files = [(f.replace('.py', '')) for f in os.listdir(
-                r'.\dagbot\extensions') if f.endswith('.py')]
+                './dagbot/extensions') if f.endswith('.py')]
             if extension in files:
                 try:
                     self.bot.reload_extension(f"extensions.{extension}")
@@ -155,7 +154,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def unload(self, ctx, *, extension: str):
         files = [(f.replace('.py', '')) for f in os.listdir(
-            r'./dagbot/extensions') if f.endswith('.py')]
+            './dagbot/extensions') if f.endswith('.py')]
         if extension in files:
             try:
                 self.bot.unload_extension(f"extensions.{extension}")
@@ -175,7 +174,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def load(self, ctx, *, extension: str):
         files = [(f.replace('.py', '')) for f in os.listdir(
-            r'./dagbot/extensions') if f.endswith('.py')]
+            './dagbot/extensions') if f.endswith('.py')]
         if extension in files:
             try:
                 self.bot.load_extension(f"extensions.{extension}")

@@ -22,6 +22,6 @@ class caching:
         for key in wedit.keys():
             cog = self.bot.get_cog(key)
             if len(cog.get_commands(
-            )) > 1 and cog.qualified_name != 'Jishaku' and cog.qualified_name != 'help' and cog.qualified_name != 'Developer':
-                keylist.append(key)
+            )) > 1 and cog.qualified_name != 'Jishaku' and cog.qualified_name.lower() != 'help' and cog.qualified_name != 'Developer':
+                keylist.append(key.lower())
         self.bot.coglist = keylist

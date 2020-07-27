@@ -148,12 +148,12 @@ class Misc(commands.Cog):
         blankstr = "░"
         blankchar = "\u2000"
         boosts = int(guild.premium_subscription_count)
-        bfrac = int((boostcount / 30) * 25)
         if boosts > 30:
             boostcount = 30
         else:
             boostcount = boosts
         bar = f"{boosts} | {filstr * bfrac}{blankchar * (25-bfrac)} | 30"
+        bfrac = int((boostcount / 30) * 25)
         embed.add_field(
             name="Channels",
             value=f"<:category:724330131421659206>: **{humanize.intcomma(len(categories))}**\n<:textchannel:724637677395116072>: **{humanize.intcomma(len(text_channels))}**\n<:voicechannel:724637677130875001>: **{humanize.intcomma(len(voice_channels))}**",
@@ -249,7 +249,7 @@ class Misc(commands.Cog):
             n = True
         else:
             for guild in self.bot.guilds:
-                if user in guild.member:
+                if user in guild.members:
                     if guild.get_member(user.id).premium_since is not None:
                         n = True
 
