@@ -23,8 +23,8 @@ from discord.ext import commands
 from utils.converters import ImageConverter
 
 
-class AI(commands.Cog):
-    """Interact with the AI's of today (long way to go)"""
+class ai(commands.Cog):
+    """Interact with the ai's of today (long way to go)"""
 
     def __init__(self, client):
         self.client = client
@@ -187,4 +187,4 @@ class AI(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(AI(client))
+    client.add_cog(ai(client))

@@ -7,7 +7,7 @@ from utils.converters import BetterMemberConverter, UrlValidator
 
 
 def setup(client):
-    client.add_cog(Memes(client))
+    client.add_cog(memes(client))
 
 
 topasslist = []
@@ -46,7 +46,7 @@ class Source(menus.GroupByPageSource):
         return embed
 
 
-class Memes(commands.Cog):
+class memes(commands.Cog):
     """Helps you craft wonderful memes worth sharing"""
 
     def __init__(self, client):

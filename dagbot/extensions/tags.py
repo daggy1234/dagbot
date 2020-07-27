@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-class Tags(commands.Cog):
+class tags(commands.Cog):
     """Commands that can help quickly store and retrive data"""
 
     def __init__(self, bot):
@@ -205,7 +205,7 @@ class Tags(commands.Cog):
         if len(tlist) == 0:
             tlist = "None"
         embed = discord.Embed(
-            title="{}'s Tags".format(str(member.name)),
+            title="{}'s tags".format(str(member.name)),
             description=tlist,
             color=guild.me.color,
         )
@@ -249,4 +249,4 @@ class Tags(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Tags(bot))
+    bot.add_cog(tags(bot))

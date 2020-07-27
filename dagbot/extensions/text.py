@@ -14,10 +14,10 @@ client = sr_api.Client()
 
 
 def setup(client):
-    client.add_cog(Text(client))
+    client.add_cog(text(client))
 
 
-class Text(commands.Cog):
+class text(commands.Cog):
     """Fun ways to make your text more interesting"""
 
     def __init__(self, client):

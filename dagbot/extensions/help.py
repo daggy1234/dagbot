@@ -56,13 +56,10 @@ class DagbotHelp(commands.HelpCommand):
                         if cog == 'help':
                             await msg.edit(embed=embed)
                         else:
-                            coginst = ctx.bot.get_cog(cog.title())
+                            
+                            coginst = ctx.bot.get_cog(cog.lower())
                             if coginst == None:
-                                coginst = ctx.bot.get_cog(cog.upper())
-                                if coginst == None:
-                                    coginst = ctx.bot.get_cog(cog.lower())
-                                    if coginst == None:
-                                        coginst = ctx.bot.get_cog(cog)
+                                continue
                             embd = await self.cog_help_maker(coginst, ctx)
                             embd.set_author(
                                 icon_url=ctx.author.avatar_url,
@@ -233,7 +230,7 @@ class DagbotHelp(commands.HelpCommand):
         return await ctx.send(embed=embed)
 
 
-class Help(commands.Cog):
+class help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._original_help_command = bot.help_command
@@ -246,4 +243,4 @@ class Help(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Help(bot))
+    bot.add_cog(help(bot))

@@ -13,7 +13,7 @@ dictionary = PyDictionary()
 
 
 def setup(client):
-    client.add_cog(Smart(client))
+    client.add_cog(smart(client))
 
 
 # return(resp['yodish'])
@@ -38,7 +38,7 @@ def setup(client):
 #             soup = BeautifulSoup(html,'html.parser')
 #             y = (soup.find('return').text)
 #             return(y)
-class Smart(commands.Cog):
+class smart(commands.Cog):
     """Nerd commands (be proud)"""
 
     def __init__(self, client):

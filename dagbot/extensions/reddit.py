@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from discord.ext import commands, tasks
 
 
-class Reddit(commands.Cog):
+class reddit(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.memcache.start()
@@ -362,4 +362,4 @@ class Reddit(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(Reddit(client))
+    client.add_cog(reddit(client))

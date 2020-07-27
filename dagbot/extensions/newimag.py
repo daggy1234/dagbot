@@ -19,10 +19,10 @@ client = sr_api.Client()
 
 
 def setup(client):
-    client.add_cog(Image(client))
+    client.add_cog(image(client))
 
 
-class Image(commands.Cog):
+class image(commands.Cog):
     """Funny images produced by me!"""
 
     def __init__(self, client):

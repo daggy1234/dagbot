@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-class Settings(commands.Cog):
+class settings(commands.Cog):
     """Commands Related to bot configuration"""
 
     def __init__(self, bot):
@@ -151,4 +151,4 @@ class Settings(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Settings(bot))
+    bot.add_cog(settings(bot))

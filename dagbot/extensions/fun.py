@@ -65,8 +65,8 @@ class MyMenugif(menus.Menu):
         self.stop()
 
 
-class Fun(commands.Cog):
-    """Funniest stuff you will ever see"""
+class fun(commands.Cog):
+    """funniest stuff you will ever see"""
 
     def __init__(self, client):
         self.client = client
@@ -143,7 +143,7 @@ class Fun(commands.Cog):
         end = time.perf_counter()
         duration = (end - start) * 1000
         client_lat = round((self.client.latency * 1000), 2)
-        await message.edit("PONG! Client: {} ms  |  Websocket: {:.2f}".format(client_lat, duration))
+        await message.edit(content="I'm Weak\n```diff\nPONG!\n- Client: {} ms\n+ Websocket: {:.2f}\n```".format(client_lat, duration))
 
     @commands.command(cooldown_after_parsing=True)
     async def dadjoke(self, ctx):
@@ -511,11 +511,11 @@ class Fun(commands.Cog):
         j = await random_with_N_digits(5)
         if j > 65535:
             j = 65535
-        hack_sequence = ('Member found!', 'Getting ip...',
-                         'ip found', f'ip={fake_ip}', 'Virus pushed to ip address',
-                         'Getting info...', f'email={b}{f}@gmail.com', 'password=******',
-                         'Deleting files...', 'Files deleted.', 'Closing connection...',
-                         'Connection closed.', f'Exited port {j}')
+        hack_sequence = ('```css\nMember found!\n```', '```css\nGetting ip...\n```',
+                         '```css\nip found\n```', f'```css\nip={fake_ip}\n```', '```css\nVirus pushed to ip address\n```',
+                         '```css\nGetting info...\n```', f'```css\nemail={b}{f}@gmail.com\n```', '```css\npassword=******\n```',
+                         '```css\nDeleting files...\n```', '```css\nFiles deleted.\n```', '```css\nClosing connection...\n```',
+                         '```css\nConnection closed.\n```', f'```css\nExited port {j}\n```')
         message = await ctx.send("```css\nHacking...```")
         for i in hack_sequence:
             await message.edit(content=message.content + f'\n{i}')
@@ -542,4 +542,4 @@ class Fun(commands.Cog):
         return await ctx.send(embed=embed)
 
 def setup(bot):
-    bot.add_cog(Fun(bot))
+    bot.add_cog(fun(bot))

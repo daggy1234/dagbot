@@ -193,7 +193,7 @@ class TicTacToe:
     async def gamegridprinter(self):
         grid = await self.sharegamegrid()
         nl = []
-        formdic = ['⬛', '❌', '<:o_:730735858075828245>']
+        formdic = ['⬛', '❌', '⭕']
         for e in grid:
             toapl = []
             for el in e:
@@ -303,7 +303,7 @@ hangmanassest = [
 
 
 def setup(bot):
-    bot.add_cog(Games(bot))
+    bot.add_cog(games(bot))
 
 
 class Mymenumcq(menus.Menu):
@@ -599,7 +599,7 @@ class MenuRPS(menus.Menu):
 # \U0000270a = rock    = 1
 
 
-class Games(commands.Cog):
+class games(commands.Cog):
     """Lets all play a game (everyone can)"""
 
     def __init__(self, bot):
@@ -1622,8 +1622,7 @@ class Games(commands.Cog):
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.channel)
-    async def fight(self, ctx, challenged):
-        challenged = await BetterMemberConverter.convert(ctx, challenged)
+    async def fight(self, ctx, challenged:discord.Member):
         mlsit = []
         mlsit.append(ctx.author)
         msg = await ctx.send(f'{challenged.mention}.  {ctx.author.mention} has challenged you to a fight! React to accept')

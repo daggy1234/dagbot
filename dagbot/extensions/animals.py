@@ -24,7 +24,7 @@ from discord.ext import commands
 client = sr_api.Client()
 
 
-class Animals(commands.Cog):
+class animals(commands.Cog):
     """Animal facts and images"""
 
     def __init__(self, client):
@@ -267,4 +267,4 @@ class Animals(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(Animals(client))
+    client.add_cog(animals(client))
