@@ -18,6 +18,7 @@
 import os
 import traceback
 import datetime
+from discord import Webhook,AsyncWebhookAdapter
 import aiohttp
 import discord
 from discord.ext import commands
