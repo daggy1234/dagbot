@@ -18,6 +18,7 @@
 import os
 import traceback
 import datetime
+import aiohttp
 import discord
 from discord.ext import commands
 
