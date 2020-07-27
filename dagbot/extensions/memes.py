@@ -1,15 +1,13 @@
 import json
-import os
-from functools import partial
 from io import BytesIO
 
 import discord
 from discord.ext import commands, menus
-from utils.converters import BetterMemberConverter, UrlValidator
+from utils.converters import BetterUserConverter, UrlValidator
 
 
 def setup(client):
-    client.add_cog(memes(client))
+    client.add_cog(Memes(client))
 
 
 topasslist = []
@@ -48,7 +46,7 @@ class Source(menus.GroupByPageSource):
         return embed
 
 
-class memes(commands.Cog):
+class Memes(commands.Cog):
     """Helps you craft wonderful memes worth sharing"""
 
     def __init__(self, client):

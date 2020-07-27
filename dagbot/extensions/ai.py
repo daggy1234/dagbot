@@ -15,20 +15,15 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-import asyncio
-import io
 import json
-import os
-import typing
 
-import aiohttp
 import async_cleverbot as ac
 import discord
 from discord.ext import commands
 from utils.converters import ImageConverter
 
 
-class ai(commands.Cog):
+class AI(commands.Cog):
     """Interact with the AI's of today (long way to go)"""
 
     def __init__(self, client):
@@ -63,11 +58,13 @@ class ai(commands.Cog):
             "Accept-Charset": "UTF-8"}
         r = await self.client.session.post(url, data=payload, headers=headers)
         js = await r.json()
+
         try:
             f = js["responses"][0]
             df = f["textAnnotations"]
         except BaseException:
             return False
+
         mst = ""
         e = df[0]
         mst = mst + str(e["description"])
@@ -124,27 +121,23 @@ class ai(commands.Cog):
         js = await r.json()
         return js["output_url"]
 
-    @commands.command(
-        cooldown_after_parsing=True, aliases=["chatbot", "ask", "converse"]
-    )
+    @commands.command(cooldown_after_parsing=True, aliases=["chatbot", "ask", "converse"])
     async def chat(self, ctx, *, query: str):
         await ctx.trigger_typing()
         try:
             r = await self.cleverbot.ask(query, ctx.author.id)
         except BaseException:
-            await ctx.send('An error occured! We will try and fix')
+            await ctx.send('An error occurred! We will try and fix')
 
         else:
             return await ctx.send(f"> {query}\n{ctx.author.mention} {r.text}")
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
-    async def caption(
-        self, ctx, *, source=None
-    ):
+    async def caption(self, ctx, *, source=None):
         image_url = await ImageConverter.convert(ctx, source)
         f = await self.captioni(image_url)
-        if f == False:
+        if not f:
             return await ctx.send("No results as of now. Shit be wonky")
         else:
             embed = discord.Embed(title=f, color=ctx.guild.me.color)
@@ -166,7 +159,7 @@ class ai(commands.Cog):
     async def ocr(self, ctx, *, source=None):
         image_url = await ImageConverter.convert(ctx, source)
         f = await self.ocra(image_url)
-        if f == False:
+        if not f:
             return await ctx.send("No results rn")
         else:
             embed = discord.Embed(
@@ -179,12 +172,10 @@ class ai(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def label(
-        self, ctx, *, source=None
-    ):
+    async def label(self, ctx, *, source=None):
         image_url = await ImageConverter.convert(ctx, source)
         y = await self.labela(image_url)
-        if y == False:
+        if not y:
             return await ctx.send("No results as of now. Shit be wonky")
         else:
             embed = discord.Embed(
@@ -196,4 +187,4 @@ class ai(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(ai(client))
+    client.add_cog(AI(client))

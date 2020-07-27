@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-class tags(commands.Cog):
+class Tags(commands.Cog):
     """Commands that can help quickly store and retrive data"""
 
     def __init__(self, bot):
@@ -249,4 +249,4 @@ class tags(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(tags(bot))
+    bot.add_cog(Tags(bot))
