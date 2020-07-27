@@ -165,9 +165,9 @@ class util(commands.Cog):
         self.googlethingy = async_cse.Search(self.client.data["gapikey"])
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(id):
+            if str(e["serverid"]) == str(g_id):
                 if e["util"]:
                     return True
                 else:
@@ -182,8 +182,8 @@ class util(commands.Cog):
         tit = file["query"]["pages"][0]["title"]
         conten = file["query"]["pages"][0]["extract"]
         furl = "https://en.wikipedia.org/wiki/" + tit
-        dict = {"title": tit, "content": conten, "url": furl}
-        return dict
+        dict_ = {"title": tit, "content": conten, "url": furl}
+        return dict_
 
     async def gettaco(self):
         response = await self.client.session.get("http://taco-randomizer.herokuapp.com")

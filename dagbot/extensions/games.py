@@ -611,9 +611,9 @@ class games(commands.Cog):
             self.not_onion_headlines = f.read().splitlines()
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.bot.cogdata:
-            if str(e["serverid"]) == str(id):
+            if str(e["serverid"]) == str(g_id):
                 if e["games"]:
                     return True
                 else:
@@ -709,7 +709,7 @@ class games(commands.Cog):
         level = file["results"][0]["difficulty"]
         q = file["results"][0]["question"]
         ca = file["results"][0]["correct_answer"]
-        list = file["results"][0]["incorrect_answers"]
+        list_ = file["results"][0]["incorrect_answers"]
         des = """
     Category: {}
     Level: {}
@@ -718,7 +718,7 @@ class games(commands.Cog):
             cat, level, q
         )
         y = random.randint(0, 3)
-        list.insert(y, ca)
+        list_.insert(y, ca)
         for c in range(0, len(list)):
             des = des + "\n" + chr(ord("\U0001f1e6") + c) + ": " + list[c]
             c += 1
@@ -1405,8 +1405,8 @@ class games(commands.Cog):
         await msg.add_reaction('\U0001f1e7')
         await asyncio.sleep(60)
         channel = ctx.channel
-        id = msg.id
-        mob = await channel.fetch_message(id)
+        m_id = msg.id
+        mob = await channel.fetch_message(m_id)
         l = mob.reactions
         choice1 = int(l[0].count) - 1
         choice2 = int(l[1].count) - 1

@@ -45,9 +45,9 @@ class smart(commands.Cog):
         self.client = client
 
     async def cog_check(self, ctx):
-        id = str(ctx.guild.id)
+        g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(id):
+            if str(e["serverid"]) == str(g_id):
                 if e["smart"]:
                     return True
                 else:
@@ -105,9 +105,9 @@ class smart(commands.Cog):
         for link in soupa.find_all("img"):
             evoimg.append(link.get("src"))
         for i in range(0, len(evoname)):
-            id = evoidlist[i]
+            _id = evoidlist[i]
             name = evoname[i]
-            fid = id.replace(" ", "")
+            fid = _id.replace(" ", "")
             fid = fid.replace("\n", "")
             fname = name.replace(" ", "")
             fname = fname.replace("\n", "")
@@ -381,7 +381,7 @@ hp spell <spell> : gets information about spell    `"""
         guild = ctx.guild
         url = f"https://oeis.org/A{num}"
         f = await self.client.session.get(url)
-        int = f.content
+        int_ = f.content
         html = await f.read()
 
         soup = BeautifulSoup(html, "html.parser")
@@ -436,12 +436,12 @@ hp spell <spell> : gets information about spell    `"""
     @commands.command(cooldown_after_parsing=True)
     async def define(self, ctx, *, word: str):
         await ctx.trigger_typing()
-        dict = dictionary.meaning(word)
-        k = dict.keys()
+        dict_ = dictionary.meaning(word)
+        k = dict_.keys()
         mast = ""
         tlist = []
         for i in k:
-            mli = dict[i]
+            mli = dict_[i]
             mast = mast + f"\n__TYPE__:**{i}**"
             mast = mast + f"\n__Meaning:__"
             for e in mli:

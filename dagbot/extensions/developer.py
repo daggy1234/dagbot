@@ -89,10 +89,10 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def rejectsuggestion(self, ctx, id, *, reason):
+    async def rejectsuggestion(self, ctx, msg_id, *, reason):
         if str(ctx.author.id) == "491174779278065689":
             channel = self.bot.get_channel(676031268009410570)
-            y = await channel.fetch_message(id)
+            y = await channel.fetch_message(msg_id)
             oldemb = y.embeds[0]
             descrip = str(oldemb.description)
             oldtit = oldemb.title
@@ -107,10 +107,10 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def approvesuggestion(self, ctx, id):
+    async def approvesuggestion(self, ctx, msg_id):
         if str(ctx.author.id) == "491174779278065689":
             channel = self.bot.get_channel(676031268009410570)
-            y = await channel.fetch_message(id)
+            y = await channel.fetch_message(msg_id)
             oldemb = y.embeds[0]
             descrip = str(oldemb.description)
             oldtit = oldemb.title

@@ -10,9 +10,9 @@ class settings(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     async def prefix(self, ctx):
-        id = ctx.guild.id
+        g_id = ctx.guild.id
         for e in self.bot.prefdict:
-            if e["server_id"] == str(id):
+            if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
         return await ctx.send(
@@ -44,13 +44,13 @@ class settings(commands.Cog):
                 "`--` is forbidden as it is a cyber security threat. Thank you for understanding."
             )
         else:
-            id = ctx.guild.id
+            g_id = ctx.guild.id
             await self.bot.pg_con.execute(
                 """
         UPDATE prefixesandstuff
         SET command_prefix=$1
         WHERE server_id = $2;""",
-                prefix, str(id)
+                prefix, str(g_id)
 
             )
             await self.bot.caching.prefixcache()
@@ -59,13 +59,13 @@ class settings(commands.Cog):
     @prefix.command()
     @commands.has_permissions(manage_guild=True)
     async def revert(self, ctx):
-        id = ctx.guild.id
+        g_id = ctx.guild.id
         await self.bot.pg_con.execute(
             """
     UPDATE prefixesandstuff
     SET command_prefix='do '
     WHERE server_id = $1;""",
-            str(id)
+            str(g_id)
         )
 
         await self.bot.caching.prefixcache()
@@ -89,15 +89,12 @@ class settings(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def enable(self, ctx, *, cog):
         if str(cog) in self.bot.coglist:
-            id = str(ctx.guild.id)
+            g_id = str(ctx.guild.id)
             await self.bot.pg_con.execute(
-                """
+                f"""
             UPDATE cogpreferences
-            SET {}='y'
-            WHERE serverid = '{}';""".format(
-                    str(cog), str(id)
-                )
-            )
+            SET {cog}='y'
+            WHERE serverid = $1""", str(g_id))
 
             await self.bot.caching.cogcache()
             return await ctx.send(f"I have enabled the cog `{cog}` for this server")
@@ -110,15 +107,12 @@ class settings(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def disable(self, ctx, *, cog):
         if str(cog) in self.bot.coglist:
-            id = str(ctx.guild.id)
+            g_id = str(ctx.guild.id)
             await self.bot.pg_con.execute(
-                """
+                f"""
             UPDATE cogpreferences
-            SET {}='n'
-            WHERE serverid = '{}';""".format(
-                    str(cog), str(id)
-                )
-            )
+            SET {cog}='n'
+            WHERE serverid = $1""", g_id)
             await self.bot.caching.cogcache()
             return await ctx.send(f"I have disabled the cog `{cog}` for this server.")
 

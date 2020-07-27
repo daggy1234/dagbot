@@ -11,9 +11,9 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.Cog.listener()
     async def on_message(self, message):
         channel = message.channel
-        id = message.guild.id
+        g_id = message.guild.id
         for e in self.bot.prefdict:
-            if e["server_id"] == str(id):
+            if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
         ctx = await self.bot.get_context(message)
@@ -38,23 +38,20 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        id = guild.id
+        g_id = guild.id
         try:
             await self.bot.pg_con.execute(
                 """
         INSERT INTO prefixesandstuff (on_message_perm,server_id,command_prefix)
         VALUES (True,$1,'do ');""",
-                str(id)
+                str(g_id)
             )
 
             await self.bot.caching.prefixcache()
             await self.bot.pg_con.execute(
                 """
             INSERT INTO cogpreferences
-            VALUES('{}','y','y','y','y','y','y','y','y','y','y','y','y');""".format(
-                    id
-                )
-            )
+            VALUES('$1,'y','y','y','y','y','y','y','y','y','y','y','y');""", g_id)
             await self.bot.caching.cogcache()
         except BaseException:
             pass
@@ -98,21 +95,15 @@ For any help join our support server!
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        id = guild.id
+        g_id = guild.id
         await self.bot.pg_con.execute(
             """
     DELETE FROM prefixesandstuff
-    WHERE (server_id = '{}') ;""".format(
-                id
-            )
-        )
+    WHERE (server_id = '$1') ;""", g_id)
         await self.bot.pg_con.execute(
             """
     DELETE FROM cogpreferences
-    WHERE (serverid = '{}') ;""".format(
-                id
-            )
-        )
+    WHERE (serverid = '$1') ;""", g_id)
         await self.bot.caching.prefixcache()
         print("LEFT A GUILD")
 
