@@ -3,7 +3,7 @@ from io import BytesIO
 
 import discord
 from discord.ext import commands, menus
-from utils.converters import BetterUserConverter, UrlValidator
+from utils.converters import BetterMemberConverter, UrlValidator
 
 
 def setup(client):

@@ -9,7 +9,7 @@ import sr_api
 from bs4 import BeautifulSoup
 from discord.ext import commands, menus
 from PyDictionary import PyDictionary
-from utils.converters import BetterUserConverter
+from utils.converters import BetterMemberConverter
 
 dictionary = PyDictionary()
 
