@@ -106,10 +106,18 @@ For any help join our support server!
     WHERE (serverid = '$1') ;""", g_id)
         await self.bot.caching.prefixcache()
         print("LEFT A GUILD")
-
     @commands.Cog.listener()
-    async def on_socket_response(self, msg):
-        self.bot.socket_stats[msg.get('t')] += 1
+    async def on_socket_response(self, message):
+        if not (stat := message.get('t')):
+            try:
+                self.bot.socket_stats['undocumented'] += 1
+            except KeyError:
+                self.bot.socket_stats['undocumented'] = 1
+        try:
+            self.bot.socket_stats[stat] += 1
+        except KeyError:
+            self.bot.socket_stats[stat] = 1
+
 
 def setup(bot):
     bot.add_cog(EventHandler(bot))
