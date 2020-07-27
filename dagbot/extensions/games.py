@@ -193,7 +193,7 @@ class TicTacToe:
     async def gamegridprinter(self):
         grid = await self.sharegamegrid()
         nl = []
-        formdic = ['⬛', '❌', '\U00002b55']
+        formdic = ['⬛', '❌', '<:o_:730735858075828245>']
         for e in grid:
             toapl = []
             for el in e:
@@ -446,8 +446,8 @@ class Mymenuhead(menus.Menu):
         return await channel.send(embed=embed)
         self.stop()
 
-    @menus.button("\U00002705")
-    async def right(self, payload):
+    @menus.button("<a:giftick:734746863340748892>")
+    async def right(self, payload): 
         guild = self.message.guild
         if int(self.ans) == 1:
             embed = discord.Embed(
@@ -468,7 +468,7 @@ class Mymenuhead(menus.Menu):
             self.result = True
             self.stop()
 
-    @menus.button("\U0000274c")
+    @menus.button("<a:gifcross:734746864280404018>")
     async def wrong(self, payload):
         guild = self.message.guild
         if int(self.ans) != 1:
@@ -1517,15 +1517,15 @@ class Games(commands.Cog):
         mlsit = []
         mlsit.append(ctx.author)
         msg = await ctx.send(f'React if you wanna join {ctx.author.mention} for a game of tictactoe')
-        await msg.add_reaction('<:tick:720924220292464650>')
+        await msg.add_reaction('<a:giftick:734746863340748892>')
         # and reaction.author != ctx.author
 
         def check(reaction, user):
             # print('reaction')
             print(reaction.message.id == msg.id and user.bot == False and str(
-                reaction.emoji) == '<:tick:720924220292464650>')
+                reaction.emoji) == '<a:giftick:734746863340748892>')
             return reaction.message.id == msg.id and user.bot == False and str(
-                reaction.emoji) == '<:tick:720924220292464650>'
+                reaction.emoji) == '<a:giftick:734746863340748892>'
         try:
             reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60.0)
             print('ye check')
@@ -1627,14 +1627,14 @@ class Games(commands.Cog):
         mlsit = []
         mlsit.append(ctx.author)
         msg = await ctx.send(f'{challenged.mention}.  {ctx.author.mention} has challenged you to a fight! React to accept')
-        await msg.add_reaction('<:tick:720924220292464650>')
+        await msg.add_reaction('<a:giftick:734746863340748892>')
 
         def check(reaction, user):
             # print('reaction')
             print(reaction.message.id == msg.id and user.bot == False and str(
-                reaction.emoji) == '<:tick:720924220292464650>')
+                reaction.emoji) == '<a:giftick:734746863340748892>')
             return reaction.message.id == msg.id and user.bot == False and str(
-                reaction.emoji) == '<:tick:720924220292464650>' and user.id == challenged.id
+                reaction.emoji) == '<a:giftick:734746863340748892>' and user.id == challenged.id
         try:
             reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60.0)
             print('ye check')
