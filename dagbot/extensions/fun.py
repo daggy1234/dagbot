@@ -321,7 +321,7 @@ class Fun(commands.Cog):
 
         headers = {
             "x-rapidapi-host": "joke3.p.rapidapi.com",
-            "x-rapidapi-key": self.bot.data['rapidapi'],
+            "x-rapidapi-key": self.client.data['rapidapi'],
         }
 
         response = requests.request("GET", url, headers=headers)

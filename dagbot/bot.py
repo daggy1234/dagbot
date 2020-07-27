@@ -73,9 +73,9 @@ class Dagbot(commands.AutoShardedBot):
                 print(f"{extension} cannot be loaded due to {error}")
 
         self.before_invoke(self.starttyping)
-        self.after_invoke(self.exittyping)
+        #self.after_invoke(self.exittyping)
         self.loop.create_task(self.startdagbot())
-
+        self.socket_stats = {}
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()]
@@ -114,10 +114,9 @@ class Dagbot(commands.AutoShardedBot):
         )
 
     async def starttyping(self, ctx):
-        ctx.typing = ctx.typing().__enter__()
+        await ctx.trigger_typing()
 
-    async def exittyping(self, ctx):
-        ctx.typing.__exit__(None, None, None)
+    
 
     async def on_command_completion(self, ctx):
         self.commands_called += 1

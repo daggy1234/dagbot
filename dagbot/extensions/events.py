@@ -107,6 +107,9 @@ For any help join our support server!
         await self.bot.caching.prefixcache()
         print("LEFT A GUILD")
 
+    @commands.Cog.listener()
+    async def on_socket_response(self, msg):
+        self.bot.socket_stats[msg.get('t')] += 1
 
 def setup(bot):
     bot.add_cog(EventHandler(bot))

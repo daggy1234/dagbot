@@ -55,10 +55,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
             title=e_tit.content,
             description=e_desc.content,
             color=ctx.guild.me.color)
-        webhook = Webhook.from_url(
-            'https://discordapp.com/api/webhooks/706536494227259513/sssn-2bg6CFW-0P4EjysBgKuoeyzx7SbpvpclXfq83nUhkdMLdgHraNszh03Tufr0kNk',
-            adapter=AsyncWebhookAdapter(
-                self.bot.session))
+       
         embed.set_author(name='Dagbot Dev Team',
                          icon_url="https://dagbot-is.the-be.st/logo.png")
         embed.add_field(
@@ -69,7 +66,8 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
             name='Bot Invite',
             value="[Click me](https://discordapp.com/api/oauth2/authorize?client_id=675589737372975124&permissions=378944&scope=bot)",
             inline=True)
-        await webhook.send('New update', embed=embed)
+        channel = self.bot.get_channel(681778906780532757)
+        await channel.send('New update', embed=embed)
 
     @commands.command()
     @commands.is_owner()
@@ -128,7 +126,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         mst = ""
         if extension == '~':
             files = [('extensions.' + f.replace('.py', ''))
-                     for f in os.listdir(r'.\dagbot\extensions') if f.endswith('.py')]
+                     for f in os.listdir('./dagbot/extensions') if f.endswith('.py')]
             for file in files:
                 try:
                     self.bot.reload_extension(file)
@@ -157,7 +155,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def unload(self, ctx, *, extension: str):
         files = [(f.replace('.py', '')) for f in os.listdir(
-            r'.\dagbot\extensions') if f.endswith('.py')]
+            r'./dagbot/extensions') if f.endswith('.py')]
         if extension in files:
             try:
                 self.bot.unload_extension(f"extensions.{extension}")
@@ -177,7 +175,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def load(self, ctx, *, extension: str):
         files = [(f.replace('.py', '')) for f in os.listdir(
-            r'.\dagbot\extensions') if f.endswith('.py')]
+            r'./dagbot/extensions') if f.endswith('.py')]
         if extension in files:
             try:
                 self.bot.load_extension(f"extensions.{extension}")
@@ -192,7 +190,23 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.description = mst
         await ctx.send(embed=embed)
-
-
+    
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def socketstats(self, ctx):
+        #https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py#L413-L422
+        delta = datetime.datetime.utcnow() - self.bot.uptime
+        minutes = delta.total_seconds() / 60
+        total = sum(self.bot.socket_stats.values())
+        cpm = total / minutes
+        embed = discord.Embed(color=ctx.guild.me.color)
+        embed.description = (f'{total} socket events observed ({cpm:.2f}/minute):\n```{self.bot.socket_stats}```')
+        await ctx.send(embed=embed)
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def command_stats(self,ctx):
+        embed = discord.Embed(color=ctx.guild.me.color)
+        embed.description = f"A total of {self.bot.commands_called} commands!\n```{self.bot.useage}```"
+        await ctx.send(embed=embed)
 def setup(bot):
     bot.add_cog(Developer(bot))

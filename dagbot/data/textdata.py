@@ -129,7 +129,9 @@ A cog is a command category, you can enable or disable cogs and all of the comma
     "prefix": """
 `prefix`: mention Dagbot or just use the prefix command to get the prefix
 `prefix help` To get info about orefix related commands
-""",
+""","hangman":"""
+`DAGBOT hangman\nCatgeories:\nmovies\nword\nanimals\nthing\ncountry\n just enter cancel to terminate the game. `
+"""
 }
 
 

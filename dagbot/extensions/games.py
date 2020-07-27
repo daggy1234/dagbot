@@ -625,7 +625,7 @@ class Games(commands.Cog):
         return resp
 
     async def getlogos(self):
-        data = {'token': self.client.data['dagpitoken']}
+        data = {'token': self.bot.data['dagpitoken']}
         r = await self.bot.session.get('https://dagpi.tk/api/logogame', headers=data)
         resp = await r.json()
         return resp
@@ -1274,7 +1274,7 @@ class Games(commands.Cog):
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def textgame(self, ctx):
         await ctx.trigger_typing()
-        sent = await getsent()
+        sent = await self.getsent()
         ans = sent.lower()
         emo = " \u200b"
         sent = sent.replace(" ", emo)
