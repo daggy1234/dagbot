@@ -106,7 +106,7 @@ class AI(commands.Cog):
         url = "https://captionbot.azurewebsites.net/api/messages"
 
         r = await self.client.session.post(url, data=json.dumps(data), headers=headers)
-        t = await r.Text()
+        t = await r.text()
         return t
         # if not r.ok:
         #     return(None)
@@ -130,7 +130,7 @@ class AI(commands.Cog):
             await ctx.send('An error occurred! We will try and fix')
 
         else:
-            return await ctx.send(f"> {query}\n{ctx.author.mention} {r.Text}")
+            return await ctx.send(f"> {query}\n{ctx.author.mention} {r.text}")
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
