@@ -152,8 +152,10 @@ class Misc(commands.Cog):
             boostcount = 30
         else:
             boostcount = boosts
-        bar = f"{boosts} | {filstr * bfrac}{blankchar * (25-bfrac)} | 30"
+            
         bfrac = int((boostcount / 30) * 25)
+        bar = f"{boosts} | {filstr * bfrac}{blankchar * (25-bfrac)} | 30"
+        
         embed.add_field(
             name="Channels",
             value=f"<:category:724330131421659206>: **{humanize.intcomma(len(categories))}**\n<:textchannel:724637677395116072>: **{humanize.intcomma(len(text_channels))}**\n<:voicechannel:724637677130875001>: **{humanize.intcomma(len(voice_channels))}**",
