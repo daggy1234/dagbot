@@ -49,12 +49,20 @@ class DagbotHelp(commands.HelpCommand):
                         print('timeout')
                         continue
                     else:
+                        print(str(reaction))
                         ind = emoji_list.index(str(reaction))
+                        print(ind)
                         cog = cog_list[ind]
                         if cog == 'help':
                             await msg.edit(embed=embed)
                         else:
-                            coginst = ctx.bot.get_cog(cog)
+                            coginst = ctx.bot.get_cog(cog.title())
+                            if coginst == None:
+                                coginst = ctx.bot.get_cog(cog.upper())
+                                if coginst == None:
+                                    coginst = ctx.bot.get_cog(cog.lower())
+                                    if coginst == None:
+                                        coginst = ctx.bot.get_cog(cog)
                             embd = await self.cog_help_maker(coginst, ctx)
                             embd.set_author(
                                 icon_url=ctx.author.avatar_url,

@@ -139,7 +139,7 @@ emojilist = {
     "text": "\U0001f1f9",
     "games": "\U0001f3b2",
     "reddit": "\U0001f534",
-    "image": "\U0001f5bc",
+    "Image": "\U0001f5bc",
     "util": "\U0001f5a5",
     "smart": "\U0001f9e0",
     "fun": "\U0001f973",
