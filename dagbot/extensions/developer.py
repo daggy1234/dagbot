@@ -194,9 +194,9 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def socketstats(self, ctx):
         #https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py#L413-L422
-        delta = datetime.datetime.utcnow() - self.bot.uptime
+        delta = datetime.datetime.utcnow() - self.bot.launch_time
         minutes = delta.total_seconds() / 60
-        total = sum(self.bot.socket_stats.values())
+        total = len(self.bot.socket_stats)
         cpm = total / minutes
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.description = (f'{total} socket events observed ({cpm:.2f}/minute):\n```{self.bot.socket_stats}```')
