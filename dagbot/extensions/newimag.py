@@ -99,7 +99,7 @@ class Image(commands.Cog):
             embed.set_image(url=y)
             return await ctx.send(embed=embed)
     @commands.command(cooldown_after_parsing=True)
-    async def ascii(
+    async def asciiimage(
         self, ctx, *, source=None
     ):
         image_url = await ImageConverter().convert(ctx, source)
