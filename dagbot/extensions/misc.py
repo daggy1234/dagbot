@@ -35,7 +35,7 @@ def linecount():
     )
 
 
-class misc(commands.Cog):
+class Misc(commands.Cog):
     """An assorted bag of ever changing commands """
 
     def __init__(self, bot):
@@ -457,4 +457,4 @@ class misc(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(misc(bot))
+    bot.add_cog(Misc(bot))

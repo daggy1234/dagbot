@@ -4,21 +4,16 @@ import time
 from ipaddress import IPv4Address, IPv6Address
 from random import getrandbits
 
-import aiohttp
 import discord
 import sr_api
 from bs4 import BeautifulSoup
 from discord.ext import commands, menus
 from PyDictionary import PyDictionary
-from utils.converters import BetterMemberConverter
+from utils.converters import BetterUserConverter
 
 dictionary = PyDictionary()
 
 client = sr_api.Client()
-
-
-def setup(client):
-    client.add_cog(fun(client))
 
 
 class MyMenugif(menus.Menu):
@@ -70,7 +65,7 @@ class MyMenugif(menus.Menu):
         self.stop()
 
 
-class fun(commands.Cog):
+class Fun(commands.Cog):
     """Funniest stuff you will ever see"""
 
     def __init__(self, client):
@@ -94,7 +89,7 @@ class fun(commands.Cog):
 
     async def getinpir(self):
         r = await self.client.session.get('https://inspirobot.me/api?generate=true')
-        text = await r.text()
+        text = await r.Text()
         return text
 
     async def get_giffy(self, query):
@@ -134,7 +129,7 @@ class fun(commands.Cog):
         y = random.randint(1, 2325)
         url = f"https://xkcd.com/{y}/"
         r = await self.client.session.get(url)
-        html = await r.text()
+        html = await r.Text()
         soup = BeautifulSoup(html, "html.parser")
         res = soup.find("div", id="comic")
         title = res.img["title"]

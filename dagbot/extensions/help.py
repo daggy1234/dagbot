@@ -4,10 +4,10 @@ from contextlib import suppress
 import data.textdata as data
 import discord
 from async_timeout import timeout
-from discord.ext import commands, menus
+from discord.ext import commands
 
 
-class Dagbothelp(commands.HelpCommand):
+class DagbotHelp(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         ctx = self.context
         guild = ctx.guild
@@ -26,7 +26,7 @@ class Dagbothelp(commands.HelpCommand):
         for record in ctx.bot.cogdata:
             if str(record["serverid"]) == str(g_id):
                 for cog, state in zip(record.keys(), record.values()):
-                    if cog != 'serverid' and state == True:
+                    if cog != 'serverid' and state is True:
                         cog_list.append(cog)
                         em = data.emojilist[cog]
                         cog_moji.append(em)
@@ -60,7 +60,6 @@ class Dagbothelp(commands.HelpCommand):
                                 icon_url=ctx.author.avatar_url,
                                 name="Dagot Help Command")
                             await msg.edit(embed=embd)
-
         except BaseException:
             return
 
@@ -79,13 +78,12 @@ class Dagbothelp(commands.HelpCommand):
         if len(cog_commands) == 0:
             return await ctx.send("This cog doesn't have any commands for some reason.")
         # command.clean_params
-        pre = "."
         print('preprocess')
+
         if cog.qualified_name == "image":
             addi = "TRY THEM AND SEE, CANNOT EXPLAIN\n Please note `source` means you can attach an image, provide a url or mention someone\n `user` only accepts a member"
         elif cog.qualified_name == "animals":
             addi = "Self explanatory get facts or images! \n Try them and see"
-
         else:
             addi = ""
 
@@ -227,11 +225,11 @@ class Dagbothelp(commands.HelpCommand):
         return await ctx.send(embed=embed)
 
 
-class help(commands.Cog):
+class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._original_help_command = bot.help_command
-        bot.help_command = Dagbothelp()
+        bot.help_command = DagbotHelp()
         bot.help_command.cog = self
 
     @commands.command()
@@ -240,4 +238,4 @@ class help(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(help(bot))
+    bot.add_cog(Help(bot))

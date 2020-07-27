@@ -28,6 +28,7 @@ async def get_prefix(bot, message):
 
 
 class Dagbot(commands.AutoShardedBot):
+
     def __init__(self):
         super().__init__(
             command_prefix=get_prefix,
@@ -35,55 +36,59 @@ class Dagbot(commands.AutoShardedBot):
             case_insensitive=True,
             allowed_mentions=discord.AllowedMentions(
                 roles=False,
-                everyone=False))
+                everyone=False)
+        )
+
         with open('./dagbot/data/credentials.yml', 'r') as file:
             self.data = yaml.load(file, Loader=yaml.FullLoader)
+
+        self.launch_time = None
+        self.session = None
+        self.pg_con = None
+
         self.caching = caching(self)
         self.dagpi = Client(self.data['dagpitoken'])
         self.bwordchecker = bword()
         self.bwordchecker.loadbword()
         self.useage = {}
         self.commands_called = 0
+
         # self.add_cog(Help(bot))
+
         self.load_extension("jishaku")
+
         extensions = [
-            "text",
-            "fun",
-            "newimag",
-            "reddit",
-            "games",
-            "util",
-            "whysomart",
-            "animals",
-            "memes",
-            "tags",
-            "misc",
-            "settings",
-            "ai",
-            "events",
-            "errors",
-            "developer",
-            "help"
+            "text", "fun", "newimag",
+            "reddit", "games", "util",
+            "whysomart", "animals", "memes",
+            "tags", "misc", "settings",
+            "ai", "events", "errors",
+            "developer", "help"
         ]
         for extension in extensions:
             try:
                 self.load_extension(f"extensions.{extension}")
+                print(f"loaded extension {extension}")
             except Exception as error:
                 print(f"{extension} cannot be loaded due to {error}")
-            else:
-                print(f"loaded extension {extension}")
+
         self.before_invoke(self.starttyping)
         self.after_invoke(self.exittyping)
         self.loop.create_task(self.startdagbot())
+
         self.sentry = sentry_sdk.init(
-            dsn=self.data['sentryurl'], integrations=[
-                AioHttpIntegration()])
+            dsn=self.data['sentryurl'],
+            integrations=[AioHttpIntegration()]
+        )
+
         self.run(self.data['token'])
 
     async def startdagbot(self):
         await self.makesession()
         await self.dbconnect()
+
         self.launch_time = datetime.utcnow()
+
         await self.caching.prefixcache()
         await self.get_cog("reddit").memecache()
         await self.caching.cogcache()

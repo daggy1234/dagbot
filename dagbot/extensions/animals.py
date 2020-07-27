@@ -17,7 +17,6 @@
 """
 import random
 
-import aiohttp
 import discord
 import sr_api
 from discord.ext import commands
@@ -25,11 +24,7 @@ from discord.ext import commands
 client = sr_api.Client()
 
 
-def setup(client):
-    client.add_cog(animals(client))
-
-
-class animals(commands.Cog):
+class Animals(commands.Cog):
     """Animal facts and images"""
 
     def __init__(self, client):
@@ -68,7 +63,8 @@ class animals(commands.Cog):
         link = await self.get_cat()
         embed = discord.Embed(
             title="DAGBOT -  Cat Pictures",
-            color=guild.me.color)
+            color=guild.me.color
+        )
         embed.set_image(url=link)
         return await ctx.send(embed=embed)
 
@@ -79,7 +75,8 @@ class animals(commands.Cog):
         link = await self.get_dog()
         embed = discord.Embed(
             title="DAGBOT - Dog Pictures",
-            color=guild.me.color)
+            color=guild.me.color
+        )
         embed.set_image(url=link)
         return await ctx.send(embed=embed)
 
@@ -95,7 +92,6 @@ class animals(commands.Cog):
     async def fox(self, ctx):
         await ctx.trigger_typing()
         y = await client.get_image("fox")
-
         embed = discord.Embed(title="Cute Fox!", color=ctx.guild.me.color)
         embed.set_image(url=y.url)
         return await ctx.send(embed=embed)
@@ -268,3 +264,7 @@ class animals(commands.Cog):
             title="Giraffe Fact!", description=fact, color=guild.me.color
         )
         return await ctx.send(embed=embed)
+
+
+def setup(client):
+    client.add_cog(Animals(client))

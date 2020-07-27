@@ -3,14 +3,12 @@ import json
 import os
 import random
 
-import aiohttp
 import discord
-import humanize
 import matplotlib.pyplot as plt
 from discord.ext import commands, tasks
 
 
-class reddit(commands.Cog):
+class Reddit(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.memcache.start()
@@ -364,4 +362,4 @@ class reddit(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(reddit(client))
+    client.add_cog(Reddit(client))

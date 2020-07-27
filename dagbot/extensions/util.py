@@ -1,7 +1,5 @@
 import random
-import time
 
-import aiohttp
 import async_cse
 import discord
 from bs4 import BeautifulSoup
@@ -190,7 +188,7 @@ class util(commands.Cog):
         file = await response.read()
         soup = BeautifulSoup(file, "html.parser")
         ll = []
-        head = str(soup.body.find("h1", attrs={"class": "light"}).text)
+        head = str(soup.body.find("h1", attrs={"class": "light"}).Text)
         for link in soup.find_all("a"):
             ll.append(link.get("href"))
         perma = f"http://taco-randomizer.herokuapp.com{str(ll[1])}"

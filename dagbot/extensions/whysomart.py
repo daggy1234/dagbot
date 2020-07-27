@@ -13,7 +13,7 @@ dictionary = PyDictionary()
 
 
 def setup(client):
-    client.add_cog(smart(client))
+    client.add_cog(Smart(client))
 
 
 # return(resp['yodish'])
@@ -38,7 +38,7 @@ def setup(client):
 #             soup = BeautifulSoup(html,'html.parser')
 #             y = (soup.find('return').text)
 #             return(y)
-class smart(commands.Cog):
+class Smart(commands.Cog):
     """Nerd commands (be proud)"""
 
     def __init__(self, client):
@@ -100,8 +100,8 @@ class smart(commands.Cog):
 
         soupa = BeautifulSoup(head, "html.parser")
         for info in soupa.find_all("h3"):
-            evoidlist.append(info.find("span").text)
-            evoname.append(info.text)
+            evoidlist.append(info.find("span").Text)
+            evoname.append(info.Text)
         for link in soupa.find_all("img"):
             evoimg.append(link.get("src"))
         for i in range(0, len(evoname)):
@@ -130,7 +130,7 @@ class smart(commands.Cog):
         infobox = str(
             soup.body.find(
                 "p", attrs={
-                    "class": "version-y active"}).text)
+                    "class": "version-y active"}).Text)
         infobox = infobox.replace("\n", "")
 
         pokinfo = str(
@@ -217,8 +217,8 @@ class smart(commands.Cog):
         file = response.content
         html = await file.read()
         soup = BeautifulSoup(html, "html.parser")
-        quote = str(soup.body.find("dt", attrs={"class": "quote"}).text)
-        author = str(soup.body.find("b").text)
+        quote = str(soup.body.find("dt", attrs={"class": "quote"}).Text)
+        author = str(soup.body.find("b").Text)
         embed.add_field(
             name="QUOTE", value=("{}\n{}".format(quote, author)), inline=True
         )
@@ -422,7 +422,7 @@ hp spell <spell> : gets information about spell    `"""
         guild = message.guild
         url = "https://www.kickassfacts.com/random-facts/"
         r = await self.client.session.get(url)
-        html = await r.text()
+        html = await r.Text()
         fact = []
         factlink = []
         soup = BeautifulSoup(html, "html.parser")
@@ -462,7 +462,7 @@ hp spell <spell> : gets information about spell    `"""
             title="DAGBOT - NUMBER FACT",
             color=guild.me.color)
         response = await self.client.session.get(url)
-        fact = await response.text()
+        fact = await response.Text()
         embed.add_field(name="NUMBER FACT", value=fact, inline=True)
         await channel.send(embed=embed)
 
@@ -475,7 +475,7 @@ hp spell <spell> : gets information about spell    `"""
         )
         url = "http://numbersapi.com/{}/math".format(num)
         response = await self.client.session.get(url)
-        fact = await response.text()
+        fact = await response.Text()
         embed.add_field(name="NUMBER", value=str(num), inline=True)
         embed.add_field(name="NUMBER FACT", value=fact, inline=False)
         await channel.send(embed=embed)

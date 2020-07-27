@@ -1,10 +1,8 @@
 import asyncio
 import json
-import os
 import random
 from datetime import datetime
 
-import aiohttp
 import discord
 from async_timeout import timeout
 from bs4 import BeautifulSoup
@@ -13,7 +11,8 @@ from random_word import RandomWords
 from utils.converters import BetterMemberConverter
 
 
-class tictacktoe:
+class TicTacToe:
+
     def __init__(self):
         self.gamegrid = None
         self.consideredmoves = []
@@ -83,17 +82,17 @@ class tictacktoe:
     async def checkcorners(self):
         r = await self.checkempty(0, 0)
         if r:
-            return(0, 0)
+            return 0, 0
         r = await self.checkempty(0, 2)
         if r:
-            return(0, 2)
+            return 0, 2
         r = await self.checkempty(2, 0)
         if r:
-            return(2, 0)
+            return 2, 0
         r = await self.checkempty(2, 2)
         if r:
-            return(2, 2)
-        return(False)
+            return 2, 2
+        return False
 
     async def converter(self, play):
         d = {'a': 0, 'b': 1, 'c': 2}
@@ -102,32 +101,32 @@ class tictacktoe:
                 nu = int(d[play[0]])
                 print(nu)
             except BaseException:
-                return(False)
+                return False
             else:
                 try:
                     nut = int(play[1]) - 1
                 except BaseException:
-                    return(False)
+                    return False
                 else:
-                    return(nu, nut)
+                    return nu, nut
 
     async def restchec(self):
         print('Option 3')
         r = await self.checkempty(1, 1)
         if r:
-            return(1, 1)
+            return 1, 1
         r = await self.checkempty(0, 1)
         if r:
-            return(0, 1)
+            return 0, 1
         r = await self.checkempty(1, 0)
         if r:
-            return(1, 0)
+            return 1, 0
         r = await self.checkempty(1, 2)
         if r:
-            return(1, 2)
+            return 1, 2
         r = await self.checkempty(2, 1)
         if r:
-            return(2, 1)
+            return 2, 1
 
     async def aigamemove(self, turns, playermoves):
         print(turns)
@@ -150,7 +149,7 @@ class tictacktoe:
                         self.consideredmoves.append(e)
                         print(out)
                         self.oppmove += 1
-                        return(out)
+                        return out
 
         for i in range(0, 3):
             for j in range(0, 3):
@@ -160,7 +159,7 @@ class tictacktoe:
                     re = await self.gamecheck(dupgrid)
                     if re[0] == True and re[1] == 2:
                         print('Option 1')
-                        return(i, j)
+                        return i, j
                         break
                     else:
                         dupgrid[i][j] = 0
@@ -175,7 +174,7 @@ class tictacktoe:
                     re = await self.gamecheck(dupgrid)
                     if re[0] == True and re[1] == 1:
                         print('Option 2')
-                        return(k, l)
+                        return k, l
                         break
                     else:
                         dupgrid[k][l] = 0
@@ -186,10 +185,10 @@ class tictacktoe:
         if out == False:
             out = await self.restchec()
             print('opyion 4')
-            return(out)
+            return out
         else:
             print('op 3')
-            return(out)
+            return out
 
     async def gamegridprinter(self):
         grid = await self.sharegamegrid()
@@ -214,9 +213,9 @@ class tictacktoe:
 
     async def checkempty(self, nu, nut):
         if self.gamegrid[nu][nut] == 0:
-            return(True)
+            return True
         else:
-            return(False)
+            return False
 
 
 hangmanassest = [
@@ -304,7 +303,7 @@ hangmanassest = [
 
 
 def setup(bot):
-    bot.add_cog(games(bot))
+    bot.add_cog(Games(bot))
 
 
 class Mymenumcq(menus.Menu):
@@ -496,7 +495,7 @@ class Mymenuhead(menus.Menu):
         return self.result
 
 
-class menurps(menus.Menu):
+class MenuRPS(menus.Menu):
     def __init__(self, ai):
         super().__init__()
         self.ai = ai
@@ -567,7 +566,7 @@ class menurps(menus.Menu):
             self.stop()
 
     @menus.button("\U00002702")
-    async def Scissors(self, payload):
+    async def scissors(self, payload):
         guild = self.message.guild
         if self.ai == 1:
             embed = discord.Embed(
@@ -600,7 +599,7 @@ class menurps(menus.Menu):
 # \U0000270a = rock    = 1
 
 
-class games(commands.Cog):
+class Games(commands.Cog):
     """Lets all play a game (everyone can)"""
 
     def __init__(self, bot):
@@ -655,17 +654,17 @@ class games(commands.Cog):
 
     async def geteither(self):
         y = await self.bot.session.get('http://either.io/')
-        html = await y.text()
+        html = await y.Text()
         soup = BeautifulSoup(html, 'html.parser')
         l = (soup.findAll('span', attrs={'class': 'option-text'}))
-        op1 = l[0].text
-        op2 = l[1].text
+        op1 = l[0].Text
+        op2 = l[1].Text
         perlist = (soup.findAll('div', attrs={'class': 'percentage'}))
         numlist = (soup.findAll('div', attrs={'class': 'total-votes'}))
-        v1 = numlist[0].span.text
-        v2 = numlist[1].span.text
-        p1 = perlist[0].span.text
-        p2 = perlist[1].span.text
+        v1 = numlist[0].span.Text
+        v2 = numlist[1].span.Text
+        p1 = perlist[0].span.Text
+        p2 = perlist[1].span.Text
         toretdict = {
             'choice1': op1,
             'votes1': v1,
@@ -678,26 +677,26 @@ class games(commands.Cog):
     async def get_all_movies(self):
         url = "https://www.randomlists.com/data/movies.json"
         resp = await self.bot.session.get(url)
-        return json.loads(await resp.text())["RandL"]["items"]
+        return json.loads(await resp.Text())["RandL"]["items"]
 
     async def get_all_thing(self):
         url = "https://www.randomlists.com/data/things.json"
         resp = await self.bot.session.get(url)
-        return json.loads(await resp.text())["RandL"]["items"]
+        return json.loads(await resp.Text())["RandL"]["items"]
 
     async def get_all_animal(self):
         url = "https://www.randomlists.com/data/animals.json"
         resp = await self.bot.session.get(url)
-        return json.loads(await resp.text())["RandL"]["items"]
+        return json.loads(await resp.Text())["RandL"]["items"]
 
     async def getsent(self):
         url = "https://www.randomwordgenerator.org/Random/sentence_generator"
         r = await self.bot.session.get(url)
-        html = await r.text()
+        html = await r.Text()
         # html = (y.text)
         soup = BeautifulSoup(html, "html.parser")
         l = soup.findAll("b")
-        t = l[2].text
+        t = l[2].Text
         st = t.strip("1.     ")
         st = st.strip()
         return st
@@ -733,7 +732,7 @@ class games(commands.Cog):
     @commands.max_concurrency(3, commands.BucketType.channel)
     async def rps(self, ctx):
         ai = random.randint(1, 3)
-        game = menurps(ai)
+        game = MenuRPS(ai)
         await game.start(ctx)
 
     @commands.command(cooldown_after_parsing=True, aliases=["RR"])
@@ -1440,7 +1439,7 @@ class games(commands.Cog):
         def gamecheck(message):
             return message.author == ctx.author and message.channel == ctx.channel and len(
                 message.content) == 2
-        game = tictacktoe()
+        game = TicTacToe()
         await game.makegamegrid()
         playermoves = []
         ai = 0
@@ -1534,7 +1533,7 @@ class games(commands.Cog):
             return await ctx.send('sorry no one wants to play with you. Maybe play with me? `ttt ai`')
         print('game start')
         mlsit.append(user)
-        game = tictacktoe()
+        game = TicTacToe()
         playermoves = []
         await game.makegamegrid()
         embed = discord.Embed(
