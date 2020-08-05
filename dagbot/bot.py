@@ -78,7 +78,8 @@ class Dagbot(commands.AutoShardedBot):
         self.socket_stats = {}
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
-            integrations=[AioHttpIntegration()]
+            integrations=[AioHttpIntegration()],
+            release="dagbot@1.1.0"
         )
 
         self.run(self.data['token'])
