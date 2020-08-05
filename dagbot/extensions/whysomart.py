@@ -104,27 +104,31 @@ class smart(commands.Cog):
             evoname.append(info.Text)
         for link in soupa.find_all("img"):
             evoimg.append(link.get("src"))
-        for i in range(0, len(evoname)):
-            _id = evoidlist[i]
-            name = evoname[i]
-            fid = _id.replace(" ", "")
-            fid = fid.replace("\n", "")
-            fname = name.replace(" ", "")
-            fname = fname.replace("\n", "")
-            fname = fname.replace("#", "")
-            fname = fname.replace("1", "")
-            fname = fname.replace("3", "")
-            fname = fname.replace("2", "")
-            fname = fname.replace("4", "")
-            fname = fname.replace("5", "")
-            fname = fname.replace("6", "")
-            fname = fname.replace("7", "")
-            fname = fname.replace("8", "")
-            fname = fname.replace("9", "")
-            fname = fname.replace("0", "")
-            evoidf.append(fid)
-            evonamef.append(fname)
-            i += 1
+        try:
+            for i in range(0, len(evoname)):
+                _id = evoidlist[i]
+                name = evoname[i]
+                fid = _id.replace(" ", "")
+                fid = fid.replace("\n", "")
+                fname = name.replace(" ", "")
+                fname = fname.replace("\n", "")
+                fname = fname.replace("#", "")
+                fname = fname.replace("1", "")
+                fname = fname.replace("3", "")
+                fname = fname.replace("2", "")
+                fname = fname.replace("4", "")
+                fname = fname.replace("5", "")
+                fname = fname.replace("6", "")
+                fname = fname.replace("7", "")
+                fname = fname.replace("8", "")
+                fname = fname.replace("9", "")
+                fname = fname.replace("0", "")
+                evoidf.append(fid)
+                evonamef.append(fname)
+                i += 1
+        except:
+            evoidf=['Error']
+            evonamef=['Error']
         header = []
         datafact = []
         infobox = str(

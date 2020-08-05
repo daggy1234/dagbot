@@ -83,6 +83,15 @@ class Dagbot(commands.AutoShardedBot):
 
         self.run(self.data['token'])
 
+    async def process_commands(self,message):
+        if message.author.bot and message.guild.id != 491175207122370581:
+            return
+
+        ctx = await self.get_context(message)
+        await self.invoke(ctx)
+
+    
+
     async def startdagbot(self):
         await self.makesession()
         await self.dbconnect()

@@ -9,7 +9,7 @@ import sr_api
 from bs4 import BeautifulSoup
 from discord.ext import commands, menus
 from PyDictionary import PyDictionary
-from utils.converters import BetterMemberConverter
+
 
 dictionary = PyDictionary()
 
@@ -208,21 +208,21 @@ class fun(commands.Cog):
         else:
             return await ctx.send("Unknown Error")
 
-    @commands.command(cooldown_after_parsing=True)
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    async def yomama(self, message):
-        channel = message.channel
-        guild = message.guild
-        response = await self.client.session.get("https://api.yomomma.info/")
-        yomama = await response.json(content_type=None)
-        embed = discord.Embed(title="DAGBOT - YOMAMA", color=guild.me.color)
-        embed.add_field(
-            name="yomama",
-            value=(
-                "{}".format(
-                    yomama["joke"])),
-            inline=True)
-        await channel.send(embed=embed)
+    # @commands.command(cooldown_after_parsing=True)
+    # @commands.cooldown(1, 3, commands.BucketType.user)
+    # async def yomama(self, message):
+    #     channel = message.channel
+    #     guild = message.guild
+    #     response = await self.client.session.get("https://api.yomomma.info/")
+    #     yomama = await response.json(content_type=None)
+    #     embed = discord.Embed(title="DAGBOT - YOMAMA", color=guild.me.color)
+    #     embed.add_field(
+    #         name="yomama",
+    #         value=(
+    #             "{}".format(
+    #                 yomama["joke"])),
+    #         inline=True)
+    #     await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     async def randam(self, ctx):
@@ -324,8 +324,8 @@ class fun(commands.Cog):
             "x-rapidapi-key": self.client.data['rapidapi'],
         }
 
-        response = requests.request("GET", url, headers=headers)
-        jokelist = response.json()
+        response = await self.client.session.get(url, headers=headers)
+        jokelist = await response.json()
         joke = jokelist["content"]
         embed.add_field(name="JOKE", value=joke, inline=True)
         await channel.send(embed=embed)
@@ -386,8 +386,7 @@ class fun(commands.Cog):
             await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
-    async def hug(self, ctx, user=None):
-        user = await BetterUserConverter().convert(ctx, user)
+    async def hug(self, ctx, user: discord.Member):
         channel = ctx.channel
         guild = ctx.guild
         send = ctx.author.display_name

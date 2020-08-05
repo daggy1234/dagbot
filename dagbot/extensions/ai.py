@@ -135,7 +135,7 @@ class ai(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def caption(self, ctx, *, source=None):
-        image_url = await ImageConverter.convert(ctx, source)
+        image_url = await ImageConverter().convert(ctx, source)
         f = await self.captioni(image_url)
         if not f:
             return await ctx.send("No results as of now. Shit be wonky")
@@ -157,7 +157,7 @@ class ai(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 20, commands.BucketType.user)
     async def ocr(self, ctx, *, source=None):
-        image_url = await ImageConverter.convert(ctx, source)
+        image_url = await ImageConverter().convert(ctx, source)
         f = await self.ocra(image_url)
         if not f:
             return await ctx.send("No results rn")
@@ -173,7 +173,7 @@ class ai(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def label(self, ctx, *, source=None):
-        image_url = await ImageConverter.convert(ctx, source)
+        image_url = await ImageConverter().convert(ctx, source)
         y = await self.labela(image_url)
         if not y:
             return await ctx.send("No results as of now. Shit be wonky")

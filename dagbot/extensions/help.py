@@ -46,12 +46,12 @@ class DagbotHelp(commands.HelpCommand):
                     try:
                         reaction, user = await ctx.bot.wait_for('reaction_add', check=lambda reaction, user: str(reaction) in emoji_list and reaction.message.channel == ctx.channel and not user.bot, timeout=20)
                     except asyncio.TimeoutError:
-                        print('timeout')
+                        
                         continue
                     else:
-                        print(str(reaction))
+                        
                         ind = emoji_list.index(str(reaction))
-                        print(ind)
+                        
                         cog = cog_list[ind]
                         if cog == 'help':
                             await msg.edit(embed=embed)
@@ -69,7 +69,6 @@ class DagbotHelp(commands.HelpCommand):
             return
 
     async def cog_help_maker(self, cog, ctx):
-        print('making help')
         sp = 15
         guild = ctx.guild
         g_id = guild.id
@@ -77,13 +76,13 @@ class DagbotHelp(commands.HelpCommand):
             if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
-        print('prefix ready')
+        
         cog_commands = cog.get_commands()
         cmlist = ""
         if len(cog_commands) == 0:
             return await ctx.send("This cog doesn't have any commands for some reason.")
         # command.clean_params
-        print('preprocess')
+        
 
         if cog.qualified_name == "image":
             addi = "TRY THEM AND SEE, CANNOT EXPLAIN\n Please note `source` means you can attach an image, provide a url or mention someone\n `user` only accepts a member"
@@ -95,7 +94,7 @@ class DagbotHelp(commands.HelpCommand):
         embed = discord.Embed(
             color=ctx.guild.me.color, title=f"{cog.qualified_name} help\n{addi}",
         )
-        print('initial embed')
+        
         if cog.qualified_name == "settings":
             tmstr = 10
         elif cog.qualified_name == "memes":
@@ -134,7 +133,7 @@ class DagbotHelp(commands.HelpCommand):
         embed.set_footer(
             text=f"🞵 means that the command listed is a Group. Use {prefix}help <group> for help with its subcommands."
         )
-        print('ready embed')
+        
         return embed
 
     async def send_cog_help(self, cog):

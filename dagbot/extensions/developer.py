@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import os
+from discord.ext import menus
+from tabulate import tabulate
 import traceback
 import datetime
 from discord import Webhook,AsyncWebhookAdapter
@@ -23,6 +25,17 @@ import aiohttp
 import discord
 from discord.ext import commands
 
+class TabulateData(menus.ListPageSource):
+    def __init__(self, data,headers,title):
+        super().__init__(data, per_page=7)
+        self.title = title
+        self.headers = headers
+    async def format_page(self, menu, entries):
+        headers = self.headers
+        embed = discord.Embed(title=self.title)
+        tab = tabulate(entries,headers,tablefmt="fancy_grid")
+        embed.description =  f"```{tab}\n```"
+        return embed
 
 class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
@@ -35,11 +48,6 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         await self.bot.session.close()
         await self.bot.pg_con.close()
         await ctx.send('Shutting Down Now <a:catroll:720695153601282068>')
-        async with aiohttp.ClientSession() as session:
-            webhook = Webhook.from_url(
-                'https://discordapp.com/api/webhooks/727546679439654953/H05HMXP7FyKrGz4YmhnI-8W_6L7jSzkqzpCsoWVDqxLi9VmKJf1WiKIbn8tOnGhI7imt',
-                adapter=AsyncWebhookAdapter(session))
-            await webhook.send('Dagbot is down')
         await self.bot.logout()
 
     @commands.command()
@@ -200,14 +208,22 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         minutes = delta.total_seconds() / 60
         total = len(self.bot.socket_stats)
         cpm = total / minutes
-        embed = discord.Embed(color=ctx.guild.me.color)
-        embed.description = (f'{total} socket events observed ({cpm:.2f}/minute):\n```{self.bot.socket_stats}```')
-        await ctx.send(embed=embed)
+        
+        tit = (f'Socket Stats ,{total} socket events observed ({cpm:.2f}/minute)')
+        useage = {key: value for key, value in sorted(self.bot.socket_stats.items(), key=lambda item: item[1],reverse=True)}
+        fl = []
+        for key,val in zip(useage.keys(),useage.values()):
+            fl.append([key,val])
+        pages = menus.MenuPages(source=TabulateData(fl,['Event','Occurences'],tit), clear_reactions_after=True)
+        return await pages.start(ctx)
     @commands.command(hidden=True)
     @commands.is_owner()
     async def command_stats(self,ctx):
-        embed = discord.Embed(color=ctx.guild.me.color)
-        embed.description = f"A total of {self.bot.commands_called} commands!\n```{self.bot.useage}```"
-        await ctx.send(embed=embed)
+        useage = {key: value for key, value in sorted(self.bot.useage.items(), key=lambda item: item[1],reverse=True)}
+        fl = []
+        for key,val in zip(useage.keys(),useage.values()):
+            fl.append([key,val])
+        pages = menus.MenuPages(source=TabulateData(fl,['commands','useage'],f'Command Stats, {self.bot.commands_called}'), clear_reactions_after=True)
+        return await pages.start(ctx)
 def setup(bot):
     bot.add_cog(Developer(bot))

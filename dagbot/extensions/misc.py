@@ -154,7 +154,7 @@ class misc(commands.Cog):
             boostcount = boosts
             
         bfrac = int((boostcount / 30) * 25)
-        bar = f"{boosts} | {filstr * bfrac}{blankchar * (25-bfrac)} | 30"
+        bar = f"{boosts} | `{filstr * bfrac}{blankchar * (25-bfrac)}` | 30"
         
         embed.add_field(
             name="Channels",

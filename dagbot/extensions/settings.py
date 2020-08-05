@@ -80,9 +80,12 @@ class settings(commands.Cog):
                 break
         return await ctx.send("Current Command Prefix is: ```{}```".format(prefix))
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True,aliases=['cogs'])
     async def cog(self, ctx):
-        return await ctx.send("Please use cog help to get started!")
+        embed = discord.Embed(title="List Of cogs",color=ctx.guild.me.color)
+        l = '\n'.join(_bot.coglist)
+        embed.description = l
+        return await ctx.send("Please use cog help to get started!",embed=embed)
 
     @cog.command()
     @commands.cooldown(1, 10, commands.BucketType.guild)

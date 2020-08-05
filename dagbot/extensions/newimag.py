@@ -160,40 +160,7 @@ class image(commands.Cog):
             embed.set_image(url=y)
             return await ctx.send(embed=embed)
 
-    @commands.command(cooldown_after_parsing=True)
-    async def whyareyougay(self, ctx, *, user: discord.Member):
-        await ctx.trigger_typing()
-        image_url = str(user.avatar_url_as(format="png", size=1024))
-        name = ctx.author.name
-        async with aiohttp.ClientSession() as session:
-            async with session.get(image_url) as r:
-                if r.status == 200:
-                    imgf = await aiofiles.open(f"avatar1{name}.png", mode="wb")
-                    await imgf.write(await r.read())
-                    await imgf.close()
-                del r
-        image_url = str(ctx.author.avatar_url_as(format="png", size=1024))
-        async with aiohttp.ClientSession() as session:
-            async with session.get(image_url) as r:
-                if r.status == 200:
-                    imgf = await aiofiles.open(f"avatar2{name}.png", mode="wb")
-                    await imgf.write(await r.read())
-                    await imgf.close()
-                del r
-        im = Image.open("whyareyougay.png")
-        av = Image.open(f"avatar1{name}.png")
-        gay = Image.open(f"avatar2{name}.png")
-        mp = av.resize((150, 150), 0)
-        op = gay.resize((150, 150), 0)
-        os.remove(f"avatar2{name}.png")
-        os.remove(f"avatar1{name}.png")
-        im.paste(op, (550, 100))
-        im.paste(mp, (100, 125))
-        im.save(f"manipg{name}.png")
-        return await ctx.send(
-            file=discord.File(f"manipg{name}.png", filename="whyareyougay.png")
-        )
-        os.remove(f"manipg{name}.png")
+   
 
     @commands.command(cooldown_after_parsing=True)
     async def invert(

@@ -67,7 +67,7 @@ class reddit(commands.Cog):
         memelist = r["data"]["children"]
         for meme in memelist:
             data = meme["data"]
-            if data["over_18"] == True:
+            if data["over_18"] == True or data['stickied']:
                 continue
             else:
                 auth = "u/" + data["author"]
@@ -75,7 +75,10 @@ class reddit(commands.Cog):
                 if data["is_reddit_media_domain"] == True:
                     purl = data["url"]
                 elif data["domain"] == "i.imgur.com":
-                    purl = data["url"].replace(".gifv", ".gif")
+                    if data['url'].endswith('.gifv'):
+                        purl = data["url"].replace(".gifv", ".gif")
+                    else:
+                        purl = data['url'] + '.gif'
                 else:
                     purl = data["url"]
                 title = data["title"]

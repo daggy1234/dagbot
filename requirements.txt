@@ -6,6 +6,7 @@ async_cleverbot
 async-timeout==3.0.1
 random_word
 jishaku
+tabulate
 beautifulsoup4==4.8.2
 asyncpg
 validator_collection

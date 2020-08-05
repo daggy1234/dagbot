@@ -106,7 +106,7 @@ class memes(commands.Cog):
         else:
             st = query.split(":")
             tosearch = st[0].lower()
-            with open("imgfliptemplates.json") as file:
+            with open("./dagbot/data/templates.json") as file:
                 f = json.load(file)
                 timplist = []
                 li = f["data"]["memes"]
@@ -187,7 +187,7 @@ class memes(commands.Cog):
                     )
             else:
                 source = msg.content
-                val_stat = await URLValidator().validate(source)
+                val_stat = await UrlValidator().validate(source)
                 if val_stat:
                     image_url = str(source)
                 else:
@@ -286,7 +286,7 @@ class memes(commands.Cog):
                     )
             else:
                 source = msg.content
-                val_stat = await URLValidator().validate(source)
+                val_stat = await UrlValidator().validate(source)
                 if val_stat:
                     image_url = str(source)
                 else:
