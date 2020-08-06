@@ -1,6 +1,6 @@
 import json
 from io import BytesIO
-
+import asyncio
 import discord
 from discord.ext import commands, menus
 from utils.converters import BetterMemberConverter, UrlValidator
@@ -106,7 +106,7 @@ class memes(commands.Cog):
         else:
             st = query.split(":")
             tosearch = st[0].lower()
-            with open("./dagbot/data/templates.json") as file:
+            with open("./dagbot/data/imgfliptemplates.json") as file:
                 f = json.load(file)
                 timplist = []
                 li = f["data"]["memes"]
@@ -174,7 +174,7 @@ class memes(commands.Cog):
             )
         else:
             try:
-                image_url = await BetterUserConverter().convert(ctx, message.content).avatar_url(static_format='png', size='1024')
+                image_url = await BetterMemberConverter().convert(ctx, message.content).avatar_url(static_format='png', size='1024')
             except BaseException:
                 pass
             if len(msg.attachments) != 0:
@@ -273,7 +273,7 @@ class memes(commands.Cog):
             )
         else:
             try:
-                image_url = await BetterUserConverter().convert(ctx, message.content).avatar_url(static_format='png', size='1024')
+                image_url = await BetterMemberConverter().convert(ctx, message.content).avatar_url(static_format='png', size='1024')
             except BaseException:
                 pass
             if len(msg.attachments) != 0:

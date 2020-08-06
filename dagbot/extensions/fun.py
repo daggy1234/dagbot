@@ -143,6 +143,7 @@ class fun(commands.Cog):
         end = time.perf_counter()
         duration = (end - start) * 1000
         client_lat = round((self.client.latency * 1000), 2)
+        await asyncio.sleep(2)
         await message.edit(content="I'm Weak\n```diff\nPONG!\n- Client: {} ms\n+ Websocket: {:.2f}\n```".format(client_lat, duration))
 
     @commands.command(cooldown_after_parsing=True)

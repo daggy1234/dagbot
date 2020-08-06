@@ -23,4 +23,4 @@ sentry-sdk
 cryptography
 git+https://github.com/Rapptz/discord-ext-menus
 git+https://github.com/Rapptz/discord.py
-asyncdagpi==2.3.0
+asyncdagpi

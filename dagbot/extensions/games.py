@@ -718,8 +718,8 @@ class games(commands.Cog):
         )
         y = random.randint(0, 3)
         list_.insert(y, ca)
-        for c in range(0, len(list)):
-            des = des + "\n" + chr(ord("\U0001f1e6") + c) + ": " + list[c]
+        for c in range(0, len(list_)):
+            des = des + "\n" + chr(ord("\U0001f1e6") + c) + ": " + list_[c]
             c += 1
         q = q.replace("&quot;", "`")
         q = q.replace("&#039;", "'")

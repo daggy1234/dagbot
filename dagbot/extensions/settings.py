@@ -83,7 +83,7 @@ class settings(commands.Cog):
     @commands.group(invoke_without_command=True,aliases=['cogs'])
     async def cog(self, ctx):
         embed = discord.Embed(title="List Of cogs",color=ctx.guild.me.color)
-        l = '\n'.join(_bot.coglist)
+        l = '\n'.join(bot.coglist)
         embed.description = l
         return await ctx.send("Please use cog help to get started!",embed=embed)
 
