@@ -2,6 +2,7 @@ import json
 from io import BytesIO
 import asyncio
 import discord
+import asyncdagpi.exceptions as dex
 from discord.ext import commands, menus
 from utils.converters import BetterMemberConverter, UrlValidator
 
@@ -77,11 +78,11 @@ class memes(commands.Cog):
             "url": url,
             "text": text}
         respurl = await self.client.session.post(f'https://dagpi.tk/api/{feature}', headers=jsdic)
-        js = await respurl.json()
         try:
+            js = await respurl.json()
             return(js['url'])
         except BaseException:
-            raise commands.CheckFailure
+            raise dex.APIError
 
     async def cog_check(self, ctx):
         g_id = str(ctx.guild.id)
@@ -185,6 +186,8 @@ class memes(commands.Cog):
                     return await ctx.send(
                         "I was unable to use the attachment you provided"
                     )
+            elif len(msg.mentions) != 0:
+                image_url = str(msg.mentions[0].avatar_url_as(format='png',size=1024))
             else:
                 source = msg.content
                 val_stat = await UrlValidator().validate(source)
@@ -284,6 +287,8 @@ class memes(commands.Cog):
                     return await ctx.send(
                         "I was unable to use the attachment you provided"
                     )
+            elif len(msg.mentions) != 0:
+                image_url = str(msg.mentions[0].avatar_url_as(format='png',size=1024))
             else:
                 source = msg.content
                 val_stat = await UrlValidator().validate(source)

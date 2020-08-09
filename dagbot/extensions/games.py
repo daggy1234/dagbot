@@ -654,17 +654,17 @@ class games(commands.Cog):
 
     async def geteither(self):
         y = await self.bot.session.get('http://either.io/')
-        html = await y.Text()
+        html = await y.text()
         soup = BeautifulSoup(html, 'html.parser')
         l = (soup.findAll('span', attrs={'class': 'option-text'}))
-        op1 = l[0].Text
-        op2 = l[1].Text
+        op1 = l[0].text
+        op2 = l[1].text
         perlist = (soup.findAll('div', attrs={'class': 'percentage'}))
         numlist = (soup.findAll('div', attrs={'class': 'total-votes'}))
-        v1 = numlist[0].span.Text
-        v2 = numlist[1].span.Text
-        p1 = perlist[0].span.Text
-        p2 = perlist[1].span.Text
+        v1 = numlist[0].span.text
+        v2 = numlist[1].span.text
+        p1 = perlist[0].span.text
+        p2 = perlist[1].span.text
         toretdict = {
             'choice1': op1,
             'votes1': v1,
@@ -677,26 +677,26 @@ class games(commands.Cog):
     async def get_all_movies(self):
         url = "https://www.randomlists.com/data/movies.json"
         resp = await self.bot.session.get(url)
-        return json.loads(await resp.Text())["RandL"]["items"]
+        return json.loads(await resp.text())["RandL"]["items"]
 
     async def get_all_thing(self):
         url = "https://www.randomlists.com/data/things.json"
         resp = await self.bot.session.get(url)
-        return json.loads(await resp.Text())["RandL"]["items"]
+        return json.loads(await resp.text())["RandL"]["items"]
 
     async def get_all_animal(self):
         url = "https://www.randomlists.com/data/animals.json"
         resp = await self.bot.session.get(url)
-        return json.loads(await resp.Text())["RandL"]["items"]
+        return json.loads(await resp.text())["RandL"]["items"]
 
     async def getsent(self):
         url = "https://www.randomwordgenerator.org/Random/sentence_generator"
         r = await self.bot.session.get(url)
-        html = await r.Text()
+        html = await r.text()
         # html = (y.text)
         soup = BeautifulSoup(html, "html.parser")
         l = soup.findAll("b")
-        t = l[2].Text
+        t = l[2].text
         st = t.strip("1.     ")
         st = st.strip()
         return st

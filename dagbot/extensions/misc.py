@@ -264,28 +264,32 @@ class misc(commands.Cog):
             embed.add_field(name="stats", value=description, inline=False)
 
         # add badges
-        mst = ""
-        for a in user.activities:
-            if isinstance(a, discord.Spotify):
-                activity = "Listening to **Spotify**"
-            elif isinstance(a, discord.CustomActivity):
-                emoji = ""
-                if a.emoji:
-                    if a.emoji.is_custom_emoji() and ctx.bot.get_emoji(a.emoji.id) == False:
-                        emoji = "<:crosss:720924220258779227>"
-                    else:
-                        emoji = a.emoji
-                activity = f'{emoji} {a.name or ""}'
-            else:
-                try:
-                    st = str(act.type).replace('ActivityType.', '')
-                    activity = ((st + ' ' + act.name).title() + '\n')
-                except BaseException:
-                    pass
-
-            mst += activity + "\n"
-        if len(mst) != 0:
-            embed.add_field(name="Activity", value=mst, inline=False)
+        try:
+            mst = ""
+            for a in user.activities:
+                if isinstance(a, discord.Spotify):
+                    activity = "Listening to **Spotify**"
+                elif isinstance(a, discord.CustomActivity):
+                    emoji = ""
+                    if a.emoji:
+                        if a.emoji.is_custom_emoji() and ctx.bot.get_emoji(a.emoji.id) == False:
+                            emoji = "<:crosss:720924220258779227>"
+                        else:
+                            emoji = a.emoji
+                    activity = f'{emoji} {a.name or ""}'
+                else:
+                    try:
+                        st = str(act.type).replace('ActivityType.', '')
+                        activity = ((st + ' ' + act.name).title() + '\n')
+                    except:
+                        activity = ''
+                        
+                mst += activity + "\n"
+            
+            if len(mst) != 0:
+                embed.add_field(name="Activity", value=mst, inline=False)
+        except BaseException:
+            pass
         embed.set_thumbnail(url=user.avatar_url_as(static_format="png"))
         return await ctx.send(embed=embed)
 
