@@ -51,7 +51,7 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
             await self.bot.pg_con.execute(
                 """
             INSERT INTO cogpreferences
-            VALUES('$1,'y','y','y','y','y','y','y','y','y','y','y','y');""", g_id)
+            VALUES('$1','y','y','y','y','y','y','y','y','y','y','y','y');""", g_id)
             await self.bot.caching.cogcache()
         except BaseException:
             pass
@@ -86,7 +86,8 @@ You can also @Dagbot to use commands.
 The bot is modular and you can enable/disable command categories! Check `cog help` to learn more.
 For any help join our support server!
 **server**: https://discord.gg/grGkdeS
-**Website**: https://dagbot-is.the-be.st
+**Website**: https://dagbot.daggy.tech
+**Feedback**: https://dagbot.daggy.tech/feedback
 """
         try:
             await guild.system_channel.send(message)

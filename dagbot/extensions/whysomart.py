@@ -100,8 +100,8 @@ class smart(commands.Cog):
 
         soupa = BeautifulSoup(head, "html.parser")
         for info in soupa.find_all("h3"):
-            evoidlist.append(info.find("span").Text)
-            evoname.append(info.Text)
+            evoidlist.append(info.find("span").text)
+            evoname.append(info.text)
         for link in soupa.find_all("img"):
             evoimg.append(link.get("src"))
         try:
@@ -134,7 +134,7 @@ class smart(commands.Cog):
         infobox = str(
             soup.body.find(
                 "p", attrs={
-                    "class": "version-y active"}).Text)
+                    "class": "version-y active"}).text)
         infobox = infobox.replace("\n", "")
 
         pokinfo = str(
@@ -221,8 +221,8 @@ class smart(commands.Cog):
         file = response.content
         html = await file.read()
         soup = BeautifulSoup(html, "html.parser")
-        quote = str(soup.body.find("dt", attrs={"class": "quote"}).Text)
-        author = str(soup.body.find("b").Text)
+        quote = str(soup.body.find("dt", attrs={"class": "quote"}).text)
+        author = str(soup.body.find("b").text)
         embed.add_field(
             name="QUOTE", value=("{}\n{}".format(quote, author)), inline=True
         )
@@ -426,7 +426,7 @@ hp spell <spell> : gets information about spell    `"""
         guild = message.guild
         url = "https://www.kickassfacts.com/random-facts/"
         r = await self.client.session.get(url)
-        html = await r.Text()
+        html = await r.text()
         fact = []
         factlink = []
         soup = BeautifulSoup(html, "html.parser")
@@ -466,7 +466,7 @@ hp spell <spell> : gets information about spell    `"""
             title="DAGBOT - NUMBER FACT",
             color=guild.me.color)
         response = await self.client.session.get(url)
-        fact = await response.Text()
+        fact = await response.text()
         embed.add_field(name="NUMBER FACT", value=fact, inline=True)
         await channel.send(embed=embed)
 
@@ -479,7 +479,7 @@ hp spell <spell> : gets information about spell    `"""
         )
         url = "http://numbersapi.com/{}/math".format(num)
         response = await self.client.session.get(url)
-        fact = await response.Text()
+        fact = await response.text()
         embed.add_field(name="NUMBER", value=str(num), inline=True)
         embed.add_field(name="NUMBER FACT", value=fact, inline=False)
         await channel.send(embed=embed)

@@ -361,14 +361,15 @@ class misc(commands.Cog):
             return await ctx.send('We could not detect VisualStudioCode Activity')
         file_url = act.large_image_url
         file_name = act.details
-        time = humanize.naturaltime(datetime.utcnow() - act.start)
         vsclogo = act.small_image_url
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.set_author(name=user.display_name, icon_url=vsclogo)
         embed.set_thumbnail(url=file_url)
         embed.description = file_name
-        embed.add_field(name="Started", value=str(time))
-        embed.add_field(name='details', value=str(act.state))
+        if file_name != "Idling":
+            time = humanize.naturaltime(datetime.utcnow() - act.start)
+            embed.add_field(name="Started", value=str(time))
+            embed.add_field(name='details', value=str(act.state))
         return await ctx.send(embed=embed)
 
     @commands.command()
@@ -391,6 +392,15 @@ class misc(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command()
+    async def support(self, ctx):
+        embed = discord.Embed(color=ctx.guild.me.color)
+        embed.add_field(
+            name="Feedback Form", value="[Form](https://dagbot.daggy.tech/feedback)",
+
+        )
+        return await ctx.send(embed=embed)
+
+    @commands.command()
     async def about(self, ctx):
         embed = discord.Embed(
             title="About Dagbot",
@@ -403,7 +413,7 @@ class misc(commands.Cog):
                 channels += 1
         embed.add_field(
             name="Url's",
-            value="[Invite Link](https://discordapp.com/api/oauth2/authorize?client_id=675589737372975124&permissions=378944&scope=bot)\n[Support Server](https://discord.gg/grGkdeS)\n[API](https://dagpi.tk)\n[Website](https://dagbot-is.the-be.st)\n[Source](https://github.com/Daggy1234/dagbot)",
+            value="[Invite Link](https://discordapp.com/api/oauth2/authorize?client_id=675589737372975124&permissions=378944&scope=bot)\n[Support Server](https://discord.gg/grGkdeS)\n[API](https://dagpi.tk)\n[Website](https://dagbot.daggy.tech)\n[Source](https://github.com/Daggy1234/dagbot)",
         )
         embed.add_field(
             name="Stats",

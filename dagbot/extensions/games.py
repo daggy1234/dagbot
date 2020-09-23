@@ -1000,7 +1000,7 @@ class games(commands.Cog):
             elif num == 3:
                 animal = await self.get_all_animal()
                 ann = (random.sample(animal, 1))[0]
-                url = f"https://www.randomlists.com/img/animals/{ann}.jpg"
+                url = f"https://www.randomlists.com/img/animals/{ann.replace(' ','_')}.jpg"
                 wordllist = []
                 blankguesslist = []
 
@@ -1033,7 +1033,7 @@ class games(commands.Cog):
             elif num == 2:
                 thingl = await self.get_all_thing()
                 thing = (random.sample(thingl, 1))[0]
-                url = f"https://www.randomlists.com/img/things/{thing}.jpg"
+                url = f"https://www.randomlists.com/img/things/{thing.replace(' ','_')}.jpg"
                 wordllist = []
                 blankguesslist = []
 

@@ -63,7 +63,8 @@ class image(commands.Cog):
     async def tweet(self, ctx, user=None, *, text):
         if user is None:
             user = ctx.author
-        user = await BetterMemberConverter().convert(ctx, user)
+        else:
+            user = await BetterMemberConverter().convert(ctx, user)
         uname = user.display_name
         text = str(text)
         pfp = str(user.avatar_url_as(format="png", size=1024))
@@ -273,7 +274,8 @@ class image(commands.Cog):
         await ctx.trigger_typing()
         if user is None:
             user = ctx.author
-        user = await BetterMemberConverter().convert(ctx, user)
+        else:
+            user = await BetterMemberConverter().convert(ctx, user)
         url = user.avatar_url
         guy = user.display_name
         embed = discord.Embed(
