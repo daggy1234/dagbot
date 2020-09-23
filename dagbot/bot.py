@@ -73,25 +73,23 @@ class Dagbot(commands.AutoShardedBot):
                 print(f"{extension} cannot be loaded due to {error}")
 
         self.before_invoke(self.starttyping)
-        #self.after_invoke(self.exittyping)
+        # self.after_invoke(self.exittyping)
         self.loop.create_task(self.startdagbot())
         self.socket_stats = {}
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
-            release="dagbot@1.2.2"
+            release="dagbot@1.2.3"
         )
 
         self.run(self.data['token'])
 
-    async def process_commands(self,message):
+    async def process_commands(self, message):
         if message.author.bot and message.guild.id != 491175207122370581:
             return
 
         ctx = await self.get_context(message)
         await self.invoke(ctx)
-
-    
 
     async def startdagbot(self):
         await self.makesession()
@@ -105,7 +103,7 @@ class Dagbot(commands.AutoShardedBot):
         await asyncio.sleep(1)
         await self.caching.getkeydict()
         await self.get_cog("reddit").memecache()
-        
+
     async def makesession(self):
         self.session = aiohttp.ClientSession()
         print('made session')
@@ -127,8 +125,6 @@ class Dagbot(commands.AutoShardedBot):
 
     async def starttyping(self, ctx):
         await ctx.trigger_typing()
-
-    
 
     async def on_command_completion(self, ctx):
         self.commands_called += 1

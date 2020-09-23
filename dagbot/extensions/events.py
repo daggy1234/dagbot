@@ -51,7 +51,7 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
             await self.bot.pg_con.execute(
                 """
             INSERT INTO cogpreferences
-            VALUES('$1','y','y','y','y','y','y','y','y','y','y','y','y');""", str(g_id))
+            VALUES($1,'y','y','y','y','y','y','y','y','y','y','y','y');""", str(g_id))
             await self.bot.caching.cogcache()
         except BaseException as e:
             raise RuntimeError(str(e))

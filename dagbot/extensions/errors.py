@@ -166,6 +166,7 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
                     scope.set_tag('guild_name', ctx.guild.name)
                     scope.set_tag("channel_id", ctx.channel.id)
                     scope.set_tag('channel_name', ctx.channel.name)
+                    scope.set_tag('command',ctx.invoked_with)
                 capture_exception(error)
                 await ctx.send(embed=embed)
 
