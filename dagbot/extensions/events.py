@@ -54,7 +54,7 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
             VALUES($1,'y','y','y','y','y','y','y','y','y','y','y','y');""", str(g_id))
             await self.bot.caching.cogcache()
         except BaseException as e:
-            raise RuntimeError(str(e))
+            pass
             
         embed = discord.Embed(
             description=f"Joined guild {guild.name} [{guild.id}]",
@@ -97,15 +97,15 @@ For any help join our support server!
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        g_id = guild.id
+        g_id = str(guild.id)
         await self.bot.pg_con.execute(
             """
     DELETE FROM prefixesandstuff
-    WHERE (server_id = '$1') ;""", g_id)
+    WHERE (server_id = $1) ;""", g_id)
         await self.bot.pg_con.execute(
             """
     DELETE FROM cogpreferences
-    WHERE (serverid = '$1') ;""", g_id)
+    WHERE (serverid = $1) ;""", g_id)
         await self.bot.caching.prefixcache()
         print("LEFT A GUILD")
     @commands.Cog.listener()
