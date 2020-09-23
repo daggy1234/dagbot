@@ -51,10 +51,11 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
             await self.bot.pg_con.execute(
                 """
             INSERT INTO cogpreferences
-            VALUES('$1','y','y','y','y','y','y','y','y','y','y','y','y');""", g_id)
+            VALUES('$1','y','y','y','y','y','y','y','y','y','y','y','y');""", str(g_id))
             await self.bot.caching.cogcache()
-        except BaseException:
-            pass
+        except BaseException as e:
+            raise RuntimeError(str(e))
+            
         embed = discord.Embed(
             description=f"Joined guild {guild.name} [{guild.id}]",
             color=guild.me.color)

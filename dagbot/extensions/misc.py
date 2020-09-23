@@ -392,7 +392,7 @@ class misc(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command()
-    async def support(self, ctx):
+    async def feedback(self, ctx):
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.add_field(
             name="Feedback Form", value="[Form](https://dagbot.daggy.tech/feedback)",
