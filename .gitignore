@@ -2,6 +2,5 @@ __pycache__
 .vscode
 .google-cookie
 memes.json
-*.yaml
 *.yml
 .idea
