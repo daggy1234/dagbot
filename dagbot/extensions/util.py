@@ -16,7 +16,6 @@ class MyMenuyt(menus.Menu):
         self.y = y
 
     async def send_initial_message(self, ctx, channel):
-        guild = ctx.guild
         embed = discord.Embed(
             title=self.y["title"][0],
             url=self.y["urls"][0],
@@ -172,9 +171,9 @@ class util(commands.Cog):
                     return False
 
     async def get_wiki(self, query):
-        url = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=4&exlimit=1&titles={}&explaintext=1&formatversion=2&format=json".format(
-            query
-        )
+        url = "https://en.wikipedia.org/w/api.php?action=query&prop=" \
+              "extracts&exsentences=4&exlimit=1&titles={}&explaintext=1&" \
+              "formatversion=2&format=json".format(query)
         response = await self.client.session.get(url)
         file = await (response.json())
         tit = file["query"]["pages"][0]["title"]
@@ -184,7 +183,8 @@ class util(commands.Cog):
         return dict_
 
     async def gettaco(self):
-        response = await self.client.session.get("http://taco-randomizer.herokuapp.com")
+        response = await self.client.session.get(
+            "http://taco-randomizer.herokuapp.com")
         file = await response.read()
         soup = BeautifulSoup(file, "html.parser")
         ll = []
@@ -196,8 +196,8 @@ class util(commands.Cog):
         return fdict
 
     async def ytget(self, query):
-        url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={query}&key={self.client.data['gapikey']}"
-        header = {"Accept": "application/json"}
+        url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q=" \
+              f"{query}&key={self.client.data['gapikey']}"
         response = await self.client.session.get(url)
         resp = await response.json()
         titlist = []
@@ -220,7 +220,8 @@ class util(commands.Cog):
                     urlist.append(f"https://www.youtube.com/watch?v={id}")
                 else:
                     urlist.append(
-                        "https://i1.wp.com/www.rattleandmum.co.za/wp-content/uploads/2015/02/IMG_0102.png"
+                        "https://i1.wp.com/www.rattleandmum.co.za/wp-content/"
+                        "uploads/2015/02/IMG_0102.png"
                     )
                 titlist.append(r["snippet"]["title"])
                 desclist.append(r["snippet"]["description"])
@@ -240,7 +241,8 @@ class util(commands.Cog):
 
     async def get_weather(self, y):
         response = await self.client.session.get(
-            f"https://api.openweathermap.org/data/2.5/weather?q={y}&appid={self.client.data['weatherapi']}"
+            f"https://api.openweathermap.org/data/2.5/weather?q={y}&"
+            f"appid={self.client.data['weatherapi']}"
         )
         file = await response.json()
         try:
@@ -295,7 +297,7 @@ pressure:              {}hPa```""".format(
     async def google(self, ctx, *, query: str):
         channel = ctx.channel
         qu, st = await self.client.bwordchecker.bwordcheck(query)
-        if qu == False:
+        if not qu:
             reslist = await self.googlethingy.search(query, safesearch=True)
             if len(reslist) == 0:
                 return await ctx.send("NO RESULTS")
@@ -312,14 +314,14 @@ pressure:              {}hPa```""".format(
                     await m.start(ctx)
             else:
                 return await ctx.send(
-                    f"You have used an NSFW command search query in a Safe for Work channel\n{st}"
+                    f"You have used an NSFW command search query in a "
+                    f"Safe for Work channel\n{st}"
                 )
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 120, type=commands.BucketType.user)
     async def weather(self, message, *, city: str):
         channel = message.channel
-        guild = message.guild
         y = str(city)
         result = await self.get_weather(y)
         await channel.send(result)
@@ -363,7 +365,7 @@ pressure:              {}hPa```""".format(
     async def wikipedia(self, ctx, *, query):
         channel = ctx.channel
         qu, st = await self.client.bwordchecker.bwordcheck(query)
-        if qu == False:
+        if not qu:
             await ctx.trigger_typing()
             resp = await self.get_wiki(query)
             color = ctx.guild.me.color
@@ -390,28 +392,27 @@ pressure:              {}hPa```""".format(
                 return await ctx.send(embed=embed)
             else:
                 return await ctx.send(
-                    f"You have used an NSFW command search query in a Safe for Work channel\n{st}"
+                    f"You have used an NSFW command search query in a "
+                    f"Safe for Work channel\n{st}"
                 )
 
     @commands.command(cooldown_after_parsing=True, aliases=["yt"])
     async def youtube(self, ctx, *, query):
         channel = ctx.channel
         qu, st = await self.client.bwordchecker.bwordcheck(query)
-        if qu == False:
-            guild = ctx.guild
+        if not qu:
             await ctx.trigger_typing()
             y = await self.ytget(query)
-            if y["title"] == False:
+            if not y["title"]:
                 return await ctx.send("No results")
             else:
                 m = MyMenuyt(y)
                 await m.start(ctx)
         else:
             if channel.is_nsfw():
-                guild = ctx.guild
                 await ctx.trigger_typing()
                 y = await self.ytget(query)
-                if y["title"] == False:
+                if not y["title"]:
                     return await ctx.send("No results")
                 else:
                     m = MyMenuyt(y)
@@ -419,5 +420,6 @@ pressure:              {}hPa```""".format(
 
             else:
                 return await ctx.send(
-                    f"You have used an NSFW command search query in a Safe for Work channel\n{st}"
+                    f"You have used an NSFW command search query in a "
+                    f"Safe for Work channel\n{st}"
                 )

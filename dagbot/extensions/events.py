@@ -1,7 +1,8 @@
-import discord
 from contextlib import suppress
-from discord.ext import commands
+
+import discord
 from discord import Webhook, AsyncWebhookAdapter
+from discord.ext import commands
 
 
 class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
@@ -16,6 +17,9 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
             if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
+            else:
+                prefix = "do {This is due to an error please change the" \
+                         "prefix immediately to make things work}"
         ctx = await self.bot.get_context(message)
         if not ctx.valid:
             if self.bot.user in message.mentions:
@@ -27,7 +31,8 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
                     color=message.guild.me.color,
                 )
                 embed.add_field(
-                    name="Support Server", value="[Invite Link](https://discord.gg/grGkdeS)"
+                    name="Support Server",
+                    value="[Invite Link](https://discord.gg/grGkdeS)"
                 )
                 embed.add_field(
                     name="Invite Link",
@@ -51,18 +56,19 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
             await self.bot.pg_con.execute(
                 """
             INSERT INTO cogpreferences
-            VALUES($1,'y','y','y','y','y','y','y','y','y','y','y','y');""", str(g_id))
+            VALUES($1,'y','y','y','y','y','y','y','y','y','y','y','y');""",
+                str(g_id))
             await self.bot.caching.cogcache()
-        except BaseException as e:
+        except Exception:
             pass
-            
+
         embed = discord.Embed(
             description=f"Joined guild {guild.name} [{guild.id}]",
             color=guild.me.color)
         embed.set_thumbnail(url=guild.icon_url_as(static_format="png"))
         embed.add_field(
             name="**Members**",  # Basic stats about the guild
-            value=f"""**Total:** {len(guild.members)}\n"
+            value=f"""**Total:** {len(guild.member_count)}\n"
 **Owner: ** {guild.owner}\n""",
             inline=False,
         )
@@ -73,19 +79,28 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
                     added_event = thing
                     break
             embed.add_field(name="Added By", value=added_event.user)
-        channel = self.bot.get_channel(726880565801779341)
+
         webhook = Webhook.from_url(
             self.bot.data['guildlog'],
             adapter=AsyncWebhookAdapter(
                 self.bot.session))
-        await webhook.send(f"We have officially reached our **{len(self.bot.guilds)}th** server ", embed=embed, username='Dagbot Guilds')
+        await webhook.send(
+            f"We have  reached our **{len(self.bot.guilds)}th** server ",
+            embed=embed, username='Dagbot Guilds')
 
         message = """
 Thank you for adding Dagbot to your server!
-The defualt prefix is `do ` but you can change this by using the `prefix set {prefix}` command! [see prefix help]
+The defualt prefix is `do ` but you can change this by using the \
+`prefix set {prefix}` command! [see prefix help]
 You can also @Dagbot to use commands.
-The bot is modular and you can enable/disable command categories! Check `cog help` to learn more.
+The bot is modular and you can enable/disable command categories!
+Check `cog help` to learn more.
 For any help join our support server!
+
+If there is an error with the bot try running the \
+`repair` command that should fix everything!
+Run `@dagbotrepair`
+
 **server**: https://discord.gg/grGkdeS
 **Website**: https://dagbot.daggy.tech
 **Feedback**: https://dagbot.daggy.tech/feedback
@@ -107,7 +122,8 @@ For any help join our support server!
     DELETE FROM cogpreferences
     WHERE (serverid = $1) ;""", g_id)
         await self.bot.caching.prefixcache()
-        print("LEFT A GUILD")
+        self.bot.logger.warn("LEFT A GUILD")
+
     @commands.Cog.listener()
     async def on_socket_response(self, message):
         if not (stat := message.get('t')):

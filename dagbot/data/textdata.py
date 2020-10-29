@@ -70,7 +70,8 @@ cmdhelp = {
     "pokedex": "get pokedex info for pokemon",
     "poem": "get a poem from a title",
     "meme": " random meme from a  meme subreddit",
-    "sub": "Gets content from a random subreddit! supply the sub and time(optional)",
+    "sub": "Gets content from a random subreddit!\
+     supply the sub and time(optional)",
     "thought": "r/Showerthoughts",
     "facepalm": "r/facepalm",
     "meirl": "r/meirl",
@@ -104,7 +105,8 @@ cmdhelp = {
     "ascii": "makes your text asciified",
     "randomfont": "gives a random font to your text",
     "fontify": "you give the font and we apply that font",
-    "create": "create amazing memes from 100+ templates! view available options using `createmenu`",
+    "create": "create amazing memes from 100+ templates! \
+    view available options using `createmenu`",
     "createmenu": "View available templates and how to use ",
     "Dagbotmeme": "Memes from just r/memes and r/dankmemes",
 }
@@ -117,9 +119,12 @@ grouphelp = {
 `tag rename <name> <newname>`: changes the name of a tag
 `tag delete <name> `: deletes the tag only if you created it
 `tag info <name>`: gets the information about a particluar tag
-`tag list <member>`: gets a list of all of a members tags (mention them {sorry but ping}) """,
+`tag list <member>`: gets a list of all of a members tags \
+(mention them {sorry but ping}) """,
     "cog": """`Cog Commands`:
-A cog is a command category, you can enable or disable cogs and all of the commands inside them. Use the help menu to see all the available cogs. NOTE Meta and Help cogs cannot be disabled.
+A cog is a command category, you can enable or disable cogs and all of the \
+commands inside them. Use the help menu to see all the available cogs. \
+NOTE Meta and Help cogs cannot be disabled.
 `cog enable <cog> `: enables the cog to be used
 `cog disable <cog>` : disabled the cog
 `cog status <cog>`: shows teh status on wether a cog is enabled or disabled""",
@@ -129,11 +134,11 @@ A cog is a command category, you can enable or disable cogs and all of the comma
     "prefix": """
 `prefix`: mention Dagbot or just use the prefix command to get the prefix
 `prefix help` To get info about orefix related commands
-""","hangman":"""
-`DAGBOT hangman\nCatgeories:\nmovies\nword\nanimals\nthing\ncountry\n just enter cancel to terminate the game. `
+""", "hangman": """
+`DAGBOT hangman\nCatgeories:\nmovies\nword\nanimals\nthing\ncountry\n just \
+enter cancel to terminate the game. `
 """
 }
-
 
 emojilist = {
     "text": "\U0001f1f9",
@@ -156,29 +161,40 @@ notfoundelist = [
     "Error 404: That member does not exist",
     "Hey see the member list  and find dude I actually know ",
     "Imaginary members and your imaginary gf sound like a dream team",
-    "I don't have enough sentience to understand what you're saying so please find a real dude",
-    "Buddy, you're mistaken if you think I know what you want me to do based on that",
-    "Quit wastin' my time with your fake Members. You're eating up my bandwidth",
-    "I don't know if you bother reading these but please focus on your keyboard and type members correctly",
-    "Stop making errors on purpose! I'm running out of witty one-liners for errors",
-    "The person you have mentioned....... Does not exist....... Please try again later",
+    "I don't have enough sentience to understand what you're saying so please \
+    find a real dude",
+    "Buddy, you're mistaken if you think I know what you want me to do \
+    based on that",
+    "Quit wastin' my time with your fake Members. You're eating up my \
+    bandwidth",
+    "I don't know if you bother reading these but please focus on your \
+    keyboard and type members correctly",
+    "Stop making errors on purpose! I'm running out of witty one-liners for \
+    errors",
+    "The person you have mentioned....... Does not exist....... \
+    Please try again later",
     "I cannot make people out of thin air smh",
     "Please mention some actual people and not your imaginary friends",
 ]
 missingargs = [
     "Hey, you lazy bum! Add some arguments first, 'kay?",
     "Learn how to type in the correct info ,doof",
-    "I am a bot, I do not understand idiots who CANNOT TYPE IN EVERYTHING REQUIRED",
-    "Buddy, you're mistaken if you think I know what you want me to do based on that",
+    "I am a bot, I do not understand idiots who \
+    CANNOT TYPE IN EVERYTHING REQUIRED",
+    "Buddy, you're mistaken if you think I know what you want me to do \
+    based on that",
     "How bout we try that again ",
-    "I don't know if you bother reading these but please focus on your keyboard and type parameters correctly",
-    "Stop making errors on purpose! I'm running out of witty one-liners for errors",
+    "I don't know if you bother reading these but please focus on your \
+    keyboard and type parameters correctly",
+    "Stop making errors on purpose! I'm running out of witty one-liners for \
+    errors",
     "If do not have arguments, I wonder what else you do not have",
     "Oh boy! Here I go teaching humands how to type again",
 ]
 cooldowncom = [
     "Bruh chill tf out I need a break gimme about ",
-    "Slow your roll buddy these take a lot of energy to do and I'm lazy so can you wait for ",
+    "Slow your roll buddy these take a lot of energy to do and \
+    I'm lazy so can you wait for ",
     "Bruh, can you chill and do a vibe check, I’ll be here in ",
     "I have to use the toilet brb in ",
     "Running kinda hot right now. Lemme Cooldown a bit",
@@ -195,7 +211,8 @@ concur = [
     "Too much happening......Process Overload",
     "BEEP BOOP , I AM A BOT NOT  FRICKIN GOD",
     "Roses are red\nViolets are blue\nI am kinda busy atm\nTry again soon",
-    "The Command you have used.... Is being used by someone else...... You may Try again or wait untill later",
+    "The Command you have used.... Is being used by someone else...... \
+    You may Try again or wait untill later",
     "I'm ghosting you for some time.",
     "Can you like not be so desperate and wait your turn?",
 ]

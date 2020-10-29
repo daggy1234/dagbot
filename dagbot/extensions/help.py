@@ -1,10 +1,11 @@
 import asyncio
 from contextlib import suppress
 
-import data.textdata as data
 import discord
 from async_timeout import timeout
 from discord.ext import commands
+
+import dagbot.data.textdata as data
 
 
 class DagbotHelp(commands.HelpCommand):
@@ -20,7 +21,10 @@ class DagbotHelp(commands.HelpCommand):
         embed.set_author(
             icon_url=ctx.author.avatar_url,
             name="Dagot Help Command")
-        embed.description = '''`[]` means that a parameter is optional\n`<>` means that a parameter is required\nYou can use do `help <command>`/`help <category>` for help with specific commands or react with the reactions below.'''
+        embed.description = '''`[]` means that a parameter is optional\n`<>` 
+        means that a parameter is required\nYou can use do `help <command>`/`
+        help <category>` for help with specific commands or react with the 
+        reactions below.'''
         cog_moji = []
         cog_list = []
         for record in ctx.bot.cogdata:
@@ -44,21 +48,26 @@ class DagbotHelp(commands.HelpCommand):
             async with timeout(300):
                 while True:
                     try:
-                        reaction, user = await ctx.bot.wait_for('reaction_add', check=lambda reaction, user: str(reaction) in emoji_list and reaction.message.channel == ctx.channel and not user.bot, timeout=20)
+                        reaction, user = await ctx.bot.wait_for('reaction_add',
+                                                                check=lambda
+                                                                    reaction,
+                                                                    user: str(
+                                                                    reaction) in emoji_list and reaction.message.channel == ctx.channel and not user.bot,
+                                                                timeout=20)
                     except asyncio.TimeoutError:
-                        
+
                         continue
                     else:
-                        
+
                         ind = emoji_list.index(str(reaction))
-                        
+
                         cog = cog_list[ind]
                         if cog == 'help':
                             await msg.edit(embed=embed)
                         else:
-                            
+
                             coginst = ctx.bot.get_cog(cog.lower())
-                            if coginst == None:
+                            if coginst is None:
                                 continue
                             embd = await self.cog_help_maker(coginst, ctx)
                             embd.set_author(
@@ -76,25 +85,28 @@ class DagbotHelp(commands.HelpCommand):
             if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
-        
+
         cog_commands = cog.get_commands()
         cmlist = ""
         if len(cog_commands) == 0:
-            return await ctx.send("This cog doesn't have any commands for some reason.")
+            return await ctx.send(
+                "This cog doesn't have any commands for some reason.")
         # command.clean_params
-        
 
         if cog.qualified_name == "image":
-            addi = "TRY THEM AND SEE, CANNOT EXPLAIN\n Please note `source` means you can attach an image, provide a url or mention someone\n `user` only accepts a member"
+            addi = "TRY THEM AND SEE, CANNOT EXPLAIN\n Please note `source` " \
+                   "means you can attach an image, provide a url or mention " \
+                   "someone\n `user` only accepts a member"
         elif cog.qualified_name == "animals":
             addi = "Self explanatory get facts or images! \n Try them and see"
         else:
             addi = ""
 
         embed = discord.Embed(
-            color=ctx.guild.me.color, title=f"{cog.qualified_name} help\n{addi}",
+            color=ctx.guild.me.color,
+            title=f"{cog.qualified_name} help\n{addi}",
         )
-        
+
         if cog.qualified_name == "settings":
             tmstr = 10
         elif cog.qualified_name == "memes":
@@ -131,9 +143,10 @@ class DagbotHelp(commands.HelpCommand):
 
         embed.description = cmlist
         embed.set_footer(
-            text=f"🞵 means that the command listed is a Group. Use {prefix}help <group> for help with its subcommands."
+            text=f"🞵 means that the command listed is a Group. Use "
+                 f"{prefix}help <group> for help with its subcommands."
         )
-        
+
         return embed
 
     async def send_cog_help(self, cog):
@@ -143,7 +156,7 @@ class DagbotHelp(commands.HelpCommand):
         for record in ctx.bot.cogdata:
             if str(record["serverid"]) == str(g_id):
                 for cogthing, state in zip(record.keys(), record.values()):
-                    if cog.qualified_name == cogthing and state == True:
+                    if cog.qualified_name == cogthing and state is True:
                         r = True
         if r:
             embed = await self.cog_help_maker(cog, ctx)
@@ -155,12 +168,8 @@ class DagbotHelp(commands.HelpCommand):
         ctx = self.context
         guild = ctx.guild
         ctx = self.context
-        g_id = guild.id
-        for e in ctx.bot.prefdict:
-            if e["server_id"] == str(g_id):
-                prefix = e["command_prefix"]
-                break
-        embed = discord.Embed(color=guild.me.color,)
+
+        embed = discord.Embed(color=guild.me.color, )
 
         if group.signature:
             embed.title = f"{group.qualified_name} {group.signature}"
@@ -190,13 +199,13 @@ class DagbotHelp(commands.HelpCommand):
     async def send_command_help(self, command):
         ctx = self.context
         guild = ctx.guild
-        embed = discord.Embed(color=guild.me.color,)
-        my_ord_dict = command.clean_params
+        embed = discord.Embed(color=guild.me.color, )
         sig = command.signature
         sig = sig.replace('[source]', '<source>')
         embed.title = f"{command.name} {sig}"
         try:
-            embed.description = cmdhelp[f"{command}"]
+
+            embed.description = data.cmdhelp[f"{command}"]
         except BaseException:
             embed.description = "No help just yet!"
         alis = command.aliases
@@ -216,7 +225,8 @@ class DagbotHelp(commands.HelpCommand):
             typ = await self.bucket_type_processor(cmd._buckets._cooldown.type)
             embed.add_field(
                 name="Cooldowns",
-                value=f"This command may be used {rate} times every {time}s per {typ}",
+                value=f"This command may be used {rate} times every {time}s "
+                      f"per {typ}",
                 inline=False)
         with suppress(AttributeError):
             cmd = command

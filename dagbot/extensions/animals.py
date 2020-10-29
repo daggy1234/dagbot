@@ -45,12 +45,14 @@ class animals(commands.Cog):
         return file["file"]
 
     async def get_dog(self):
-        response = await self.client.session.get("https://dog.ceo/api/breeds/image/random")
+        response = await self.client.session.get(
+            "https://dog.ceo/api/breeds/image/random")
         file = await response.json()
         return file["message"]
 
     async def get_cat_fact(self):
-        response = await self.client.session.get("https://cat-fact.herokuapp.com/facts")
+        response = await self.client.session.get(
+            "https://cat-fact.herokuapp.com/facts")
         ict = await response.json()
         fileict = ict["all"]
         y = random.randint(0, len(fileict) - 1)
@@ -113,15 +115,6 @@ class animals(commands.Cog):
         embed = discord.Embed(
             title="Cute Birb (bird)!",
             color=ctx.guild.me.color)
-        embed.set_image(url=y.url)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def racoon(self, ctx):
-        await ctx.trigger_typing()
-        y = await client.get_image("racoon")
-
-        embed = discord.Embed(title="Cute Racoon!", color=ctx.guild.me.color)
         embed.set_image(url=y.url)
         return await ctx.send(embed=embed)
 
@@ -241,17 +234,6 @@ class animals(commands.Cog):
         fact = await client.get_fact("whale")
         embed = discord.Embed(
             title="Whale Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
-
-    # giraffe
-    @commands.command(cooldown_after_parsing=True)
-    async def racoonfact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("racoon")
-        embed = discord.Embed(
-            title="Racoon Fact!", description=fact, color=guild.me.color
         )
         return await ctx.send(embed=embed)
 

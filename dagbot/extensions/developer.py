@@ -15,27 +15,28 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-import os
-from discord.ext import menus
-from tabulate import tabulate
-import traceback
 import datetime
-from discord import Webhook,AsyncWebhookAdapter
-import aiohttp
+import os
+import traceback
+
 import discord
-from discord.ext import commands
+from discord.ext import commands, menus
+from tabulate import tabulate
+
 
 class TabulateData(menus.ListPageSource):
-    def __init__(self, data,headers,title):
+    def __init__(self, data, headers, title):
         super().__init__(data, per_page=7)
         self.title = title
         self.headers = headers
+
     async def format_page(self, menu, entries):
         headers = self.headers
         embed = discord.Embed(title=self.title)
-        tab = tabulate(entries,headers,tablefmt="fancy_grid")
-        embed.description =  f"```{tab}\n```"
+        tab = tabulate(entries, headers, tablefmt="fancy_grid")
+        embed.description = f"```{tab}\n```"
         return embed
+
 
 class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
@@ -57,7 +58,8 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
         def check(message):
             return (ctx.author.id == message.author.id) and (
-                message.channel == ctx.channel)
+                    message.channel == ctx.channel)
+
         e_tit = await self.bot.wait_for('message', check=check)
         await ctx.send('Send me the embed content')
         e_desc = await self.bot.wait_for('message', check=check)
@@ -65,7 +67,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
             title=e_tit.content,
             description=e_desc.content,
             color=ctx.guild.me.color)
-       
+
         embed.set_author(name='Dagbot Dev Team',
                          icon_url="https://dagbot-is.the-be.st/logo.png")
         embed.add_field(
@@ -74,7 +76,8 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
             inline=True)
         embed.add_field(
             name='Bot Invite',
-            value="[Click me](https://discordapp.com/api/oauth2/authorize?client_id=675589737372975124&permissions=378944&scope=bot)",
+            value="[Click me](https://discordapp.com/api/oauth2/authorize?"
+                  "client_id=675589737372975124&permissions=378944&scope=bot)",
             inline=True)
         channel = self.bot.get_channel(681778906780532757)
         await channel.send('New update', embed=embed)
@@ -103,9 +106,8 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
             y = await channel.fetch_message(msg_id)
             oldemb = y.embeds[0]
             descrip = str(oldemb.description)
-            oldtit = oldemb.title
             newemb = discord.Embed(
-                title=f"SUGGESTION REJECTED",
+                title="SUGGESTION REJECTED",
                 description=descrip,
                 color=ctx.guild.me.color)
             newemb.add_field(name="Reason", value=reason)
@@ -121,9 +123,8 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
             y = await channel.fetch_message(msg_id)
             oldemb = y.embeds[0]
             descrip = str(oldemb.description)
-            oldtit = oldemb.title
             newemb = discord.Embed(
-                title=f"SUGGESTION APPROVED",
+                title="SUGGESTION APPROVED",
                 description=descrip,
                 color=ctx.guild.me.color)
             await y.edit(embed=newemb)
@@ -135,27 +136,31 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     async def reload(self, ctx, *, extension: str):
         mst = ""
         if extension == '~':
-            files = [('extensions.' + f.replace('.py', ''))for f in os.listdir('./dagbot/extensions') if f.endswith('.py')]
+            files = [('extensions.' + f.replace('.py', '')) for f in
+                     os.listdir('./dagbot/extensions') if f.endswith('.py')]
             for file in files:
                 try:
                     self.bot.reload_extension(file)
                     mst += f"<a:giftick:734746863340748892> {file}\n"
-                except BaseException:
+                except Exception:
                     mst += f"<a:gifcross:734746864280404018> {file}\n"
         else:
             files = [(f.replace('.py', '')) for f in os.listdir(
                 './dagbot/extensions') if f.endswith('.py')]
             if extension in files:
                 try:
-                    self.bot.reload_extension(f"extensions.{extension}")
-                    mst = f"<a:giftick:734746863340748892> {extension}\n\nWe successfully reloaded it!"
+                    self.bot.reload_extension(f"dagbot.extensions.{extension}")
+                    mst = f"<a:giftick:734746863340748892> {extension}\n\n" \
+                          f"We successfully reloaded it!"
                 except Exception as exc:
                     traceback_data = ''.join(
                         traceback.format_exception(
                             type(exc), exc, exc.__traceback__, 1))
-                    mst = f"<a:gifcross:734746864280404018> {extension}\n```py\n{traceback_data}\n```"
+                    mst = f"<a:gifcross:734746864280404018> {extension}\n" \
+                          f"```py\n{traceback_data}\n```"
             else:
-                return await ctx.send(f"Extension {extension} could not be found")
+                return await ctx.send(
+                    f"Extension {extension} could not be found")
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.description = mst
         await ctx.send(embed=embed)
@@ -167,13 +172,15 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
             './dagbot/extensions') if f.endswith('.py')]
         if extension in files:
             try:
-                self.bot.unload_extension(f"extensions.{extension}")
-                mst = f"<a:giftick:734746863340748892> {extension}\n\nWe successfully unloaded it!"
+                self.bot.unload_extension(f"dagbot.extensions.{extension}")
+                mst = f"<a:giftick:734746863340748892> {extension}\n\n" \
+                      f"We successfully unloaded it!"
             except Exception as exc:
                 traceback_data = ''.join(
                     traceback.format_exception(
                         type(exc), exc, exc.__traceback__, 1))
-                mst = f"<a:gifcross:734746864280404018> {extension}\n```py\n{traceback_data}\n```"
+                mst = f"<a:gifcross:734746864280404018> {extension}\n`" \
+                      f"``py\n{traceback_data}\n```"
         else:
             return await ctx.send(f"Extension {extension} could not be found")
         embed = discord.Embed(color=ctx.guild.me.color)
@@ -187,43 +194,60 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
             './dagbot/extensions') if f.endswith('.py')]
         if extension in files:
             try:
-                self.bot.load_extension(f"extensions.{extension}")
-                mst = f"<a:giftick:734746863340748892> {extension}\n\nWe successfully loaded it!"
+                self.bot.load_extension(f"dagbot.extensions.{extension}")
+                mst = f"<a:giftick:734746863340748892> {extension}\n\n" \
+                      f"We successfully loaded it!"
             except Exception as exc:
                 traceback_data = ''.join(
                     traceback.format_exception(
                         type(exc), exc, exc.__traceback__, 1))
-                mst = f"<a:gifcross:734746864280404018> {extension}\n```py\n{traceback_data}\n```"
+                mst = f"<a:gifcross:734746864280404018> {extension}\n" \
+                      f"```py\n{traceback_data}\n```"
         else:
             return await ctx.send(f"Extension {extension} could not be found")
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.description = mst
         await ctx.send(embed=embed)
-    
+
     @commands.command(hidden=True)
     @commands.is_owner()
     async def socketstats(self, ctx):
-        #https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py#L413-L422
+        # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py
         delta = datetime.datetime.utcnow() - self.bot.launch_time
         minutes = delta.total_seconds() / 60
         total = len(self.bot.socket_stats)
         cpm = total / minutes
-        
-        tit = (f'Socket Stats ,{total} socket events observed ({cpm:.2f}/minute)')
-        useage = {key: value for key, value in sorted(self.bot.socket_stats.items(), key=lambda item: item[1],reverse=True)}
+
+        tit = (
+            f'Socket Stats ,{total} socket events observed ({cpm:.2f}/minute)')
+        useage = {key: value for key, value in
+                  sorted(self.bot.socket_stats.items(),
+                         key=lambda item: item[1], reverse=True)}
         fl = []
-        for key,val in zip(useage.keys(),useage.values()):
-            fl.append([key,val])
-        pages = menus.MenuPages(source=TabulateData(fl,['Event','Occurences'],tit), clear_reactions_after=True)
+        for key, val in zip(useage.keys(), useage.values()):
+            fl.append([key, val])
+        pages = menus.MenuPages(
+            source=TabulateData(fl, ['Event', 'Occurences'], tit),
+            clear_reactions_after=True)
         return await pages.start(ctx)
+
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def command_stats(self,ctx):
-        useage = {key: value for key, value in sorted(self.bot.useage.items(), key=lambda item: item[1],reverse=True)}
+    async def command_stats(self, ctx):
+        useage = {key: value for key, value in
+                  sorted(self.bot.useage.items(), key=lambda item: item[1],
+                         reverse=True)}
         fl = []
-        for key,val in zip(useage.keys(),useage.values()):
-            fl.append([key,val])
-        pages = menus.MenuPages(source=TabulateData(fl,['commands','useage'],f'Command Stats, {self.bot.commands_called}'), clear_reactions_after=True)
+        columns = ['commands', 'useage']
+        cc = self.bot.commands_called
+        for key, val in zip(useage.keys(), useage.values()):
+            fl.append([key, val])
+        pages = menus.MenuPages(source=TabulateData(fl, columns, f'Command '
+                                                                 f'Stats, '
+                                                                 f'{cc}'),
+                                clear_reactions_after=True)
         return await pages.start(ctx)
+
+
 def setup(bot):
     bot.add_cog(Developer(bot))

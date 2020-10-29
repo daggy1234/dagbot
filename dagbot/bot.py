@@ -1,30 +1,40 @@
 import asyncio
-import os
-import random
+import logging
 from datetime import datetime
-
-import yaml
 
 import aiohttp
 import asyncpg
 import discord
 import sentry_sdk
-from asyncdagpi.client import Client
+import yaml
+from asyncdagpi import Client
 from discord import AsyncWebhookAdapter, Webhook
-from discord.ext import commands, menus, tasks
+from discord.ext import commands
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
-from utils.badwordcheck import bword
-from utils.caching import caching
+
+from .utils.badwordcheck import bword
+from .utils.caching import caching
+from .utils.logger import create_logger
 
 
 async def get_prefix(bot, message):
     g_id = message.guild.id
+    prefix = None
     for e in bot.prefdict:
         if e["server_id"] == str(g_id):
             prefix = e["command_prefix"]
             break
-
+    if not prefix:
+        prefix = "do"
     return commands.when_mentioned_or(prefix)(bot, message)
+
+
+def make_intents() -> discord.Intents:
+    intents = discord.Intents.none()
+    intents.guilds = True
+    intents.messages = True
+    intents.reactions = True
+    return intents
 
 
 class Dagbot(commands.AutoShardedBot):
@@ -34,14 +44,18 @@ class Dagbot(commands.AutoShardedBot):
             command_prefix=get_prefix,
             description='The number 1 wanna be meme bot',
             case_insensitive=True,
+            max_messages=100,
             allowed_mentions=discord.AllowedMentions(
                 roles=False,
-                everyone=False)
+                everyone=False),
+            intents=make_intents()
         )
 
-        with open('./dagbot/data/credentials.yml', 'r') as file:
+        self.logger = create_logger("Dagbot", logging.DEBUG)
+        with open('./configuration.yml', 'r') as file:
             self.data = yaml.load(file, Loader=yaml.FullLoader)
 
+        self.logger.info("Loaded Config File")
         self.launch_time = None
         self.session = None
         self.pg_con = None
@@ -67,13 +81,14 @@ class Dagbot(commands.AutoShardedBot):
         ]
         for extension in extensions:
             try:
-                self.load_extension(f"extensions.{extension}")
-                print(f"loaded extension {extension}")
+                self.load_extension(f"dagbot.extensions.{extension}")
+                self.logger.info(f"loaded extension {extension}")
             except Exception as error:
-                print(f"{extension} cannot be loaded due to {error}")
+                self.logger.critical(
+                    f"{extension} cannot be loaded due to {error}")
 
         self.before_invoke(self.starttyping)
-        # self.after_invoke(self.exittyping)
+        self.logger.info("Initialising Stuff")
         self.loop.create_task(self.startdagbot())
         self.socket_stats = {}
         self.sentry = sentry_sdk.init(
@@ -81,9 +96,8 @@ class Dagbot(commands.AutoShardedBot):
             integrations=[AioHttpIntegration()],
             release="dagbot@1.2.4"
         )
-
+        self.logger.info("Ready to roll")
         self.run(self.data['token'])
-        
 
     async def process_commands(self, message):
         if message.author.bot and message.guild.id != 491175207122370581:
@@ -97,7 +111,7 @@ class Dagbot(commands.AutoShardedBot):
         await self.dbconnect()
 
         self.launch_time = datetime.utcnow()
-
+        self.logger.info("Started DAGBOT")
         await self.caching.prefixcache()
         await asyncio.sleep(1)
         await self.caching.cogcache()
@@ -107,7 +121,7 @@ class Dagbot(commands.AutoShardedBot):
 
     async def makesession(self):
         self.session = aiohttp.ClientSession()
-        print('made session')
+        self.logger.info('made session')
 
     async def postready(self):
         webhook = Webhook.from_url(
@@ -117,12 +131,16 @@ class Dagbot(commands.AutoShardedBot):
         await webhook.send('Dagbot is Online')
 
     async def dbconnect(self):
-        self.pg_con = await asyncpg.connect(
-            host=self.data['dbhost'],
-            database=self.data['database'],
-            user=self.data['user'],
-            password=self.data['dbpassword'],
-        )
+        try:
+            self.pg_con = await asyncpg.connect(
+                host=self.data['dbhost'],
+                database=self.data['database'],
+                user=self.data['user'],
+                password=self.data['dbpassword'],
+            )
+            self.logger.info("Connected to the Database")
+        except Exception:
+            self.logger.critical("DB COULDN'T CONNECT")
 
     async def starttyping(self, ctx):
         await ctx.trigger_typing()
@@ -135,4 +153,4 @@ class Dagbot(commands.AutoShardedBot):
             self.useage[ctx.command.qualified_name] = 1
 
     async def on_ready(self):
-        print('Dagbot is ready to roll')
+        self.logger.info('Dagbot is ready to roll')

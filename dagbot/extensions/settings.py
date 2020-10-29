@@ -16,14 +16,15 @@ class settings(commands.Cog):
                 prefix = e["command_prefix"]
                 break
         return await ctx.send(
-            "Current Command Prefix is: `{}`\n Use prefix help for more commands".format(
+            "Current Command Prefix is: `{}`\n Use prefix help "
+            "for more commands".format(
                 prefix
             )
         )
 
-    @prefix.command()
+    @prefix.command(name="help")
     @commands.has_permissions(manage_guild=True)
-    async def help(self, ctx):
+    async def prefix_help(self, ctx):
         return await ctx.send(
             """`
     Welcome, Admin Perms are required
@@ -41,7 +42,8 @@ class settings(commands.Cog):
             prefix = prefix + " "
         if "--" in prefix:
             return await ctx.send(
-                "`--` is forbidden as it is a cyber security threat. Thank you for understanding."
+                "`--` is forbidden as it is a cyber security threat. "
+                "Thank you for understanding."
             )
         else:
             g_id = ctx.guild.id
@@ -78,14 +80,15 @@ class settings(commands.Cog):
             if e["server_id"] == str(id):
                 prefix = e["command_prefix"]
                 break
-        return await ctx.send("Current Command Prefix is: ```{}```".format(prefix))
+        return await ctx.send(
+            "Current Command Prefix is: ```{}```".format(prefix))
 
-    @commands.group(invoke_without_command=True,aliases=['cogs'])
+    @commands.group(invoke_without_command=True, aliases=['cogs'])
     async def cog(self, ctx):
-        embed = discord.Embed(title="List Of cogs",color=ctx.guild.me.color)
-        l = '\n'.join(self.bot.coglist)
-        embed.description = l
-        return await ctx.send("Please use cog help to get started!",embed=embed)
+        embed = discord.Embed(title="List Of cogs", color=ctx.guild.me.color)
+        embed.description = '\n'.join(self.bot.coglist)
+        return await ctx.send("Please use cog help to get started!",
+                              embed=embed)
 
     @cog.command()
     @commands.cooldown(1, 10, commands.BucketType.guild)
@@ -100,7 +103,8 @@ class settings(commands.Cog):
             WHERE serverid = $1""", str(g_id))
 
             await self.bot.caching.cogcache()
-            return await ctx.send(f"I have enabled the cog `{cog}` for this server")
+            return await ctx.send(
+                f"I have enabled the cog `{cog}` for this server")
 
         else:
             return await ctx.send("The cog you have entered does not exist")
@@ -117,7 +121,8 @@ class settings(commands.Cog):
             SET {cog}='n'
             WHERE serverid = $1""", g_id)
             await self.bot.caching.cogcache()
-            return await ctx.send(f"I have disabled the cog `{cog}` for this server.")
+            return await ctx.send(
+                f"I have disabled the cog `{cog}` for this server.")
 
         else:
             return await ctx.send("The cog you have entered does not exist")
@@ -134,9 +139,11 @@ class settings(commands.Cog):
                 for e in self.bot.coglist:
                     if e != "Jishaku" and e != "settings" and e != "Help":
                         if c[e]:
-                            kwrd = "<:enableonx:723926397869097072><:enableont:723926397835280525>"
+                            kwrd = "<:enableonx:723926397869097072>" \
+                                   "<:enableont:723926397835280525>"
                         else:
-                            kwrd = "<:disableonx:723926397642473534><:disableont:723926397784948809>"
+                            kwrd = "<:disableonx:723926397642473534>" \
+                                   "<:disableont:723926397784948809>"
                         mstr = mstr + "\n" + f"{kwrd} | {e}"
         embed.description = mstr
         return await ctx.send(embed=embed)
@@ -146,11 +153,46 @@ class settings(commands.Cog):
         return await ctx.send(
             """
         Cog Commands:
-        A cog is a command category, you can enable or disable cogs and all of the commands inside them. Use the help menu to see all the available cogs. NOTE Meta and Help cogs cannot be disabled.
+        A cog is a command category, you can enable or disable cogs and all
+        of the commands inside them. Use the help menu to see all the available
+         cogs. NOTE Meta and Help cogs cannot be disabled.
         `cog enable <cog> `: enables the cog to be used
         `cog disable <cog> `: disabled the cog
-        `cog status <cog>`: shows teh status on wether a cog is enabled or disabled"""
+        `cog status <cog>`: shows teh status on wether a cog is enabled or
+        disabled"""
         )
+
+    @commands.command()
+    async def repair(self, ctx):
+        guild = ctx.guild
+        g_id = str(guild.id)
+        await ctx.send("Starting to delete all of the Data")
+        await self.bot.pg_con.execute(
+            """
+    DELETE FROM prefixesandstuff
+    WHERE (server_id = $1) ;""", g_id)
+        await self.bot.pg_con.execute(
+            """
+    DELETE FROM cogpreferences
+    WHERE (serverid = $1) ;""", g_id)
+        await ctx.send("Adding Data to the Database. New Configuration")
+        await self.bot.pg_con.execute(
+            """
+    INSERT INTO prefixesandstuff (on_message_perm,server_id,command_prefix)
+    VALUES (True,$1,'do ');""",
+            str(g_id)
+        )
+        await self.bot.pg_con.execute(
+            """
+        INSERT INTO cogpreferences
+        VALUES($1,'y','y','y','y','y','y','y','y','y','y','y','y');""",
+            str(g_id))
+
+        await ctx.send("Repopulating the Cache")
+        await self.bot.caching.prefixcache()
+        await self.bot.caching.cogcache()
+        await ctx.send("Guild has been repaired. "
+                       "For more issues join the support server")
 
 
 def setup(bot):

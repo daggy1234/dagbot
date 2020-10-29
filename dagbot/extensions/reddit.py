@@ -32,11 +32,10 @@ class reddit(commands.Cog):
         r = await self.client.session.get(url, params=params, headers=headers)
         file = await r.json()
         try:
-            y = file["error"]
+            file["error"]
         except BaseException:
             iurl = file["image_url"]
             tit = file["title"]
-            sub = file["subreddit"]
             u = file["upvotes"]
             auth = file["author"]
             auth = auth.replace("/u", "u")
@@ -60,19 +59,21 @@ class reddit(commands.Cog):
         danklist = []
         url = f"https://reddit.com/r/{sub}.json"
         headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) \
+                AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 \
+                    Safari/537.36"
         }
         y = await self.client.session.get(url, headers=headers)
         r = await y.json()
         memelist = r["data"]["children"]
         for meme in memelist:
             data = meme["data"]
-            if data["over_18"] == True or data['stickied']:
+            if data["over_18"] or data['stickied']:
                 continue
             else:
                 auth = "u/" + data["author"]
                 auth_url = f"https://reddit.com/user/{data['author']}"
-                if data["is_reddit_media_domain"] == True:
+                if data["is_reddit_media_domain"]:
                     purl = data["url"]
                 elif data["domain"] == "i.imgur.com":
                     if data['url'].endswith('.gifv'):
@@ -96,15 +97,33 @@ class reddit(commands.Cog):
         return danklist
 
     async def memecache(self):
-        with open("./dagbot/data/memes.json", "r") as file:
-            jsdict = json.load(file)
-            jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist("dankmemes")
-            await asyncio.sleep(1)
-            jsdict["memes"] = jsdict["memes"] + await self.sublist("memes")
-            await asyncio.sleep(1)
-            jsdict["wholesome"] = jsdict["wholesome"] + await self.sublist(
-                "wholesomememes"
-            )
+        try:
+            with open("./dagbot/data/memes.json", "r") as file:
+                jsdict = json.load(file)
+                jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist(
+                    "dankmemes")
+                await asyncio.sleep(1)
+                jsdict["memes"] = jsdict["memes"] + await self.sublist("memes")
+                await asyncio.sleep(1)
+                jsdict["wholesome"] = jsdict["wholesome"] + await self.sublist(
+                    "wholesomememes"
+                )
+        except FileNotFoundError:
+            with open("./dagbot/data/memes.json", "x") as file:
+                js = json.dumps(
+                    {"dankmemes": [], "memes": [], "wholesome": []})
+                file.write(js)
+
+            with open("./dagbot/data/memes.json", "r") as file:
+                jsdict = json.load(file)
+                jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist(
+                    "dankmemes")
+                await asyncio.sleep(1)
+                jsdict["memes"] = jsdict["memes"] + await self.sublist("memes")
+                await asyncio.sleep(1)
+                jsdict["wholesome"] = jsdict["wholesome"] + await self.sublist(
+                    "wholesomememes"
+                )
         with open("./dagbot/data/memes.json", "w") as file:
             json.dump(jsdict, file)
         print("Memes Cached")
@@ -113,7 +132,8 @@ class reddit(commands.Cog):
     async def memcache(self):
         with open("./dagbot/data/memes.json", "r") as file:
             jsdict = json.load(file)
-            jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist("dankmemes")
+            jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist(
+                "dankmemes")
             await asyncio.sleep(1)
             jsdict["memes"] = jsdict["memes"] + await self.sublist("memes")
             await asyncio.sleep(1)
@@ -122,11 +142,11 @@ class reddit(commands.Cog):
             )
         with open("./dagbot/data/memes.json", "w") as file:
             json.dump(jsdict, file)
-        print("Memes Cached")
+        self.client.logger.info("MEMES CACHED")
 
     @memcache.before_loop
     async def before_printer(self):
-        print("waiting...")
+        self.client.logger.info("WAITING FOR ON READY")
         await self.client.wait_until_ready()
 
     async def loadmeme(self, sub):
@@ -202,9 +222,8 @@ class reddit(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def aww(self, ctx):
         await ctx.trigger_typing()
-        channel = ctx.channel
-        guild = ctx.guild
-        return await ctx.send("Please use the animals instead. r/aww is pretty meh")
+        return await ctx.send(
+            "Please use the animals instead. r/aww is pretty meh")
 
     @commands.command(cooldown_after_parsing=True,
                       aliases=["dankex", "exchange"])
@@ -331,7 +350,7 @@ class reddit(commands.Cog):
         js = await r.json()
 
         try:
-            it = len(js["x"]) - 1
+            len(js["x"]) - 1
         except BaseException:
             await ctx.send(
                 "No data, please enter a valid post id from r/DankExchange"
@@ -340,7 +359,6 @@ class reddit(commands.Cog):
             def makegraph():
                 plt.xlabel("Time in Minutes")
                 plt.ylabel("Upvotes")
-                x = js["x"]
                 y = js["y"]
                 plt.plot(
                     y,
@@ -352,7 +370,8 @@ class reddit(commands.Cog):
                 )
                 plt.savefig(f"{pid}graph.png")
                 plt.close()
-            res = await self.client.loop.run_in_executor(None, makegraph)
+
+            await self.client.loop.run_in_executor(None, makegraph)
             file = discord.File(f"{pid}graph.png", filename="graph.png")
             embed = discord.Embed(
                 title=f"Upvote Graph for {pid}",

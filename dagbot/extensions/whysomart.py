@@ -1,13 +1,10 @@
-import asyncio
-import os
 import random
 from contextlib import suppress
 
-import aiohttp
 import discord
+from PyDictionary import PyDictionary
 from bs4 import BeautifulSoup
 from discord.ext import commands
-from PyDictionary import PyDictionary
 
 dictionary = PyDictionary()
 
@@ -22,7 +19,8 @@ def setup(client):
 # #headers = {'content-type': 'application/soap+xml'}
 #     headers = {'content-type': 'text/xml'}
 #     body = '''<?xml version="1.0" encoding="ISO-8859-1"?>
-# <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:yod="uri:http://www.yodaspeak.co.uk/webservice/yodatalk">
+# <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" \
+# xmlns:yod="uri:http://www.yodaspeak.co.uk/webservice/yodatalk">
 #    <soapenv:Header/>
 #    <soapenv:Body>
 #       <yod:yodaTalk>
@@ -55,7 +53,8 @@ class smart(commands.Cog):
 
     async def characterhpget(self, y):
         response = await self.client.session.get(
-            f"https://www.potterapi.com/v1/characters?key={self.client.data['hpapikey']}"
+            f"https://www.potterapi.com/v1/characters?\
+                key={self.client.data['hpapikey']}"
         )
         flist = await (response.json())
         vallist = []
@@ -126,10 +125,9 @@ class smart(commands.Cog):
                 evoidf.append(fid)
                 evonamef.append(fname)
                 i += 1
-        except:
-            evoidf=['Error']
-            evonamef=['Error']
-        header = []
+        except KeyError:
+            evoidf = ['Error']
+            evonamef = ['Error']
         datafact = []
         infobox = str(
             soup.body.find(
@@ -198,11 +196,11 @@ class smart(commands.Cog):
         js = await resp.json()
         data = js['collection']
         if data['metadata']['total_hits'] == 0:
-            return(False)
+            return (False)
         else:
             lik = data['items'][0]
             resul = len(lik)
-            return([lik, resul])
+            return ([lik, resul])
 
     async def getyoda(self, string):
         htmlst = string.replace(" ", "%20")
@@ -262,7 +260,8 @@ hp spell <spell> : gets information about spell    `"""
             )
         elif isinstance(y, dict):
             embed = discord.Embed(
-                title="DAGBOT - HARRY POTTER  Character RESULTS", color=guild.me.color
+                title="DAGBOT - HARRY POTTER  Character RESULTS",
+                color=guild.me.color
             )
             embed.add_field(name="Name", value=y["name"], inline=False)
             try:

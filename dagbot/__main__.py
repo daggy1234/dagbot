@@ -1,3 +1,3 @@
-from bot import Dagbot
+from .bot import Dagbot
 
 dagbot = Dagbot()

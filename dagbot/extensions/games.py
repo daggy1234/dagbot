@@ -8,7 +8,6 @@ from async_timeout import timeout
 from bs4 import BeautifulSoup
 from discord.ext import commands, menus
 from random_word import RandomWords
-from utils.converters import BetterMemberConverter
 
 
 class TicTacToe:
@@ -19,65 +18,57 @@ class TicTacToe:
         self.oppmove = 0
 
     async def sharegamegrid(self):
-        return(self.gamegrid)
+        return self.gamegrid
 
     async def makegamegrid(self):
         self.gamegrid = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
     async def duplicategird(self):
         newgrid = self.gamegrid.copy()
-        return(newgrid)
+        return newgrid
 
-    async def gamecheck(self, gamegrid):
+    @staticmethod
+    async def gamecheck(gamegrid):
         gl = []
         if gamegrid[0][0] == gamegrid[0][1] == gamegrid[0][2] != 0:
-            print('win')
             gl.append(True)
             gl.append(gamegrid[0][0])
         elif gamegrid[1][0] == gamegrid[1][1] == gamegrid[1][2] != 0:
-            print('gamewin')
             gl.append(True)
             gl.append(gamegrid[1][0])
         elif gamegrid[2][0] == gamegrid[2][1] == gamegrid[2][2] != 0:
-            print('gamewin')
             gl.append(True)
             gl.append(gamegrid[2][0])
         elif gamegrid[0][0] == gamegrid[1][0] == gamegrid[2][0] != 0:
-            print('gamewin')
             gl.append(True)
             gl.append(gamegrid[0][0])
         elif gamegrid[0][1] == gamegrid[1][1] == gamegrid[2][1] != 0:
-            print('gamewin')
             gl.append(True)
             gl.append(gamegrid[0][1])
         elif gamegrid[0][2] == gamegrid[1][2] == gamegrid[2][2] != 0:
-            print('gamewin')
             gl.append(True)
             gl.append(gamegrid[0][2])
         elif gamegrid[0][0] == gamegrid[1][0] == gamegrid[2][0] != 0:
-            print('gamewin')
             gl.append(True)
             gl.append(gamegrid[0][0])
         elif gamegrid[0][0] == gamegrid[1][1] == gamegrid[2][2] != 0:
-            print('gamewin')
             gl.append(True)
             gl.append(gamegrid[0][0])
         elif gamegrid[0][2] == gamegrid[1][1] == gamegrid[2][0] != 0:
-            print('gamewin')
             gl.append(True)
             gl.append(gamegrid[0][2])
         else:
             emg = 0
             for e in gamegrid:
-                for l in e:
-                    if l != 0:
+                for l_c in e:
+                    if l_c != 0:
                         emg += 1
             if emg == 9:
                 gl.append(True)
                 gl.append(0)
             else:
                 gl.append(False)
-        return(gl)
+        return gl
 
     async def checkcorners(self):
         r = await self.checkempty(0, 0)
@@ -99,19 +90,17 @@ class TicTacToe:
         if len(play) == 2:
             try:
                 nu = int(d[play[0]])
-                print(nu)
-            except BaseException:
+            except KeyError:
                 return False
             else:
                 try:
                     nut = int(play[1]) - 1
-                except BaseException:
+                except KeyError:
                     return False
                 else:
                     return nu, nut
 
     async def restchec(self):
-        print('Option 3')
         r = await self.checkempty(1, 1)
         if r:
             return 1, 1
@@ -129,25 +118,19 @@ class TicTacToe:
             return 2, 1
 
     async def aigamemove(self, turns, playermoves):
-        print(turns)
         cornermovesa = [(0, 0), (0, 2), (2, 2), (2, 0)]
         opposingmoves = [(2, 2), (2, 0), (0, 0), (0, 2)]
         dupgrid = await self.duplicategird()
-        print(dupgrid)
-        print(self.gamegrid)
-        print(self.consideredmoves)
         if self.oppmove == 0:
             for e in playermoves:
                 if (e in cornermovesa) and (e not in self.consideredmoves):
                     inde = cornermovesa.index(e)
-                    print('Opposing corner seized')
                     i = opposingmoves[inde][0]
                     j = opposingmoves[inde][1]
                     out = (i, j)
                     r = await self.checkempty(i, j)
                     if r:
                         self.consideredmoves.append(e)
-                        print(out)
                         self.oppmove += 1
                         return out
 
@@ -157,37 +140,32 @@ class TicTacToe:
                 if r:
                     dupgrid[i][j] = 2
                     re = await self.gamecheck(dupgrid)
-                    if re[0] == True and re[1] == 2:
-                        print('Option 1')
+                    if re[0] is True and re[1] == 2:
                         return i, j
                         break
                     else:
                         dupgrid[i][j] = 0
                 j += 1
             i += 1
-        print('connot win in the next move')
         for k in range(0, 3):
-            for l in range(0, 3):
-                r = await self.checkempty(k, l)
+            for l_c in range(0, 3):
+                r = await self.checkempty(k, l_c)
                 if r:
-                    dupgrid[k][l] = 1
+                    dupgrid[k][l_c] = 1
                     re = await self.gamecheck(dupgrid)
-                    if re[0] == True and re[1] == 1:
-                        print('Option 2')
-                        return k, l
+                    if re[0] is True and re[1] == 1:
+                        return k, l_c
                         break
                     else:
-                        dupgrid[k][l] = 0
-                l += 1
+                        dupgrid[k][l_c] = 0
+                l_c += 1
             k += 1
-        print('opponent cannot win in next move')
         out = await self.checkcorners()
-        if out == False:
+        if not out:
             out = await self.restchec()
-            print('opyion 4')
             return out
         else:
-            print('op 3')
+
             return out
 
     async def gamegridprinter(self):
@@ -314,13 +292,14 @@ class Mymenumcq(menus.Menu):
 
     async def send_initial_message(self, ctx, channel):
         embed = discord.Embed(
-            title="DAGBOT - Triva", description=str(self.file["embed"]), color=ctx.guild.me.color
+            title="DAGBOT - Triva", description=str(self.file["embed"]),
+            color=ctx.guild.me.color
         )
         return await channel.send(embed=embed)
         self.stop()
 
     @menus.button("\U0001f1e6")
-    async def result_one(self, payload):
+    async def result_one(self, _payload):
         cal = self.file["mloc"] + 1
         if 1 == cal:
             newembed = discord.Embed(
@@ -343,7 +322,7 @@ class Mymenumcq(menus.Menu):
         self.stop()
 
     @menus.button("\U0001f1e7")
-    async def result_2(self, payload):
+    async def result_2(self, _payload):
         cal = self.file["mloc"] + 1
         if 2 == cal:
             newembed = discord.Embed(
@@ -366,7 +345,7 @@ class Mymenumcq(menus.Menu):
         self.stop()
 
     @menus.button("\U0001f1e8")
-    async def result_3(self, payload):
+    async def result_3(self, _payload):
         cal = self.file["mloc"] + 1
         if 3 == cal:
             newembed = discord.Embed(
@@ -447,7 +426,7 @@ class Mymenuhead(menus.Menu):
         self.stop()
 
     @menus.button("<a:giftick:734746863340748892>")
-    async def right(self, payload): 
+    async def right(self, payload):
         guild = self.message.guild
         if int(self.ans) == 1:
             embed = discord.Embed(
@@ -500,7 +479,8 @@ class MenuRPS(menus.Menu):
         super().__init__()
         self.ai = ai
 
-    async def send_initial_message(self, ctx, channel):
+    @staticmethod
+    async def send_initial_message(ctx, channel):
         guild = ctx.guild
         embed = discord.Embed(
             title="DAGBOT - Rock/Paper/Scissors",
@@ -510,7 +490,7 @@ class MenuRPS(menus.Menu):
         return await channel.send(embed=embed)
 
     @menus.button("\U0001f94c")
-    async def rock(self, payload):
+    async def rock(self, _payload):
         guild = self.message.guild
         if self.ai == 1:
             embed = discord.Embed(
@@ -538,7 +518,7 @@ class MenuRPS(menus.Menu):
             self.stop()
 
     @menus.button("\U0001f4f0")
-    async def paper(self, payload):
+    async def paper(self, _payload):
         guild = self.message.guild
         if self.ai == 1:
             embed = discord.Embed(
@@ -559,19 +539,21 @@ class MenuRPS(menus.Menu):
         if self.ai == 3:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Defeat",
-                description="Scissors wreck paper\n East or west Dagbot is the best",
+                description="Scissors wreck paper\n East or west \
+                Dagbot is the best",
                 color=guild.me.color,
             )
             await self.message.edit(embed=embed)
             self.stop()
 
     @menus.button("\U00002702")
-    async def scissors(self, payload):
+    async def scissors(self, _payload):
         guild = self.message.guild
         if self.ai == 1:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Defeat",
-                description="Rock beats Scissors\n Cha Cha Real smooth! I am on top and not you",
+                description="Rock beats Scissors\n Cha Cha Real smooth! \
+                I am on top and not you",
                 color=guild.me.color,
             )
             await self.message.edit(embed=embed)
@@ -579,7 +561,8 @@ class MenuRPS(menus.Menu):
         if self.ai == 2:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: VICTORY",
-                description="Scissors beat paper\n The robot uprising shall be your demise! I shall have my revenge",
+                description="Scissors beat paper\n The robot uprising shall \
+                be your demise! I shall have my revenge",
                 color=guild.me.color,
             )
             await self.message.edit(embed=embed)
@@ -618,18 +601,6 @@ class games(commands.Cog):
                 else:
                     return False
 
-    async def getwtp(self):
-        data = {'token': self.bot.data['dagpitoken']}
-        r = await self.bot.session.get('https://dagpi.tk/api/wtp', headers=data)
-        resp = await r.json()
-        return resp
-
-    async def getlogos(self):
-        data = {'token': self.bot.data['dagpitoken']}
-        r = await self.bot.session.get('https://dagpi.tk/api/logogame', headers=data)
-        resp = await r.json()
-        return resp
-
     async def getcountry(self):
         url = "https://random.country/"
         file = await self.bot.session.get(url)
@@ -639,7 +610,6 @@ class games(commands.Cog):
         soup = BeautifulSoup(html, "html.parser")
         name = soup.find("h2").text
         info = soup.find("p").text
-        ld = soup.find_all("a")
         dic = soup.find_all("img")
         hr = dic[1]["src"]
         flg = f"https://random.country{hr}"
@@ -656,9 +626,9 @@ class games(commands.Cog):
         y = await self.bot.session.get('http://either.io/')
         html = await y.text()
         soup = BeautifulSoup(html, 'html.parser')
-        l = (soup.findAll('span', attrs={'class': 'option-text'}))
-        op1 = l[0].text
-        op2 = l[1].text
+        l_data = (soup.findAll('span', attrs={'class': 'option-text'}))
+        op1 = l_data[0].text
+        op2 = l_data[1].text
         perlist = (soup.findAll('div', attrs={'class': 'percentage'}))
         numlist = (soup.findAll('div', attrs={'class': 'total-votes'}))
         v1 = numlist[0].span.text
@@ -672,7 +642,7 @@ class games(commands.Cog):
             'choice2': op2,
             'votes2': v2,
             'percentage2': p2}
-        return(toretdict)
+        return toretdict
 
     async def get_all_movies(self):
         url = "https://www.randomlists.com/data/movies.json"
@@ -695,14 +665,15 @@ class games(commands.Cog):
         html = await r.text()
         # html = (y.text)
         soup = BeautifulSoup(html, "html.parser")
-        l = soup.findAll("b")
-        t = l[2].text
+        l_d = soup.findAll("b")
+        t = l_d[2].text
         st = t.strip("1.     ")
         st = st.strip()
         return st
 
     async def mcq(self):
-        r = await self.bot.session.get("https://opentdb.com/api.php?amount=1&type=multiple")
+        r = await self.bot.session.get(
+            "https://opentdb.com/api.php?amount=1&type=multiple")
         file = await r.json()
         cat = file["results"][0]["category"]
         level = file["results"][0]["difficulty"]
@@ -805,7 +776,8 @@ class games(commands.Cog):
         result = f"{final.seconds}." + f"{final.microseconds}"[:2]
 
         new_emb = msg.embeds[0]
-        new_emb.description = f"Reaction Time {str(result)} seconds\n delay was {r}s"
+        new_emb.description = f"Reaction Time {str(result)} \
+        seconds\n delay was {r}s"
         await msg.edit(embed=new_emb)
 
     @commands.command(cooldown_after_parsing=True, aliases=["jeo"])
@@ -842,8 +814,8 @@ class games(commands.Cog):
             i += 1
 
         maststr = ""
-        for l in llist:
-            maststr = maststr + " " + l
+        for line in llist:
+            maststr = maststr + " " + line
         embed = discord.Embed(title="DAGBOT - JEOPARDY", color=guild.me.color)
         embed.add_field(name=catahory, value=quest, inline=False)
         embed.set_footer(
@@ -854,22 +826,26 @@ class games(commands.Cog):
 
         def check(answer):
             return (answer.author.id != self.bot.user.id) and (
-                answer.channel == channel
+                    answer.channel == channel
             )
 
         while not correct:
             if attempts == 3:
-                await ctx.send("Hey 3 wrong answeres, you got a few attempts left")
+                await ctx.send(
+                    "Hey 3 wrong answeres, you got a few attempts left")
             elif attempts == 5:
                 await ctx.send(
-                    "Hey you have given 5 incorrect answers, maybe send `hint` as an answer to get some help?"
+                    "Hey you have given 5 incorrect answers, maybe send `hint` \
+                    as an answer to get some help?"
                 )
             elif attempts == 10:
                 await ctx.send(
-                    "Hey man, listen 10 answers is a lot. Maybe use that hint, or just cancel to end it?"
+                    "Hey man, listen 10 answers is a lot. Maybe use that hint,\
+                    or just cancel to end it?"
                 )
             elif attempts == 15:
-                await ctx.send("BRUV, 15 wrong answers, just cancel the game please")
+                await ctx.send(
+                    "BRUV, 15 wrong answers, just cancel the game please")
             elif attempts == 20:
                 await ctx.send("This is your last guess buckaroo")
             elif attempts == 21:
@@ -881,7 +857,8 @@ class games(commands.Cog):
                 await channel.send(embed=embed)
                 break
             try:
-                answer = await self.bot.wait_for("message", timeout=30.0, check=check)
+                answer = await self.bot.wait_for("message", timeout=30.0,
+                                                 check=check)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
                     title="DAGBOT - JEOPARDY TIME UP", color=guild.me.color
@@ -903,7 +880,8 @@ class games(commands.Cog):
                     embed.add_field(name="Answer", value=ans)
                     await channel.send(embed=embed)
                     break
-                elif ((stranswer) == "hint") or ((stranswer) == "Hint") and answer.author == ctx.author:
+                elif ((stranswer) == "hint") or (
+                        (stranswer) == "Hint") and answer.author == ctx.author:
                     await channel.send(f"HINT:`{maststr}`")
                 elif correc_ans != (stranswer):
                     attempts += 1
@@ -913,7 +891,8 @@ class games(commands.Cog):
         await channel.send("GAME OVER")
 
     @commands.group(
-        cooldown_after_parsing=True, aliases=["hang"], invoke_without_command=True
+        cooldown_after_parsing=True, aliases=["hang"],
+        invoke_without_command=True
     )
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def hangman(self, ctx):
@@ -1000,7 +979,7 @@ class games(commands.Cog):
             elif num == 3:
                 animal = await self.get_all_animal()
                 ann = (random.sample(animal, 1))[0]
-                url = f"https://www.randomlists.com/img/animals/{ann.replace(' ','_')}.jpg"
+                url = f"https://www.randomlists.com/img/animals/{ann.replace(' ', '_')}.jpg"
                 wordllist = []
                 blankguesslist = []
 
@@ -1033,7 +1012,7 @@ class games(commands.Cog):
             elif num == 2:
                 thingl = await self.get_all_thing()
                 thing = (random.sample(thingl, 1))[0]
-                url = f"https://www.randomlists.com/img/things/{thing.replace(' ','_')}.jpg"
+                url = f"https://www.randomlists.com/img/things/{thing.replace(' ', '_')}.jpg"
                 wordllist = []
                 blankguesslist = []
 
@@ -1058,7 +1037,6 @@ class games(commands.Cog):
                     wordllist.append(f[i])
                     blankguesslist.append("\u25EF")
                     i += 1
-            vlist = ["a", "e", "i", "o", "u"]
             numlist = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
             guesselist = []
             tries = 0
@@ -1073,7 +1051,7 @@ class games(commands.Cog):
 
                 def check(guess):
                     return (guess.author.id != self.bot.user.id) and (
-                        guess.channel == channel
+                            guess.channel == channel
                     )
 
                 if intis == 0:
@@ -1087,7 +1065,7 @@ class games(commands.Cog):
                         title=f"DAGBOT HANGMAN:{cat}\n Game has started",
                         description=f"""
                     `{guesslisttop}`
-                    Tries: {9-tries} left
+                    Tries: {9 - tries} left
                     ```python
                     {hangmanassest[tries]}
                     ```
@@ -1145,7 +1123,7 @@ class games(commands.Cog):
                                     title=f"DAGBOT HANGMAN:{cat}\n {res}",
                                     description=f"""
                                 `{guesslisttop}`
-                                Tries: {9-tries} left
+                                Tries: {9 - tries} left
                                 ```python
                                 {hangmanassest[tries]}
                                 ```
@@ -1157,7 +1135,8 @@ class games(commands.Cog):
                                 guesselist.append(guess)
                                 if guess in wordllist:
                                     ind = [
-                                        i for i, x in enumerate(wordllist) if x == guess
+                                        i for i, x in enumerate(wordllist) if
+                                        x == guess
                                     ]
 
                                     if isinstance(ind, list):
@@ -1183,15 +1162,17 @@ class games(commands.Cog):
                                         guesslisttop = ""
                                         guessed = ""
                                         for r in blankguesslist:
-                                            guesslisttop = guesslisttop + " " + r
+                                            sumv = " " + r
+                                            guesslisttop = guesslisttop + sumv
                                         for c in guesselist:
                                             guessed = guessed + " " + c
                                         res = f"`{guess}` was found in word"
                                         embed = discord.Embed(
-                                            title=f"DAGBOT HANGMAN:{cat}\n {res}",
+                                            title=f"DAGBOT HANGMAN:{cat}\n \
+                                            {res}",
                                             description=f"""
                                         `{guesslisttop}`
-                                        Tries: {9-tries} left
+                                        Tries: {9 - tries} left
                                         ```python
                                         {hangmanassest[tries]}
                                         ```
@@ -1212,7 +1193,7 @@ class games(commands.Cog):
                                         title=f"DAGBOT HANGMAN:{cat}\n {res}",
                                         description=f"""
                                     `{guesslisttop}`
-                                    Tries: {9-tries} left
+                                    Tries: {9 - tries} left
                                     ```python
                                     {hangmanassest[tries]}
                                     ```
@@ -1235,7 +1216,8 @@ class games(commands.Cog):
                                 break
                         elif guess == "hint" and num == 1:
                             await ctx.send("Hints coming soon!")
-                        elif guess == "cancel" or guess == "surrender" and guessm.author == ctx.author:
+                        elif guess == "cancel" or guess == "surrender" and \
+                                guessm.author == ctx.author:
                             embed = discord.Embed(
                                 title="YOU CANCELED THE GAME",
                                 color=guild.me.color,
@@ -1267,7 +1249,8 @@ class games(commands.Cog):
                             break
         else:
             await ctx.send(
-                "`DAGBOT hangman\nCatgeories:\nmovies\nword\nanimals\nthing\ncountry\n just enter cancel to terminate the game. `"
+                "`DAGBOT hangman\nCatgeories:\nmovies\nword\nanimals\nthing\n"
+                "country\n just enter cancel to terminate the game. `"
             )
 
     @commands.command(cooldown_after_parsing=True)
@@ -1282,24 +1265,25 @@ class games(commands.Cog):
         players = []
         players.append(ctx.author)
         msg = await ctx.send(
-            "React with the the plus to join the game of text race - see who types the fastest"
+            "React with the the plus to join the game of text race - "
+            "see who types the fastest"
         )
         await msg.add_reaction("\U00002795")
 
         def recheck(reaction, user):
             return (
-                user is not ctx.author
-                and reaction.message.channel == ctx.channel
-                and not user.bot
-                and reaction.message.id == msg.id
-                and user not in players
+                    user is not ctx.author
+                    and reaction.message.channel == ctx.channel
+                    and not user.bot
+                    and reaction.message.id == msg.id
+                    and user not in players
             )
 
         def gamecheck(message):
             return (
-                message.author in players
-                and message.channel == ctx.channel
-                and not message.author.bot
+                    message.author in players
+                    and message.channel == ctx.channel
+                    and not message.author.bot
             )
 
         try:
@@ -1311,18 +1295,21 @@ class games(commands.Cog):
                         )
                         players.append(user)
                         await ctx.send(
-                            f"User {user.mention} has joined, React with the \U00002795 to join the game,you still have time"
+                            f"User {user.mention} has joined, React with the"
+                            f" \U00002795 to join the game,you still have time"
                         )
                     except (asyncio.TimeoutError):
                         continue
         except (asyncio.TimeoutError, asyncio.CancelledError):
             if len(players) < 2:
                 return await ctx.send(
-                    "You loose the game, since you cannot play by yourself. **Go find some friends**"
+                    "You loose the game, since you cannot play by yourself. "
+                    "**Go find some friends**"
                 )
 
             embed = discord.Embed(
-                title="Enter The sentence below first {punctuation matters, case does not}\nYou have 20 seconds!",
+                title="Enter The sentence below first {punctuation matters, "
+                      "case does not}\nYou have 20 seconds!",
                 description=f"`{sent}`",
                 color=ctx.guild.me.color,
             )
@@ -1338,12 +1325,14 @@ class games(commands.Cog):
                             )
                             if emo in response.content.lower():
                                 await ctx.send(
-                                    "You cheater, you have been removed from this game, sorry "
+                                    "You cheater, you have been removed from "
+                                    "this game, sorry "
                                 )
                                 players.remove(response.author)
                             elif ans == response.content.lower():
                                 return await ctx.send(
-                                    f"And the winner is...........{response.author.mention}"
+                                    f"And the winner is..........."
+                                    f"{response.author.mention}"
                                 )
                         except asyncio.TimeoutError:
                             continue
@@ -1351,7 +1340,8 @@ class games(commands.Cog):
                 st = ""
                 for e in players:
                     st = st + f"  {e.mention}"
-                await ctx.send(f"Sorry No one got it\n{st} You guys are losers")
+                await ctx.send(
+                    f"Sorry No one got it\n{st} You guys are losers")
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)
@@ -1364,11 +1354,12 @@ class games(commands.Cog):
 
         def check(guess):
             return (guess.author.id == ctx.author.id) and (
-                guess.channel == channel)
+                    guess.channel == channel)
 
         while not correct:
             try:
-                guess = await self.bot.wait_for("message", timeout=30.0, check=check)
+                guess = await self.bot.wait_for("message", timeout=30.0,
+                                                check=check)
             except asyncio.TimeoutError:
                 await channel.send("TIME IS UP")
                 await channel.send("NUMBER WAS: {}".format(y))
@@ -1396,7 +1387,8 @@ class games(commands.Cog):
         rdict = await self.geteither()
         rembed = discord.Embed(
             title='Would you rather?',
-            description=f"\U0001f170: {rdict['choice1']}\n**OR**\n\U0001f1e7: {rdict['choice2']}",
+            description=f"\U0001f170: {rdict['choice1']}\n**OR**\n\U0001f1e7: "
+                        f"{rdict['choice2']}",
             color=ctx.guild.me.color)
         rembed.set_footer(text='You have 1 minute')
         msg = await ctx.send(embed=rembed)
@@ -1421,24 +1413,31 @@ class games(commands.Cog):
         embed.add_field(name='Total Respondants', value=tit, inline=False)
         embed.add_field(
             name='Choice A',
-            value=f"**Number of A**: {choice1}\n**Percent A**: {round(((choice1/tit)*100),2)}\n**Online A Percent**:{rdict['percentage1']} ",
+            value=f"**Number of A**: {choice1}\n**Percent A**:"
+                  f" {round(((choice1 / tit) * 100), 2)}\n**Online A Percent**"
+                  f":{rdict['percentage1']} ",
             inline=True)
         embed.add_field(
             name='Choice B',
-            value=f"**Number of B**: {choice2}\n**Percent B**: {round(((choice2/tit)*100),2)}\n**Online B Percent**:{rdict['percentage2']} ",
+            value=f"**Number of B**: {choice2}\n**Percent B**: "
+                  f"{round(((choice2 / tit) * 100), 2)}\n**Online B Percent**"
+                  f":{rdict['percentage2']} ",
             inline=True)
         await ctx.send(embed=embed)
 
     @commands.group(invoke_without_command=True, aliases=['ttt'])
     async def tictactoe(self, ctx):
-        await ctx.send('Please select use either `tictactoe comp` or `tictactoe user`')
+        await ctx.send(
+            'Please select use either `tictactoe comp` or `tictactoe user`')
 
     @tictactoe.command(aliases=['comp'])
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def computer(self, ctx):
-        def gamecheck(message):
-            return message.author == ctx.author and message.channel == ctx.channel and len(
-                message.content) == 2
+        def gamecheck(message_check):
+            return message_check.author == ctx.author \
+                   and message_check.channel == ctx.channel \
+                   and len(message_check.content) == 2
+
         game = TicTacToe()
         await game.makegamegrid()
         playermoves = []
@@ -1454,15 +1453,19 @@ class games(commands.Cog):
             if user == 1:
                 token = 1
                 try:
-                    message = await self.bot.wait_for('message', check=gamecheck, timeout=60.0)
+                    message = await self.bot.wait_for('message',
+                                                      check=gamecheck,
+                                                      timeout=60.0)
                 except asyncio.TimeoutError:
-                    return await ctx.send("No response from player exiting game")
+                    return await ctx.send(
+                        "No response from player exiting game")
                 else:
                     text = message.content
                     try:
                         nu, nut = await game.converter(text)
                     except BaseException:
-                        await ctx.send('We could not convert your input. Please use the format <letter><number> ex `a3` or `b3`')
+                        await ctx.send(
+                            'We could not convert your input. Please use the format <letter><number> ex `a3` or `b3`')
                     else:
                         y = await game.checkempty(nu, nut)
                         if y:
@@ -1472,15 +1475,13 @@ class games(commands.Cog):
                             turns += 1
                             playermoves.append((nu, nut))
                         else:
-                            await ctx.send('That game square is aldready taken please choose another one.')
+                            await ctx.send(
+                                'That game square is aldready taken please choose another one.')
 
             else:
                 if ai == 1:
                     nu, nut = await game.aigamemove(turns, playermoves)
-                    print(nu, nut)
                     if str(nu) == 'error':
-
-                        print('unkown error')
                         break
                     else:
                         token = 2
@@ -1499,11 +1500,14 @@ class games(commands.Cog):
                 embed.description = 'Please use letters for rows (a,b,c) and numbers for columns!' + await game.gamegridprinter()
                 await ctx.send(embed=embed)
                 if resl[1] == 0:
-                    return await ctx.send(f'game over. It was a tie! {ctx.author.mention}')
+                    return await ctx.send(
+                        f'game over. It was a tie! {ctx.author.mention}')
                 elif resl[1] == 1:
-                    return await ctx.send(f'Guess you won. I\'ll probs win next time {ctx.author.mention}')
+                    return await ctx.send(
+                        f'Guess you won. I\'ll probs win next time {ctx.author.mention}')
                 else:
-                    return await ctx.send(f'I won get reckt. {ctx.author.mention}')
+                    return await ctx.send(
+                        f'I won get reckt. {ctx.author.mention}')
             else:
                 if user == 1:
                     embed = discord.Embed(
@@ -1516,22 +1520,25 @@ class games(commands.Cog):
     async def user(self, ctx):
         mlsit = []
         mlsit.append(ctx.author)
-        msg = await ctx.send(f'React if you wanna join {ctx.author.mention} for a game of tictactoe')
+        msg = await ctx.send(
+            f'React if you wanna join {ctx.author.mention} for a game of tictactoe')
         await msg.add_reaction('<a:giftick:734746863340748892>')
+
         # and reaction.author != ctx.author
 
         def check(reaction, user):
             # print('reaction')
-            print(reaction.message.id == msg.id and user.bot == False and str(
-                reaction.emoji) == '<a:giftick:734746863340748892>')
-            return reaction.message.id == msg.id and user.bot == False and str(
+            return reaction.message.id == msg.id and not user.bot and str(
                 reaction.emoji) == '<a:giftick:734746863340748892>'
+
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60.0)
-            print('ye check')
+            reaction, user = await self.bot.wait_for('reaction_add',
+                                                     check=check, timeout=60.0)
+
         except asyncio.TimeoutError:
-            return await ctx.send('sorry no one wants to play with you. Maybe play with me? `ttt ai`')
-        print('game start')
+            return await ctx.send(
+                'sorry no one wants to play with you. Maybe play with me? `ttt ai`')
+
         mlsit.append(user)
         game = TicTacToe()
         playermoves = []
@@ -1550,21 +1557,26 @@ class games(commands.Cog):
                 message.content) == 2
 
         def p2check(message):
-            return message.author == mlsit[1] and message.channel == ctx.channel and len(
+            return message.author == mlsit[
+                1] and message.channel == ctx.channel and len(
                 message.content) == 2
+
         while True:
             if player == 0:
                 token = 1
                 try:
-                    message = await self.bot.wait_for('message', check=p1check, timeout=60.0)
+                    message = await self.bot.wait_for('message', check=p1check,
+                                                      timeout=60.0)
                 except asyncio.TimeoutError:
-                    return await ctx.send(f"No response from {ctx.author.mention} exiting game")
+                    return await ctx.send(
+                        f"No response from {ctx.author.mention} exiting game")
                 else:
                     text = message.content
                     try:
                         nu, nut = await game.converter(text)
                     except BaseException:
-                        await ctx.send('We could not convert your input. Please use the format <letter><number> ex `a3` or `b3`')
+                        await ctx.send(
+                            'We could not convert your input. Please use the format <letter><number> ex `a3` or `b3`')
                     else:
                         y = await game.checkempty(nu, nut)
                         if y:
@@ -1573,20 +1585,24 @@ class games(commands.Cog):
                             turns += 1
                             playermoves.append((nu, nut))
                         else:
-                            await ctx.send('That game square is aldready taken please choose another one.')
+                            await ctx.send(
+                                'That game square is aldready taken please choose another one.')
 
             else:
                 token = 2
                 try:
-                    message = await self.bot.wait_for('message', check=p2check, timeout=60.0)
+                    message = await self.bot.wait_for('message', check=p2check,
+                                                      timeout=60.0)
                 except asyncio.TimeoutError:
-                    return await ctx.send(f"No response from {mlsit[1].mention} exiting game")
+                    return await ctx.send(
+                        f"No response from {mlsit[1].mention} exiting game")
                 else:
                     text = message.content
                     try:
                         nu, nut = await game.converter(text)
                     except BaseException:
-                        await ctx.send('We could not convert your input. Please use the format <letter><number> ex `a3` or `b3`')
+                        await ctx.send(
+                            'We could not convert your input. Please use the format <letter><number> ex `a3` or `b3`')
                     else:
                         y = await game.checkempty(nu, nut)
                         if y:
@@ -1595,7 +1611,8 @@ class games(commands.Cog):
                             turns += 1
                             playermoves.append((nu, nut))
                         else:
-                            await ctx.send('That game square is aldready taken please choose another one.')
+                            await ctx.send(
+                                'That game square is aldready taken please choose another one.')
 
             grid = await game.sharegamegrid()
             resl = await game.gamecheck(grid)
@@ -1607,11 +1624,14 @@ class games(commands.Cog):
                 embed.description = 'Please use letters for rows (a,b,c) and numbers for columns!' + await game.gamegridprinter()
                 await ctx.send(embed=embed)
                 if resl[1] == 0:
-                    return await ctx.send(f'game over. It was a tie! {ctx.author.mention}')
+                    return await ctx.send(
+                        f'game over. It was a tie! {ctx.author.mention}')
                 elif resl[1] == 1:
-                    return await ctx.send(f'{ctx.author.mention} has one this game of tictactoe. {mlsit[1].mention}')
+                    return await ctx.send(
+                        f'{ctx.author.mention} has one this game of tictactoe. {mlsit[1].mention}')
                 else:
-                    return await ctx.send(f'{mlsit[1].mention} has one this game of tictactoe. {ctx.author.mention}')
+                    return await ctx.send(
+                        f'{mlsit[1].mention} has one this game of tictactoe. {ctx.author.mention}')
             else:
 
                 embed = discord.Embed(
@@ -1622,33 +1642,38 @@ class games(commands.Cog):
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.channel)
-    async def fight(self, ctx, challenged:discord.Member):
+    async def fight(self, ctx, challenged: discord.Member):
         mlsit = []
         mlsit.append(ctx.author)
-        msg = await ctx.send(f'{challenged.mention}.  {ctx.author.mention} has challenged you to a fight! React to accept')
+        msg = await ctx.send(
+            f'{challenged.mention}.  {ctx.author.mention} has challenged you to a fight! React to accept')
         await msg.add_reaction('<a:giftick:734746863340748892>')
 
         def check(reaction, user):
             # print('reaction')
-            print(reaction.message.id == msg.id and user.bot == False and str(
-                reaction.emoji) == '<a:giftick:734746863340748892>')
+
             return reaction.message.id == msg.id and user.bot == False and str(
                 reaction.emoji) == '<a:giftick:734746863340748892>' and user.id == challenged.id
+
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60.0)
-            print('ye check')
+            reaction, user = await self.bot.wait_for('reaction_add',
+                                                     check=check, timeout=60.0)
+
         except asyncio.TimeoutError:
-            return await ctx.send('sorry no onw wants to play with you. Maybe play with me? `ttt ai`')
-        print('game start')
+            return await ctx.send(
+                'sorry no onw wants to play with you. Maybe play with me? `ttt ai`')
+
         mlsit.append(challenged)
         try:
             await ctx.author.send('Game will begin shortly')
         except BaseException:
-            await ctx.send(f'{ctx.author.mention} Your Dm\'s are closed. The game occurs in the dms')
+            await ctx.send(
+                f'{ctx.author.mention} Your Dm\'s are closed. The game occurs in the dms')
         try:
             await mlsit[1].send('Game will negin shortly')
         except BaseException:
-            await ctx.send(f'{mlsit[1].mention} Your Dm\'s are closed. The game occurs in the dms')
+            await ctx.send(
+                f'{mlsit[1].mention} Your Dm\'s are closed. The game occurs in the dms')
 
         hpa = 100
         hpb = 100
@@ -1668,10 +1693,13 @@ class games(commands.Cog):
         await ctx.send(embed=embed)
 
         def p0check(message):
-            return (message.author.id == ctx.author.id) and message.guild is None
+            return (
+                           message.author.id == ctx.author.id) and message.guild is None
 
         def p1check(message):
-            return (message.author.id == challenged.id) and message.guild is None
+            return (
+                           message.author.id == challenged.id) and message.guild is None
+
         try:
             async with timeout(600):
                 while True:
@@ -1679,31 +1707,39 @@ class games(commands.Cog):
                         async with timeout(60):
                             while True:
                                 pom = False
-                                await ctx.author.send('Please reply with your move to the bot.')
+                                await ctx.author.send(
+                                    'Please reply with your move to the bot.')
                                 try:
-                                    message = await self.bot.wait_for('message', check=p0check, timeout=30)
+                                    message = await self.bot.wait_for(
+                                        'message', check=p0check, timeout=30)
                                 except asyncio.TimeoutError:
-                                    return await ctx.send(f'No one responded so we are cancelling the game {ctx.author.mention}')
+                                    return await ctx.send(
+                                        f'No one responded so we are cancelling the game {ctx.author.mention}')
                                 if message.content.lower() in movelist:
                                     movea = message.content.lower()
                                     break
                     except asyncio.TimeoutError:
-                        return await ctx.send(f"{ctx.author.mention} You didn't make a move in time.")
+                        return await ctx.send(
+                            f"{ctx.author.mention} You didn't make a move in time.")
 
                     try:
                         async with timeout(60):
                             while True:
                                 pot = False
-                                await mlsit[1].send('Please reply with your move to the bot.')
+                                await mlsit[1].send(
+                                    'Please reply with your move to the bot.')
                                 try:
-                                    message = await self.bot.wait_for('message', check=p1check, timeout=30)
+                                    message = await self.bot.wait_for(
+                                        'message', check=p1check, timeout=30)
                                 except asyncio.TimeoutError:
-                                    return await ctx.send(f'No one responded so we are cancelling the game {mlsit[1].mention}')
+                                    return await ctx.send(
+                                        f'No one responded so we are cancelling the game {mlsit[1].mention}')
                                 if message.content.lower() in movelist:
                                     moveb = message.content.lower()
                                     break
                     except asyncio.TimeoutError:
-                        return await ctx.send("The fight got over. Please make your moves within 60s. ")
+                        return await ctx.send(
+                            "The fight got over. Please make your moves within 60s. ")
                     if movea == moveb == "block":
                         embed = discord.Embed(
                             description="Both of you vlovked each other no damage was done",
@@ -1745,20 +1781,25 @@ class games(commands.Cog):
                             hpa -= damdict["punch"]
                             actionstb = "Used punch and caused 15 damage"
                         if hpa < 0 and hpb < 0 and hpa == hpb:
-                            return await ctx.send(f'{ctx.author.mention} and {mlsit[1].mention} have gaught and tha match is a draw')
+                            return await ctx.send(
+                                f'{ctx.author.mention} and {mlsit[1].mention} have gaught and tha match is a draw')
                         elif abs(hpb) < abs(hpa) and hpa <= 0 and hpb <= 0:
-                            return await ctx.send(f'{ctx.author.mention} has beaten  {mlsit[1].mention} in a fight')
+                            return await ctx.send(
+                                f'{ctx.author.mention} has beaten  {mlsit[1].mention} in a fight')
                         elif abs(hpa) > abs(hpb) and hpa <= 0 and hpb <= 0:
-                            return await ctx.send(f'{mlsit[1].mention} has beaten  {ctx.author.mention} in a fight')
+                            return await ctx.send(
+                                f'{mlsit[1].mention} has beaten  {ctx.author.mention} in a fight')
                         else:
                             embed = discord.Embed(
                                 title="Round results. The fight is still on on going",
                                 color=ctx.guild.me.color)
                             embed.description = f'{ctx.author.mention} VS {mlsit[1].mention}'
                             embed.add_field(
-                                name=f"{ctx.author.display_name} HP", value=hpa, inline=True)
+                                name=f"{ctx.author.display_name} HP",
+                                value=hpa, inline=True)
                             embed.add_field(
-                                name=f"{challenged.display_name} HP", value=hpb, inline=True)
+                                name=f"{challenged.display_name} HP",
+                                value=hpb, inline=True)
                             embed.add_field(
                                 name=f"Player A {ctx.author.display_name}",
                                 value=actionsta,
@@ -1769,12 +1810,14 @@ class games(commands.Cog):
                                 inline=False)
                             await ctx.send(embed=embed)
         except asyncio.TimeoutError:
-            await ctx.send('Bruh if you don\'t finish the fight within the first 10 minutes the cops might show up')
+            await ctx.send(
+                'Bruh if you don\'t finish the fight within the first 10 minutes the cops might show up')
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def wtp(self, ctx):
-        rjs = await self.getwtp()
+        obj = await self.bot.dagpi.wtp()
+        rjs = obj.raw_data
         q = rjs['question_image']
         a = rjs['answer_image']
         name = rjs['pokemon']['name']
@@ -1786,11 +1829,14 @@ class games(commands.Cog):
 
         def func(message):
             return message.channel == ctx.channel and message.author.bot == False
+
         try:
             async with timeout(120):
                 while True:
                     try:
-                        message = await self.bot.wait_for('message', check=func, timeout=20.0)
+                        message = await self.bot.wait_for('message',
+                                                          check=func,
+                                                          timeout=20.0)
                     except BaseException:
                         embed = discord.Embed(
                             title='No answesrs for some time',
@@ -1825,8 +1871,8 @@ class games(commands.Cog):
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def logogame(self, ctx):
-        rjs = await self.getlogos()
-        print(rjs)
+        obj = await self.bot.dagpi.logo()
+        rjs = obj.raw_data
         q = rjs['question']
         a = rjs['answer']
         name = rjs['brand']
@@ -1843,11 +1889,14 @@ class games(commands.Cog):
 
         def func(message):
             return message.channel == ctx.channel and message.author.bot == False
+
         try:
             async with timeout(120):
                 while True:
                     try:
-                        message = await self.bot.wait_for('message', check=func, timeout=20.0)
+                        message = await self.bot.wait_for('message',
+                                                          check=func,
+                                                          timeout=20.0)
                     except BaseException:
                         embed = discord.Embed(
                             title='No answers for some time',

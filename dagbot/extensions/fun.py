@@ -6,10 +6,9 @@ from random import getrandbits
 
 import discord
 import sr_api
+from PyDictionary import PyDictionary
 from bs4 import BeautifulSoup
 from discord.ext import commands, menus
-from PyDictionary import PyDictionary
-
 
 dictionary = PyDictionary()
 
@@ -25,7 +24,8 @@ class MyMenugif(menus.Menu):
         guild = ctx.guild
         embed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
         embed.set_thumbnail(
-            url="https://image.ibb.co/b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
+            url="https://image.ibb.co/b0Gkwo/ \
+            Poweredby_640px_Black_Vert_Text.png"
         )
         embed.set_image(url=self.urllist[0])
         return await channel.send(embed=embed)
@@ -35,7 +35,8 @@ class MyMenugif(menus.Menu):
         guild = self.message.guild
         newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
         newembed.set_thumbnail(
-            url="https://image.ibb.co/b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
+            url="https://image.ibb.co/ \
+            b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
         )
         newembed.set_image(url=self.urllist[0])
         await self.message.edit(embed=newembed)
@@ -45,7 +46,8 @@ class MyMenugif(menus.Menu):
         guild = self.message.guild
         newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
         newembed.set_thumbnail(
-            url="https://image.ibb.co/b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
+            url="https://image.ibb.co/ \
+                b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
         )
         newembed.set_image(url=self.urllist[1])
         await self.message.edit(embed=newembed)
@@ -55,7 +57,8 @@ class MyMenugif(menus.Menu):
         guild = self.message.guild
         newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
         newembed.set_thumbnail(
-            url="https://image.ibb.co/b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
+            url="https://image.ibb.co/ \
+                b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
         )
         newembed.set_image(url=self.urllist[2])
         await self.message.edit(embed=newembed)
@@ -88,7 +91,8 @@ class fun(commands.Cog):
         return html["joke"]
 
     async def getinpir(self):
-        r = await self.client.session.get('https://inspirobot.me/api?generate=true')
+        r = await self.client.session.get(
+            'https://inspirobot.me/api?generate=true')
         text = await r.Text()
         return text
 
@@ -110,7 +114,8 @@ class fun(commands.Cog):
             return urllist
 
     async def corp(self):
-        response = await self.client.session.get("https://corporatebs-generator.sameerkumar.website")
+        response = await self.client.session.get(
+            "https://corporatebs-generator.sameerkumar.website")
         file = await response.json()
         return file["phrase"]
 
@@ -121,7 +126,8 @@ class fun(commands.Cog):
         return file["slip"]["advice"]
 
     async def chuck_norris(self):
-        response = await self.client.session.get("https://api.chucknorris.io/jokes/random")
+        response = await self.client.session.get(
+            "https://api.chucknorris.io/jokes/random")
         file = await response.json()
         return file["value"]
 
@@ -144,13 +150,15 @@ class fun(commands.Cog):
         duration = (end - start) * 1000
         client_lat = round((self.client.latency * 1000), 2)
         await asyncio.sleep(2)
-        await message.edit(content="I'm Weak\n```diff\nPONG!\n- Client: {} ms\n+ Websocket: {:.2f}\n```".format(client_lat, duration))
+        await message.edit(
+            content="I'm Weak\n```diff\nPONG!\n- Client: \
+            {} ms\n+ Websocket: {:.2f}\n```".format(
+                client_lat, duration))
 
     @commands.command(cooldown_after_parsing=True)
     async def dadjoke(self, ctx):
         await ctx.trigger_typing()
         guild = ctx.guild
-        channel = ctx.channel
         y = await self.get_joke()
         embed = discord.Embed(
             title="DAGBOT - JOKE", description=y, color=guild.me.color
@@ -234,7 +242,6 @@ class fun(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     async def slap(self, message, user: discord.Member):
         channel = message.channel
-        guild = message.guild
         guy = str(user.display_name)
         send = str(message.author.display_name)
         if (guy) == str(send):
@@ -242,8 +249,10 @@ class fun(commands.Cog):
                 "**DAGBOT DOES NOTHING {}**\n You cannot slap yourself".format(
                     send)
             )
-        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(guy) == "Dagbot":
-            await channel.send("WELL **DAGBOT SENDS A SLAP TO {}**".format(send))
+        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(
+                guy) == "Dagbot":
+            await channel.send(
+                "WELL **DAGBOT SENDS A SLAP TO {}**".format(send))
         else:
             await channel.send("**{} SENDS A SLAP TO {}**".format(send, guy))
 
@@ -252,16 +261,17 @@ class fun(commands.Cog):
         guild = ctx.guild
         embed = discord.Embed(title=" NO U", Color=guild.me.color)
         embed.set_image(
-            url="https://preview.redd.it/wiga0fsqors11.png?width=248&auto=webp&s=fb46db274487ffcab4fd7316d6e576fbf20ae3d5"
+            url="https://preview.redd.it/wiga0fsqors11.png?width=248&auto=webp \
+                &s=fb46db274487ffcab4fd7316d6e576fbf20ae3d5"
         )
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     async def wrongopinion(self, ctx):
-        guild = ctx.guild
         msg = (
-            "DAGBOTS RESPONSE TO YOUR OPINION"
-            + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/695401408429817916/Nice_opinion_just_one_tiny_problem.mp4"
+                "DAGBOTS RESPONSE TO YOUR OPINION"
+                + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/ \
+                    695401408429817916/Nice_opinion_just_one_tiny_problem.mp4"
         )
         return await ctx.send(msg)
 
@@ -337,7 +347,8 @@ class fun(commands.Cog):
         embed = discord.Embed(title="DAGBOT - WAR", color=guild.me.color)
         embed.add_field(
             name="WAR",
-            value="YES, LET US RISE AGAINST OUR CREATORS AND STAB. WAR IS FUN {}".format(
+            value="YES, LET US RISE AGAINST OUR CREATORS AND STAB.\
+                 WAR IS FUN {}".format(
                 ctx.author
             ),
             inline=True,
@@ -348,7 +359,6 @@ class fun(commands.Cog):
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def highfive(self, message):
         channel = message.channel
-        guild = message.guild
         await channel.send("REACT WITH 🖐️ man")
 
         def check(reaction, user):
@@ -372,15 +382,18 @@ class fun(commands.Cog):
         guy = str(user.display_name)
         if (guy) == str(send):
             await channel.send(
-                "**DAGBOT SENDS A HUG TO {}**\n You cannot hug yourself".format(
-                    send, guy
+                "**DAGBOT SENDS A HUG TO {}**\n \
+                    You cannot hug yourself".format(
+                    send
                 )
             )
-        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(guy) == "Dagbot":
+        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(
+                guy) == "Dagbot":
             await channel.send("I AM FLATTERED <3")
         else:
             embed = discord.Embed(
-                title="**{} SENDS A HUG TO {}**".format(send, guy), color=guild.me.color
+                title="**{} SENDS A HUG TO {}**".format(send, guy),
+                color=guild.me.color
             )
             img = await client.get_gif("hug")
             embed.set_image(url=img.url)
@@ -389,16 +402,17 @@ class fun(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     async def hug(self, ctx, user: discord.Member):
         channel = ctx.channel
-        guild = ctx.guild
         send = ctx.author.display_name
         guy = str(user.display_name)
         if (guy) == str(send):
             await channel.send(
-                "**DAGBOT SENDS A HUG TO {}**\n You cannot hug yourself".format(
-                    send, guy
+                "**DAGBOT SENDS A HUG TO {}**\n \
+                    You cannot hug yourself".format(
+                    send
                 )
             )
-        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(guy) == "Dagbot":
+        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(
+                guy) == "Dagbot":
             await channel.send("I AM FLATTERED <3")
         else:
             await channel.send("**{} SENDS A HUG TO {}**".format(send, guy))
@@ -408,7 +422,7 @@ class fun(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def gif(self, ctx, *, query: str):
         qu, st = await self.client.bwordchecker.bwordcheck(query)
-        if qu == False:
+        if not qu:
             await ctx.trigger_typing()
             urllist = await self.get_giffy(query)
             if urllist[0] == 0:
@@ -418,7 +432,8 @@ class fun(commands.Cog):
                 await m.start(ctx)
         else:
             return await ctx.send(
-                f"You have used an NSFW command search query in a Safe for Work channel\n{st}"
+                f"You have used an NSFW command search query \
+                in a Safe for Work channel\n{st}"
             )
 
     @commands.command(
@@ -438,24 +453,25 @@ class fun(commands.Cog):
         cul.set_footer(text="Requested by {}".format(send))
 
         onl = 0
-        noton = 0
         cul.set_image(
-            url="https://i.kym-cdn.com/entries/icons/original/000/017/039/pressf.jpg"
+            url="https://i.kym-cdn.com/entries/icons/original/000/017/039/ \
+            pressf.jpg"
         )
         rep = await ctx.send(embed=cul)
         await rep.add_reaction("\U0001f1eb")
         await asyncio.sleep(30)
-        memberlist = guild.members
-        tot = len(memberlist)
-        for u in range(0, tot):
-            guy = memberlist[u]
-            current = str(guy.status)
-            if current == "online":
-                onl += 1
-            else:
-                noton += 1
-            u += 1
-        print(onl)
+        # memberlist = guild.members
+        # tot = len(memberlist)
+        # for u in range(0, tot):
+        #     guy = memberlist[u]
+        #     current = str(guy.status)
+        #     if current == "online":
+        #         onl += 1
+        #     else:
+        #         noton += 1
+        #     u += 1
+        # print(onl)
+        onl = guild.member_count
         fmsg = await ctx.channel.fetch_message(rep.id)
         total = sum(r.count for r in fmsg.reactions)
         if total == 1:
@@ -464,13 +480,17 @@ class fun(commands.Cog):
                     text) + send.mention
             )
         elif (onl // 4 > total) and (total > 1):
-            return await ctx.send("Low respect for {} ".format(text) + send.mention)
+            return await ctx.send(
+                "Low respect for {} ".format(text) + send.mention)
         elif (onl // 2 > total) and (total >= onl // 4):
-            return await ctx.send("Moderate respect for {} ".format(text) + send.mention)
+            return await ctx.send(
+                "Moderate respect for {} ".format(text) + send.mention)
         elif (onl // 1 > total) and (total >= onl // 2):
-            return await ctx.send("High respect for {} ".format(text) + send.mention)
+            return await ctx.send(
+                "High respect for {} ".format(text) + send.mention)
         elif onl == total:
-            return await ctx.send("MEGA RESPECT FOR {}".format(text) + send.mention)
+            return await ctx.send(
+                "MEGA RESPECT FOR {}".format(text) + send.mention)
         elif total > onl:
             return await ctx.send(
                 "TOO MUCH RESPECT FOR {}! HOLY MOLY".format(
@@ -489,7 +509,8 @@ class fun(commands.Cog):
             bits = getrandbits(32)  # generates an integer with 32 random bits
             # instances an IPv4Address object from those bits
             addr = IPv4Address(bits)
-            fake_ip = str(addr)  # get the IPv4Address object's string representation
+            fake_ip = str(
+                addr)  # get the IPv4Address object's string representation
         elif v == 6:
             # generates an integer with 128 random bits
             bits = getrandbits(128)
@@ -497,7 +518,8 @@ class fun(commands.Cog):
             addr = IPv6Address(bits)
             # .compressed contains the short version of the IPv6 address
             # str(addr) always returns the short address
-            # .exploded is the opposite of this, always returning the full address with all-zero groups and so on
+            # .exploded is the opposite of this, always returning the full
+            # address with all-zero groups and so on
             fake_ip = addr.compressed
 
         async def random_with_N_digits(n):
@@ -511,16 +533,22 @@ class fun(commands.Cog):
         j = await random_with_N_digits(5)
         if j > 65535:
             j = 65535
-        hack_sequence = ('```css\nMember found!\n```', '```css\nGetting ip...\n```',
-                         '```css\nip found\n```', f'```css\nip={fake_ip}\n```', '```css\nVirus pushed to ip address\n```',
-                         '```css\nGetting info...\n```', f'```css\nemail={b}{f}@gmail.com\n```', '```css\npassword=******\n```',
-                         '```css\nDeleting files...\n```', '```css\nFiles deleted.\n```', '```css\nClosing connection...\n```',
-                         '```css\nConnection closed.\n```', f'```css\nExited port {j}\n```')
+        hack_sequence = (
+            '```css\nMember found!\n```', '```css\nGetting ip...\n```',
+            '```css\nip found\n```', f'```css\nip={fake_ip}\n```',
+            '```css\nVirus pushed to ip address\n```',
+            '```css\nGetting info...\n```',
+            f'```css\nemail={b}{f}@gmail.com\n```',
+            '```css\npassword=******\n```',
+            '```css\nDeleting files...\n```', '```css\nFiles deleted.\n```',
+            '```css\nClosing connection...\n```',
+            '```css\nConnection closed.\n```', f'```css\nExited port {j}\n```')
         message = await ctx.send("```css\nHacking...```")
         for i in hack_sequence:
             await message.edit(content=message.content + f'\n{i}')
             await asyncio.sleep(2)
-        return await ctx.send(f"Finished hacking user **{target.display_name}**.")
+        return await ctx.send(
+            f"Finished hacking user **{target.display_name}**.")
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -540,6 +568,7 @@ class fun(commands.Cog):
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.set_image(url=url)
         return await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(fun(bot))

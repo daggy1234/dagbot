@@ -2,8 +2,9 @@ from contextlib import suppress
 
 import discord
 from discord.ext import commands
-from utils.exceptions import NoImageFound, NoMemberFound
 from validator_collection import checkers
+
+from dagbot.utils.exceptions import NoImageFound, NoMemberFound
 
 member_converter = commands.MemberConverter()
 emoji_converter = commands.EmojiConverter()
@@ -32,10 +33,10 @@ class ImageConverter(commands.Converter):
     async def convert(self, ctx, argument):
         with suppress(NoMemberFound):
             mem = await BetterMemberConverter().convert(ctx, argument)
-            return(str(mem.avatar_url_as(static_format='png', size=1024)))
+            return (str(mem.avatar_url_as(static_format='png', size=1024)))
         with suppress(Exception):
             emoji = await emoji_converter.convert(ctx, str(argument))
-            return(str(emoji.url))
+            return (str(emoji.url))
         if ctx.message.attachments:
             with suppress(Exception):
                 return ctx.message.attachments[0].url

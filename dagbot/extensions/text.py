@@ -1,11 +1,10 @@
 import random
 
-from cryptography.fernet import Fernet
-
-import discord
+import art
 import sr_api
 import zalgoify
-from art import *
+from art import text2art, artError
+from cryptography.fernet import Fernet
 from discord.ext import commands
 from owotext import OwO
 from vaporwavely import vaporize
@@ -80,7 +79,10 @@ class text(commands.Cog):
             arto = art(type)
         except artError:
             return await ctx.send(
-                "Your chosen art  does not exist/is not supported\n Please check the list of supported arts here: [link](https://pastebin.com/RfsFq1rj)\n Or just use randomart command!"
+                "Your chosen art  does not exist/is not supported\n "
+                "Please check the list of supported arts here: "
+                "[link](https://pastebin.com/RfsFq1rj)\n "
+                "Or just use randomart command!"
             )
         else:
             return await ctx.send(arto)
@@ -91,7 +93,10 @@ class text(commands.Cog):
             arto = text2art(text, font)
         except artError:
             return await ctx.send(
-                "Your font does not exist/is not supported\n Please check the list of supported fonts here: [link](https://pastebin.com/P4cu2r0G) or just use the randomfont command!\n Or just use the randomfont command!"
+                "Your font does not exist/is not supported\n "
+                "Please check the list of supported fonts here: "
+                "[link](https://pastebin.com/P4cu2r0G)"
+                " \n Or just use the randomfont command!"
             )
         else:
             return await ctx.send(f"```{arto}```")
@@ -171,7 +176,6 @@ class text(commands.Cog):
             letst = "0123456789"
             for jool in range(0, len(y)):
                 let = y[jool]
-                print(let)
                 if let == " ":
                     emos.append(2 * "\U00000020")
                 elif let == "?":
@@ -191,8 +195,9 @@ class text(commands.Cog):
                         if pos == -1:
                             pos = -1
                             if invalidchar == 0:
-                                return await ctx.send(
-                                    "invalid characters that are not alphabets, they will be replace by 🇥"
+                                await ctx.send(
+                                    "invalid characters that are not "
+                                    "alphabets, they will be replace by 🇥"
                                 )
                                 invalidchar += 1
                             else:
@@ -204,7 +209,6 @@ class text(commands.Cog):
 
             mst = ""
             for i in range(0, len(emos)):
-                print(emos[i])
                 mst = mst + emos[i]
                 i += 1
             return await ctx.send(mst)

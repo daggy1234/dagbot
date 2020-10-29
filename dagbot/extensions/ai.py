@@ -20,7 +20,8 @@ import json
 import async_cleverbot as ac
 import discord
 from discord.ext import commands
-from utils.converters import ImageConverter
+
+from dagbot.utils.converters import ImageConverter
 
 
 class ai(commands.Cog):
@@ -42,7 +43,8 @@ class ai(commands.Cog):
                     return False
 
     async def ocra(self, ur):
-        url = f"https://eu-vision.googleapis.com/v1/images:annotate?key={self.gapikey}"
+        url = f"https://eu-vision.googleapis.com/v1/ \
+        images:annotate?key={self.gapikey}"
         payload = {
             "requests": [
                 {
@@ -71,7 +73,8 @@ class ai(commands.Cog):
         return mst
 
     async def labela(self, ur):
-        url = f"https://vision.googleapis.com/v1/images:annotate?key={self.gapikey}"
+        url = f"https://vision.googleapis.com/v1/ \
+        images:annotate?key={self.gapikey}"
         payload = {
             "requests": [
                 {
@@ -105,7 +108,8 @@ class ai(commands.Cog):
         headers = {"Content-Type": "application/json; charset=utf-8"}
         url = "https://captionbot.azurewebsites.net/api/messages"
 
-        r = await self.client.session.post(url, data=json.dumps(data), headers=headers)
+        r = await self.client.session.post(url, data=json.dumps(data),
+                                           headers=headers)
         t = await r.text()
         return t
         # if not r.ok:
@@ -121,7 +125,8 @@ class ai(commands.Cog):
         js = await r.json()
         return js["output_url"]
 
-    @commands.command(cooldown_after_parsing=True, aliases=["chatbot", "ask", "converse"])
+    @commands.command(cooldown_after_parsing=True,
+                      aliases=["chatbot", "ask", "converse"])
     async def chat(self, ctx, *, query: str):
         await ctx.trigger_typing()
         try:
@@ -149,7 +154,8 @@ class ai(commands.Cog):
     async def generate(self, ctx, *, text):
         resp = await self.imgen(text)
         embed = discord.Embed(
-            title=f"Generated an image on your text {text}", color=ctx.guild.me.color
+            title=f"Generated an image on your text {text}",
+            color=ctx.guild.me.color
         )
         embed.set_image(url=resp)
         return await ctx.send(embed=embed)
@@ -163,7 +169,7 @@ class ai(commands.Cog):
             return await ctx.send("No results rn")
         else:
             embed = discord.Embed(
-                title=f"Your Image contains the following text",
+                title="Your Image contains the following text",
                 description=f,
                 color=ctx.guild.me.color,
             )
