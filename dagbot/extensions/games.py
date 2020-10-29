@@ -826,7 +826,7 @@ class games(commands.Cog):
 
         def check(answer):
             return (answer.author.id != self.bot.user.id) and (
-                    answer.channel == channel
+                answer.channel == channel
             )
 
         while not correct:
@@ -1051,7 +1051,7 @@ class games(commands.Cog):
 
                 def check(guess):
                     return (guess.author.id != self.bot.user.id) and (
-                            guess.channel == channel
+                        guess.channel == channel
                     )
 
                 if intis == 0:
@@ -1272,18 +1272,18 @@ class games(commands.Cog):
 
         def recheck(reaction, user):
             return (
-                    user is not ctx.author
-                    and reaction.message.channel == ctx.channel
-                    and not user.bot
-                    and reaction.message.id == msg.id
-                    and user not in players
+                user is not ctx.author
+                and reaction.message.channel == ctx.channel
+                and not user.bot
+                and reaction.message.id == msg.id
+                and user not in players
             )
 
         def gamecheck(message):
             return (
-                    message.author in players
-                    and message.channel == ctx.channel
-                    and not message.author.bot
+                message.author in players
+                and message.channel == ctx.channel
+                and not message.author.bot
             )
 
         try:
@@ -1354,7 +1354,7 @@ class games(commands.Cog):
 
         def check(guess):
             return (guess.author.id == ctx.author.id) and (
-                    guess.channel == channel)
+                guess.channel == channel)
 
         while not correct:
             try:
@@ -1435,8 +1435,8 @@ class games(commands.Cog):
     async def computer(self, ctx):
         def gamecheck(message_check):
             return message_check.author == ctx.author \
-                   and message_check.channel == ctx.channel \
-                   and len(message_check.content) == 2
+                and message_check.channel == ctx.channel \
+                and len(message_check.content) == 2
 
         game = TicTacToe()
         await game.makegamegrid()
@@ -1694,11 +1694,11 @@ class games(commands.Cog):
 
         def p0check(message):
             return (
-                           message.author.id == ctx.author.id) and message.guild is None
+                message.author.id == ctx.author.id) and message.guild is None
 
         def p1check(message):
             return (
-                           message.author.id == challenged.id) and message.guild is None
+                message.author.id == challenged.id) and message.guild is None
 
         try:
             async with timeout(600):

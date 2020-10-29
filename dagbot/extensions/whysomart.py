@@ -252,7 +252,7 @@ hp spell <spell> : gets information about spell    `"""
     async def character(self, ctx, *, query):
         y = await self.characterhpget(query)
         guild = ctx.guild
-        if y == False:
+        if not y:
             return await ctx.send(
                 "no results for {}, The api is case sensitive so do ensure the first letter is Caps".format(
                     query
@@ -290,22 +290,22 @@ hp spell <spell> : gets information about spell    `"""
                 i = 1
             else:
                 embed.add_field(name="Patronus", value=patronus, inline=False)
-            if y["ministryOfMagic"] == True:
+            if y["ministryOfMagic"]:
                 embed.add_field(
                     name="-",
                     value="Ministry Of Magic",
                     inline=True)
-            if y["orderOfThePhoenix"] == True:
+            if y["orderOfThePhoenix"]:
                 embed.add_field(
                     name="-",
                     value="Order Of the Phoenix",
                     inline=True)
-            if y["dumbledoresArmy"] == True:
+            if y["dumbledoresArmy"]:
                 embed.add_field(
                     name="-",
                     value="Dumbledores Army",
                     inline=True)
-            if y["deathEater"] == True:
+            if y["deathEater"]:
                 embed.add_field(name="-", value="Death Eater", inline=True)
             embed.add_field(
                 name="Blood Status",
@@ -328,7 +328,7 @@ hp spell <spell> : gets information about spell    `"""
     async def spell(self, ctx, *, query):
         y = self.spell(query)
         guild = ctx.guild
-        if y == False:
+        if not y:
             return await ctx.send(
                 "no results for {}, The api is case sensitive so do ensure the first letter is Caps".format(
                     query
@@ -370,7 +370,7 @@ hp spell <spell> : gets information about spell    `"""
     async def nasapic(self, ctx, *, query):
         url = f'https://images-api.nasa.gov/search?q={query}'
         resp = await self.getnpic(url)
-        if resp == False:
+        if not resp:
             return await ctx.send('No reults for your query')
         else:
             embed = discord.Embed(color=ctx.guild.me.color)

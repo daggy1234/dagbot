@@ -58,7 +58,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
         def check(message):
             return (ctx.author.id == message.author.id) and (
-                    message.channel == ctx.channel)
+                message.channel == ctx.channel)
 
         e_tit = await self.bot.wait_for('message', check=check)
         await ctx.send('Send me the embed content')

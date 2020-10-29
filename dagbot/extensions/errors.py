@@ -92,7 +92,7 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             cat = error.per
             rets = random.choice(data.concur)
             st = rets + \
-                 f"\nIt can only be used {times} time per {cat} concurrently."
+                f"\nIt can only be used {times} time per {cat} concurrently."
             st = st.replace("BucketType.", "")
             return await ctx.send(
                 rets +

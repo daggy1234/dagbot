@@ -21,9 +21,9 @@ class DagbotHelp(commands.HelpCommand):
         embed.set_author(
             icon_url=ctx.author.avatar_url,
             name="Dagot Help Command")
-        embed.description = '''`[]` means that a parameter is optional\n`<>` 
+        embed.description = '''`[]` means that a parameter is optional\n`<>`
         means that a parameter is required\nYou can use do `help <command>`/`
-        help <category>` for help with specific commands or react with the 
+        help <category>` for help with specific commands or react with the
         reactions below.'''
         cog_moji = []
         cog_list = []
@@ -50,8 +50,8 @@ class DagbotHelp(commands.HelpCommand):
                     try:
                         reaction, user = await ctx.bot.wait_for('reaction_add',
                                                                 check=lambda
-                                                                    reaction,
-                                                                    user: str(
+                                                                reaction,
+                                                                user: str(
                                                                     reaction) in emoji_list and reaction.message.channel == ctx.channel and not user.bot,
                                                                 timeout=20)
                     except asyncio.TimeoutError:
