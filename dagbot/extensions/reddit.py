@@ -142,7 +142,7 @@ class reddit(commands.Cog):
             )
         with open("./dagbot/data/memes.json", "w") as file:
             json.dump(jsdict, file)
-        self.client.logger.info("MEMES CACHED")
+        self.client.logger.debug("MEMES CACHED")
 
     @memcache.before_loop
     async def before_printer(self):
