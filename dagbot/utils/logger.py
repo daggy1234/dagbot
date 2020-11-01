@@ -8,17 +8,18 @@ import logging
 
 
 class CustomFormatter(logging.Formatter):
-    BLACK = "\033[30m"
+    GREEN = "\[\033[0;32m\]"
     YELLOW = "\033[33m"
     RED = "\033[31m"
+    BLUE = "\[\033[0;34m\]"
     BOLD = "\033[1m"
     RESET = "\033[0m"
     FORMAT = f"[%(asctime)s - %(name)s - %(levelname)s] {RESET} " \
              f"%(message)s (%(filename)s:%(lineno)d)"
 
     FORMATS = {
-        logging.DEBUG: BLACK,
-        logging.INFO: BLACK,
+        logging.DEBUG: GREEN,
+        logging.INFO: BLUE,
         logging.WARNING: YELLOW,
         logging.ERROR: RED,
         logging.CRITICAL: BOLD + RED
