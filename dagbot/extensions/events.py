@@ -63,7 +63,11 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 VALUES($1,'y','y','y','y','y','y','y','y','y','y','y','y');""",
                     str(g_id))
                 await self.bot.caching.cogcache()
-
+                del_query = """
+                    DELETE FROM automeme WHERE server_id = $1;
+                    """
+                await connection.execute(del_query, g_id)
+                await self.bot.caching.automemecache()
         embed = discord.Embed(
             description=f"Joined guild {guild.name} [{guild.id}]",
             color=guild.me.color)

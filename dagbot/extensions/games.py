@@ -1862,7 +1862,7 @@ class games(commands.Cog):
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def wtp(self, ctx):
         obj = await self.bot.dagpi.wtp()
-        rjs = obj.raw_data
+        rjs = obj.dict
         q = rjs['question_image']
         a = rjs['answer_image']
         name = rjs['pokemon']['name']
@@ -1919,7 +1919,7 @@ class games(commands.Cog):
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def logogame(self, ctx):
         obj = await self.bot.dagpi.logo()
-        rjs = obj.raw_data
+        rjs = obj.dict
         q = rjs['question']
         a = rjs['answer']
         name = rjs['brand']
