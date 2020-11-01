@@ -18,8 +18,7 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 prefix = e["command_prefix"]
                 break
             else:
-                prefix = "do {This is due to an error please change the" \
-                         "prefix immediately to make things work}"
+                prefix = "@Dagbot (run repair to fix. Guild is broken)"
         ctx = await self.bot.get_context(message)
         if not ctx.valid:
             if self.bot.user in message.mentions:
@@ -44,23 +43,22 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         g_id = guild.id
-        try:
-            await self.bot.pg_con.execute(
-                """
-        INSERT INTO prefixesandstuff (on_message_perm,server_id,command_prefix)
-        VALUES (True,$1,'do ');""",
-                str(g_id)
-            )
+        async with self.bot.pool.acquire() as connection:
+            async with connection.transaction():
+                await connection.execute(
+                    """
+            INSERT INTO prefixesandstuff (on_message_perm,server_id,command_prefix)
+            VALUES (True,$1,'do ');""",
+                    str(g_id)
+                )
 
-            await self.bot.caching.prefixcache()
-            await self.bot.pg_con.execute(
-                """
-            INSERT INTO cogpreferences
-            VALUES($1,'y','y','y','y','y','y','y','y','y','y','y','y');""",
-                str(g_id))
-            await self.bot.caching.cogcache()
-        except Exception:
-            pass
+                await self.bot.caching.prefixcache()
+                await connection.execute(
+                    """
+                INSERT INTO cogpreferences
+                VALUES($1,'y','y','y','y','y','y','y','y','y','y','y','y');""",
+                    str(g_id))
+                await self.bot.caching.cogcache()
 
         embed = discord.Embed(
             description=f"Joined guild {guild.name} [{guild.id}]",
@@ -113,14 +111,16 @@ Run `@dagbotrepair`
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         g_id = str(guild.id)
-        await self.bot.pg_con.execute(
-            """
-    DELETE FROM prefixesandstuff
-    WHERE (server_id = $1) ;""", g_id)
-        await self.bot.pg_con.execute(
-            """
-    DELETE FROM cogpreferences
-    WHERE (serverid = $1) ;""", g_id)
+        async with self.bot.pool.acquire() as connection:
+            async with connection.transaction():
+                await connection.execute(
+                    """
+            DELETE FROM prefixesandstuff
+            WHERE (server_id = $1) ;""", g_id)
+                await connection.execute(
+                    """
+            DELETE FROM cogpreferences
+            WHERE (serverid = $1) ;""", g_id)
         await self.bot.caching.prefixcache()
         self.bot.logger.warn("LEFT A GUILD")
 

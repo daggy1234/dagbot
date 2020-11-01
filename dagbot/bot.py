@@ -19,13 +19,10 @@ from .utils.logger import create_logger
 
 async def get_prefix(bot, message):
     g_id = message.guild.id
-    prefix = None
     for e in bot.prefdict:
         if e["server_id"] == str(g_id):
             prefix = e["command_prefix"]
             break
-    if not prefix:
-        prefix = "do"
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
@@ -54,14 +51,12 @@ class Dagbot(commands.AutoShardedBot):
         self.logger = create_logger("Dagbot", logging.DEBUG)
         with open('./configuration.yml', 'r') as file:
             self.data = yaml.load(file, Loader=yaml.FullLoader)
-
         self.logger.info("Loaded Config File")
         self.launch_time = None
         self.session = None
-        self.pg_con = None
-
+        self.pool = None
+        self.dagpi = None
         self.caching = caching(self)
-        self.dagpi = Client(self.data['dagpitoken'])
         self.bwordchecker = bword()
         self.bwordchecker.loadbword()
         self.useage = {}
@@ -77,7 +72,7 @@ class Dagbot(commands.AutoShardedBot):
             "whysomart", "animals", "memes",
             "tags", "misc", "settings",
             "ai", "events", "errors",
-            "developer", "help"
+            "developer", "help", "automeme"
         ]
         for extension in extensions:
             try:
@@ -94,7 +89,7 @@ class Dagbot(commands.AutoShardedBot):
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
-            release="dagbot@1.2.4"
+            release="dagbot@1.3.0"
         )
         self.logger.info("Ready to roll")
         self.run(self.data['token'])
@@ -117,11 +112,16 @@ class Dagbot(commands.AutoShardedBot):
         await self.caching.cogcache()
         await asyncio.sleep(1)
         await self.caching.getkeydict()
+        await self.caching.automemecache()
         await self.get_cog("reddit").memecache()
 
     async def makesession(self):
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(loop=self.loop)
         self.logger.info('made session')
+        self.dagpi = Client(self.data['dagpitoken'],
+                            loop=self.loop,
+                            session=self.session)
+        self.logger.info("Dagpi Initialised")
 
     async def postready(self):
         webhook = Webhook.from_url(
@@ -132,7 +132,7 @@ class Dagbot(commands.AutoShardedBot):
 
     async def dbconnect(self):
         try:
-            self.pg_con = await asyncpg.connect(
+            self.pool = await asyncpg.create_pool(
                 host=self.data['dbhost'],
                 database=self.data['database'],
                 user=self.data['user'],

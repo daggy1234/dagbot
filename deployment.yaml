@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dagbot
+spec:
+  selector:
+    matchLabels:
+      app: dagbot
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dagbot
+    spec:
+      containers:
+      - name: dagbot
+        image: Daggy1234/dagbot
+        imagePullPolicy: Always

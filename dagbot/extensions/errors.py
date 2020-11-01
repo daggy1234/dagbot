@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import random
 import traceback
 
-import asyncdagpi.errors as dex
+import asyncdagpi.errors as dagpi_error
 import discord
 from discord import AsyncWebhookAdapter, Webhook
 from discord.ext import commands
@@ -48,7 +48,10 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             if cog._get_overridden_method(cog.cog_command_error) is not None:
                 return
         ignored = (commands.CommandNotFound, commands.TooManyArguments)
-        dagpibrok = (dex.ApiError, dex.Unauthorised, dex.RateLimited)
+        dagpibrok = (dagpi_error.ApiError)
+        dagpi_code_broke = (dagpi_error.Unauthorised, dagpi_error.RateLimited,
+                            dagpi_error.InvalidFeature,
+                            dagpi_error.Unauthorised)
 
         if isinstance(error, ignored):
             return
@@ -92,7 +95,7 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             cat = error.per
             rets = random.choice(data.concur)
             st = rets + \
-                f"\nIt can only be used {times} time per {cat} concurrently."
+                 f"\nIt can only be used {times} time per {cat} concurrently."
             st = st.replace("BucketType.", "")
             return await ctx.send(
                 rets +
@@ -130,12 +133,13 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 return await ctx.send((error))
             elif isinstance(error, dagpibrok):
                 return await ctx.send('The API at https://dagpi.tk broke')
-            elif isinstance(error, dex.FileTooLarge):
+            elif isinstance(error, dagpi_error.FileTooLarge):
                 return await ctx.send(
-                    'The image your privided was too large to process')
-            elif isinstance(error, dex.ImageUnaccesible):
+                    'The image your provided was too large to process')
+            elif isinstance(error, dagpi_error.ImageUnaccesible):
                 return await ctx.send(
-                    'There was no image the bot could access at your url')
+                    'There was no image the bot could access at your url' + str(
+                        error))
             else:
                 name = ctx.author.display_name
                 server = ctx.guild.name

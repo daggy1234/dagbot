@@ -2,8 +2,8 @@ import asyncio
 import json
 from io import BytesIO
 
-import asyncdagpi.errors as dex
 import discord
+from asyncdagpi import ImageFeatures
 from discord.ext import commands, menus
 
 from dagbot.utils.converters import BetterMemberConverter, UrlValidator
@@ -44,15 +44,15 @@ class Source(menus.GroupByPageSource):
             f"{i}.{v.value}" for i, v in enumerate(entry.items, start=offset)
         )
         embed.description = (
-            "Dagbot's meme generation tool allows you to "
-            "access more than a 100+ meme templates.Browse through the "
-            "meme templates using the buttons below!\n "
-            "Once you select the template use the following template. "
-            "Use semicolons to seperate the number of text arguments "
-            "required! DO NOT NEED TO include all of them "
-            "`create template:text1:text2`\n **For example**\n`create "
-            "The scroll of truth:Dagbot is not the best:`\n"
-            + joined
+                "Dagbot's meme generation tool allows you to "
+                "access more than a 100+ meme templates.Browse through the "
+                "meme templates using the buttons below!\n "
+                "Once you select the template use the following template. "
+                "Use semicolons to seperate the number of text arguments "
+                "required! DO NOT NEED TO include all of them "
+                "`create template:text1:text2`\n **For example**\n`create "
+                "The scroll of truth:Dagbot is not the best:`\n"
+                + joined
         )
         return embed
 
@@ -65,35 +65,11 @@ class memes(commands.Cog):
         self.data = [Test(key=key, value=value) for key in [
             "Dagbot's meme generator"] for value in topasslist]
 
-    async def getav(self, url):
-        r = await self.client.session.get(url)
-        if r.status == 200:
-            # imgf = await aiofiles.open(f'avatar{name}.png', mode='wb')
-            byt = await r.read()
-            return byt
-            # await imgf.close()
-        else:
-            return False
-        del r
-
     async def getgeneratedmeme(self, data):
         url = "https://api.imgflip.com/caption_image"
         r = await self.client.session.post(url, params=data)
         js = await r.json()
         return js
-
-    async def dagpiresult(self, feature, url, text):
-        jsdic = {
-            'token': self.client.data['dagpitoken'],
-            "url": url,
-            "text": text}
-        respurl = await self.client.session.post(
-            f'https://dagpi.tk/api/{feature}', headers=jsdic)
-        try:
-            js = await respurl.json()
-            return (js['url'])
-        except BaseException:
-            raise dex.APIError
 
     async def cog_check(self, ctx):
         g_id = str(ctx.guild.id)
@@ -178,9 +154,9 @@ class memes(commands.Cog):
 
         def check(message):
             return (
-                message.author == ctx.author
-                and message.channel == ctx.channel
-                and not message.author.bot
+                    message.author == ctx.author
+                    and message.channel == ctx.channel
+                    and not message.author.bot
             )
 
         try:
@@ -197,13 +173,13 @@ class memes(commands.Cog):
                 cont = msg.content
                 member = await BetterMemberConverter().convert(ctx, cont)
                 image_url = member.avatar_url(static_format='png', size='1024')
-            except BaseException:
+            except Exception:
                 pass
             if len(msg.attachments) != 0:
                 try:
                     image_url = msg.attachments[0].url
 
-                except BaseException:
+                except KeyError or AttributeError:
                     return await ctx.send(
                         "I was unable to use the attachment you provided"
                     )
@@ -251,11 +227,9 @@ class memes(commands.Cog):
                 bottomtext = bm.content
             await ctx.trigger_typing()
             finalt = toptext + "|" + bottomtext
-            y = await self.dagpiresult('retromeme', image_url, finalt)
-            if isinstance(y, str):
-                embed = discord.Embed(color=ctx.guild.me.color)
-                embed.set_image(url=y)
-                return await ctx.send(embed=embed)
+            img = await self.client.dagpi.image_process(
+                ImageFeatures.retromeme(), url=image_url, text=finalt)
+            await self.client.get_cog("image").to_embed(ctx, img, "Retromeme")
 
     @commands.command(cooldown_after_parsing=True)
     async def drake(
@@ -285,69 +259,70 @@ class memes(commands.Cog):
     @commands.command(cooldown_after_parsing=True, aliases=['mm'])
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def modernmeme(self, ctx):
-        await ctx.trigger_typing()
-        await ctx.send(
-            "Lets begin. Please send an image. It can be a url or an "
-            "attachment or a mention of a member!"
-        )
-
-        def check(message):
-            return (
-                message.author == ctx.author
-                and message.channel == ctx.channel
-                and not message.author.bot
-            )
-
-        try:
-            msg = await self.client.wait_for("message", timeout=60.0,
-                                             check=check)
-        except asyncio.TimeoutError:
-            return await ctx.send(
-                "No Image was provided, If you want me to make your meme at "
-                "least give me something to work with"
-            )
-        else:
-            try:
-                cont = msg.content
-                member = await BetterMemberConverter().convert(ctx, cont)
-                image_url = member.avatar_url(static_format='png', size='1024')
-            except BaseException:
-                pass
-            if len(msg.attachments) != 0:
-                try:
-                    image_url = msg.attachments[0].url
-
-                except BaseException:
-                    return await ctx.send(
-                        "I was unable to use the attachment you provided"
-                    )
-            elif len(msg.mentions) != 0:
-                image_url = str(
-                    msg.mentions[0].avatar_url_as(format='png', size=1024))
-            else:
-                source = msg.content
-                val_stat = await UrlValidator().validate(source)
-                if val_stat:
-                    image_url = str(source)
-                else:
-                    return await ctx.send('The URL provided was invalid.')
-            await ctx.send(
-                "Great, now hit me we with the puncline/top text/joke for the "
-                "meme. Please note whatever message you send is the content. "
-            )
-            try:
-                tm = await self.client.wait_for("message", timeout=60.0,
-                                                check=check)
-            except asyncio.TimeoutError:
-                return await ctx.send(
-                    "No top text was provided, If you want me to make your "
-                    "meme at least give me something to work with"
-                )
-            else:
-                toptext = tm.content
-            async with ctx.typing():
-                memurl = await self.dagpiresult('meme', image_url, toptext)
-                embed = discord.Embed(color=ctx.guild.me.color)
-                embed.description = f"View the image Here: [link]({memurl})"
-                embed.set_image(url=memurl)
-                return await ctx.send(embed=embed)
+        return await ctx.send("UNDER MAINTENANCE")
+        # await ctx.trigger_typing()
+        # await ctx.send(
+        #     "Lets begin. Please send an image. It can be a url or an "
+        #     "attachment or a mention of a member!"
+        # )
+        #
+        # def check(message):
+        #     return (
+        #         message.author == ctx.author
+        #         and message.channel == ctx.channel
+        #         and not message.author.bot
+        #     )
+        #
+        # try:
+        #     msg = await self.client.wait_for("message", timeout=60.0,
+        #                                      check=check)
+        # except asyncio.TimeoutError:
+        #     return await ctx.send(
+        #         "No Image was provided, If you want me to make your meme at "
+        #         "least give me something to work with"
+        #     )
+        # else:
+        #     try:
+        #         cont = msg.content
+        #         member = await BetterMemberConverter().convert(ctx, cont)
+        #         image_url = member.avatar_url(static_format='png', size='1024')
+        #     except BaseException:
+        #         pass
+        #     if len(msg.attachments) != 0:
+        #         try:
+        #             image_url = msg.attachments[0].url
+        #
+        #         except BaseException:
+        #             return await ctx.send(
+        #                 "I was unable to use the attachment you provided"
+        #             )
+        #     elif len(msg.mentions) != 0:
+        #         image_url = str(
+        #             msg.mentions[0].avatar_url_as(format='png', size=1024))
+        #     else:
+        #         source = msg.content
+        #         val_stat = await UrlValidator().validate(source)
+        #         if val_stat:
+        #             image_url = str(source)
+        #         else:
+        #             return await ctx.send('The URL provided was invalid.')
+        #     await ctx.send(
+        #         "Great, now hit me we with the puncline/top text/joke for the "
+        #         "meme. Please note whatever message you send is the content. "
+        #     )
+        #     try:
+        #         tm = await self.client.wait_for("message", timeout=60.0,
+        #                                         check=check)
+        #     except asyncio.TimeoutError:
+        #         return await ctx.send(
+        #             "No top text was provided, If you want me to make your "
+        #             "meme at least give me something to work with"
+        #         )
+        #     else:
+        #         toptext = tm.content
+        #     async with ctx.typing():
+        #         memurl = await self.dagpiresult('meme', image_url, toptext)
+        #         embed = discord.Embed(color=ctx.guild.me.color)
+        #         embed.description = f"View the image Here: [link]({memurl})"
+        #         embed.set_image(url=memurl)
+        #         return await ctx.send(embed=embed)

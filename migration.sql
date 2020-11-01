@@ -1,4 +1,4 @@
-CREATE TABLE [IF NOT EXISTS] cogpreferences (
+CREATE TABLE IF NOT EXISTS cogpreferences (
     serverid text,
     fun boolean,
     reddit boolean,
@@ -13,16 +13,17 @@ CREATE TABLE [IF NOT EXISTS] cogpreferences (
     memes boolean,
     misc boolean
 
-)
+);
 
-CREATE TABLE [IF NOT EXISTS] prefixesandstuff (
+CREATE TABLE IF NOT EXISTS prefixesandstuff (
     on_message_perm boolean,
     server_id text,
     command_prefix text
-)
+);
 
-CREATE TABLE [IF NOT EXISTS] automeme (
+CREATE TABLE IF NOT EXISTS automeme (
     server_id bigint,
+    channel_id bigint,
     webhook_url text,
     active boolean
-)
+);

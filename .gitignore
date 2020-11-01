@@ -4,3 +4,4 @@ __pycache__
 memes.json
 *.yml
 .idea
+dagbot/Dagbot.log

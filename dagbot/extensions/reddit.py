@@ -157,9 +157,7 @@ class reddit(commands.Cog):
             return memdict
             file.close()
 
-    @commands.command(cooldown_after_parsing=True)
-    @commands.cooldown(1, 2, commands.BucketType.user)
-    async def meme(self, ctx):
+    async def meme_embed(self):
         r = random.randint(0, 2)
         if r == 1:
             sub = "dankmemes"
@@ -167,15 +165,20 @@ class reddit(commands.Cog):
             sub = "memes"
         else:
             sub = "wholesome"
-        await ctx.trigger_typing()
         meme = await self.loadmeme(sub)
         embed = discord.Embed(
-            title=meme["title"], color=ctx.guild.me.color, url=meme["link"]
+            title=meme["title"], url=meme["link"]
         )
         embed.set_author(name=meme["author"], url=meme["authorurl"])
         embed.add_field(name="Upvotes", value=meme["doots"], inline=True)
         url = str(meme["post"])
         embed.set_image(url=url)
+        return embed
+
+    @commands.command(cooldown_after_parsing=True)
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def meme(self, ctx):
+        embed = await self.meme_embed()
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
