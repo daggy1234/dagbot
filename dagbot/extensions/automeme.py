@@ -18,7 +18,7 @@ class automeme(commands.Cog):
                                                self.bot.session))
                 embed = await self.bot.get_cog("reddit").meme_embed()
                 await webhook.send("Automeme", embed=embed)
-        self.bot.logger.info("AUTOMEMES DISPATCHED")
+        self.bot.logger.debug("AUTOMEMES DISPATCHED")
 
     @automeme_post.before_loop
     async def before_autoemer(self):

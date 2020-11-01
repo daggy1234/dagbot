@@ -235,7 +235,8 @@ class misc(commands.Cog):
     #         "hypesquad": "<:hypesquadevents:724328584789098639>",
     #         "hypesquad_balance": "<:hypesquadbalance:724328585166454845>",
     #         "hypesquad_bravery": "<:hypesquadbravery:724328585040625667>",
-    #         "hypesquad_brilliance": "<:hypesquadbrilliance:724328585363456070>",
+    #         "hypesquad_brilliance":
+    # "<:hypesquadbrilliance:724328585363456070>",
     #         "bug_hunter": "<:bughunt:724588087052861531>",
     #         "bug_hunter_level_2": "<:bug2:699986097694048327>",
     #         "verified_bot_developer": "<:verifiedbotdev:724328584872984607>",
@@ -458,8 +459,7 @@ class misc(commands.Cog):
         embed.add_field(
             name="Stats",
             value=f"{len(self.bot.guilds)} servers\n{len(self.bot.users)} users \
-                \n{channels} channels\n{len(self.bot.commands)} commands",
-        )
+                \n{channels} channels\n{len(self.bot.commands)} commands",)
         owner = self.bot.get_user(491174779278065689)
         embed.set_author(
             name=str(owner),

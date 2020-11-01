@@ -117,7 +117,8 @@ class tags(commands.Cog):
                             "Tag {} is now tag {}".format(name, newname))
                     else:
                         return await ctx.send(
-                            "Tag belongs to some one else, you cannot rename it")
+                            "Tag belongs to some one else, \
+                            you cannot rename it")
 
     @tag.command(cooldown_after_parsing=True)
     async def update(self, ctx, name, *, content):
@@ -154,7 +155,8 @@ class tags(commands.Cog):
                             "Changed the content of tag {}".format(name))
                     else:
                         return await ctx.send(
-                            "Tag belongs to some one else, you cannot update it")
+                            "Tag belongs to some one else, \
+                                you cannot update it")
 
     @tag.command(cooldown_after_parsing=True)
     async def delete(self, ctx, *, name):
@@ -189,7 +191,8 @@ class tags(commands.Cog):
                         return await ctx.send("Tag deleted succesfully")
                     else:
                         return await ctx.send(
-                            "Tag belongs to some one else, you cannot delete it")
+                            "Tag belongs to some one else, \
+                                you cannot delete it")
 
     @tag.command(cooldown_after_parsing=True)
     async def help(self, ctx):

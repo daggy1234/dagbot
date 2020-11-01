@@ -139,7 +139,8 @@ class smart(commands.Cog):
             soup.body.find(
                 "div",
                 attrs={
-                    "class": "pokemon-ability-info color-bg color-lightblue match active"
+                    "class": "pokemon-ability-info color-bg \
+                        color-lightblue match active"
                 },
             )
         )
@@ -160,9 +161,10 @@ class smart(commands.Cog):
             cul += 2
         return pokedict
 
-    async def spell(self, y):
+    async def get_spell(self, y):
         response = await self.client.session.get(
-            f"https://www.potterapi.com/v1/spells?key={self.client.data['hpapikey']}"
+            f"https://www.potterapi.com/v1/spells?key=\
+                {self.client.data['hpapikey']}"
         )
         flist = await (response.json())
         vallist = []
@@ -186,7 +188,8 @@ class smart(commands.Cog):
             return charstring
 
     async def getapod(self):
-        url = f"https://api.nasa.gov/planetary/apod?api_key={self.client.data['nasaapikey']}"
+        url = f"https://api.nasa.gov/planetary/apod?\
+            api_key={self.client.data['nasaapikey']}"
         y = await self.client.session.get(url)
         js = await y.json()
         return js
@@ -254,7 +257,8 @@ hp spell <spell> : gets information about spell    `"""
         guild = ctx.guild
         if not y:
             return await ctx.send(
-                "no results for {}, The api is case sensitive so do ensure the first letter is Caps".format(
+                "no results for {}, The api is case sensitive so do ensure the \
+                    first letter is Caps".format(
                     query
                 )
             )
@@ -267,7 +271,7 @@ hp spell <spell> : gets information about spell    `"""
             try:
                 role = y["role"]
             except BaseException:
-                i = 1
+                pass
             else:
                 embed.add_field(name="Role", value=role, inline=False)
                 if y["role"] == "student":
@@ -275,19 +279,19 @@ hp spell <spell> : gets information about spell    `"""
             try:
                 wand = y["wand"]
             except BaseException:
-                i = 1
+                pass
             else:
                 embed.add_field(name="Wand", value=wand, inline=False)
             try:
                 boggart = y["boggart"]
             except BaseException:
-                i = 1
+                pass
             else:
                 embed.add_field(name="Boggart", value=boggart, inline=False)
             try:
                 patronus = y["patronus"]
             except BaseException:
-                i = 1
+                pass
             else:
                 embed.add_field(name="Patronus", value=patronus, inline=False)
             if y["ministryOfMagic"]:
@@ -326,11 +330,12 @@ hp spell <spell> : gets information about spell    `"""
 
     @hp.command(aliases=["Spell", "spl", "Spl"])
     async def spell(self, ctx, *, query):
-        y = self.spell(query)
-        guild = ctx.guild
+        y = self.get_spell(query)
+        guild = ctx.guildß
         if not y:
             return await ctx.send(
-                "no results for {}, The api is case sensitive so do ensure the first letter is Caps".format(
+                "no results for {}, The api is case sensitive so do ensure the \
+                    first letter is Caps".format(
                     query
                 )
             )
@@ -384,7 +389,6 @@ hp spell <spell> : gets information about spell    `"""
         guild = ctx.guild
         url = f"https://oeis.org/A{num}"
         f = await self.client.session.get(url)
-        int_ = f.content
         html = await f.read()
 
         soup = BeautifulSoup(html, "html.parser")
@@ -394,18 +398,18 @@ hp spell <spell> : gets information about spell    `"""
             return await ctx.send(f"NO RESULTS FOR {num}")
         else:
             iti = soup.find("td", align="left").text
-            l = iti.replace("\n", "")
+            l_dat = iti.replace("\n", "")
             char = 0
             chrli = []
-            for i in range(0, len(l)):
-                if l[i] == " " and char == 0:
+            for i in range(0, len(l_dat)):
+                if l_dat[i] == " " and char == 0:
                     chrli.append("")
                     char = 0
-                elif l[i] == " " and char == 1:
+                elif l_dat[i] == " " and char == 1:
                     chrli.append(" ")
                     char = 0
-                elif l[i] != " ":
-                    chrli.append(l[i])
+                elif l_dat[i] != " ":
+                    chrli.append(l_dat[i])
                     char = 1
                 i += 1
             mst = ""
@@ -442,11 +446,10 @@ hp spell <spell> : gets information about spell    `"""
         dict_ = dictionary.meaning(word)
         k = dict_.keys()
         mast = ""
-        tlist = []
         for i in k:
             mli = dict_[i]
             mast = mast + f"\n__TYPE__:**{i}**"
-            mast = mast + f"\n__Meaning:__"
+            mast = mast + "\n__Meaning:__"
             for e in mli:
                 mast = mast + f"\n{e}"
         emed = discord.Embed(
@@ -499,7 +502,7 @@ hp spell <spell> : gets information about spell    `"""
         except BaseException:
             embed.add_field(
                 name="ERROR",
-                value="POKEMON DOES NOT EXITST ENTER NUMBER/NAME IN ALL SMALLS",
+                value="POKEMON DOES NOT EXIST ENTER NUMBER/NAME IN ALL SMALLS",
                 inline=True,
             )
             await channel.send(embed=embed)
@@ -549,7 +552,7 @@ hp spell <spell> : gets information about spell    `"""
                         qc + 1, ablename
                     )
                 except BaseException:
-                    tfdtfdtefdetdfetdfetd = 0
+                    pass
                 qc += 1
 
             embed.add_field(name="abilitylist", value=mstringyu, inline=False)

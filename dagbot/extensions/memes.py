@@ -44,15 +44,15 @@ class Source(menus.GroupByPageSource):
             f"{i}.{v.value}" for i, v in enumerate(entry.items, start=offset)
         )
         embed.description = (
-                "Dagbot's meme generation tool allows you to "
-                "access more than a 100+ meme templates.Browse through the "
-                "meme templates using the buttons below!\n "
-                "Once you select the template use the following template. "
-                "Use semicolons to seperate the number of text arguments "
-                "required! DO NOT NEED TO include all of them "
-                "`create template:text1:text2`\n **For example**\n`create "
-                "The scroll of truth:Dagbot is not the best:`\n"
-                + joined
+            "Dagbot's meme generation tool allows you to "
+            "access more than a 100+ meme templates.Browse through the "
+            "meme templates using the buttons below!\n "
+            "Once you select the template use the following template. "
+            "Use semicolons to seperate the number of text arguments "
+            "required! DO NOT NEED TO include all of them "
+            "`create template:text1:text2`\n **For example**\n`create "
+            "The scroll of truth:Dagbot is not the best:`\n"
+            + joined
         )
         return embed
 
@@ -154,9 +154,9 @@ class memes(commands.Cog):
 
         def check(message):
             return (
-                    message.author == ctx.author
-                    and message.channel == ctx.channel
-                    and not message.author.bot
+                message.author == ctx.author
+                and message.channel == ctx.channel
+                and not message.author.bot
             )
 
         try:
@@ -285,7 +285,8 @@ class memes(commands.Cog):
         #     try:
         #         cont = msg.content
         #         member = await BetterMemberConverter().convert(ctx, cont)
-        #         image_url = member.avatar_url(static_format='png', size='1024')
+        #         image_url = member.avatar_url(static_format='png',
+        #  size='1024')
         #     except BaseException:
         #         pass
         #     if len(msg.attachments) != 0:
@@ -307,8 +308,9 @@ class memes(commands.Cog):
         #         else:
         #             return await ctx.send('The URL provided was invalid.')
         #     await ctx.send(
-        #         "Great, now hit me we with the puncline/top text/joke for the "
-        #         "meme. Please note whatever message you send is the content. "
+        #         "Great, now hit me we with the \
+        # puncline/top text/joke for the "
+        #         "meme. Please note whatever message you send is the content."
         #     )
         #     try:
         #         tm = await self.client.wait_for("message", timeout=60.0,

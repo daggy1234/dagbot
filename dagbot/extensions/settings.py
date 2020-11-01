@@ -196,8 +196,9 @@ class settings(commands.Cog):
 
         def check(reaction, user):
             # print('reaction')
-            return reaction.message.id == msg.id and not user.bot and user.id == ctx.author.id and str(
-                reaction.emoji) == '<a:giftick:734746863340748892>'
+            return reaction.message.id == msg.id and not user.bot and \
+                user.id == ctx.author.id and \
+                str(reaction.emoji) == '<a:giftick:734746863340748892>'
 
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
@@ -215,9 +216,9 @@ class settings(commands.Cog):
                     """
                     data = await connection.fetch(query, ctx.guild.id)
                     try:
+                        adap = discord.AsyncWebhookAdapter(self.bot.session)
                         hook = discord.Webhook.from_url(data[0]["webhook_url"],
-                                                        adapter=discord.AsyncWebhookAdapter(
-                                                            self.bot.session))
+                                                        adapter=adap)
                     except KeyError or IndexError:
                         return await ctx.send(
                             "Could not find a automemer for this"
@@ -247,8 +248,9 @@ class settings(commands.Cog):
 
         def check(reaction, user):
             # print('reaction')
-            return reaction.message.id == msg.id and not user.bot and user.id == ctx.author.id and str(
-                reaction.emoji) == '<a:giftick:734746863340748892>'
+            return reaction.message.id == msg.id and not user.bot and \
+                user.id == ctx.author.id and \
+                str(reaction.emoji) == '<a:giftick:734746863340748892>'
 
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
@@ -262,7 +264,6 @@ class settings(commands.Cog):
             async with self.bot.pool.acquire() as connection:
                 async with connection.transaction():
                     del_query = """
-                        
                          UPDATE automeme
                          SET active = 'y'
                          WHERE server_id = $1;
@@ -297,8 +298,9 @@ class settings(commands.Cog):
 
         def check(reaction, user):
             # print('reaction')
-            return reaction.message.id == msg.id and not user.bot and user.id == ctx.author.id and str(
-                reaction.emoji) == '<a:giftick:734746863340748892>'
+            return reaction.message.id == msg.id and not user.bot and \
+                user.id == ctx.author.id and \
+                str(reaction.emoji) == '<a:giftick:734746863340748892>'
 
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
@@ -334,9 +336,9 @@ class settings(commands.Cog):
 
         def check(message):
             return (
-                    message.author == ctx.author
-                    and message.channel == ctx.channel
-                    and not message.author.bot
+                message.author == ctx.author
+                and message.channel == ctx.channel
+                and not message.author.bot
             )
 
         try:
@@ -349,9 +351,9 @@ class settings(commands.Cog):
             )
         else:
             try:
-                print(msg.content)
+                cont = (msg.content)
                 channel = await commands.TextChannelConverter().convert(ctx,
-                                                                        msg.content)
+                                                                        cont)
             except commands.ChannelNotFound or commands.BadArgument:
                 return await ctx.send("Could not get a channel "
                                       "from your message. Please try again.")
@@ -363,7 +365,8 @@ class settings(commands.Cog):
                     byt = await self.bot.user.avatar_url.read()
                     hook = await channel.create_webhook(name="Dagbot Automeme",
                                                         avatar=byt,
-                                                        reason="Dagbot Automeme Setup")
+                                                        reason="Dagbot \
+                                                            Automeme Setup")
                     await ctx.send("Created Webhook")
                 except discord.Forbidden or discord.HTTPException:
                     return await ctx.send("Dagbot needs the `create_webhook` "
@@ -376,10 +379,10 @@ class settings(commands.Cog):
                             INSERT INTO automeme
                             VALUES ($1,$2,$3,'y');
                             """
-                            res = await connection.execute(query,
-                                                           ctx.guild.id,
-                                                           channel.id,
-                                                           hook.url)
+                            await connection.execute(query,
+                                                     ctx.guild.id,
+                                                     channel.id,
+                                                     hook.url)
                     await self.bot.caching.automemecache()
                     return await ctx.send("Created AUTOMEMER")
 
@@ -401,7 +404,8 @@ class settings(commands.Cog):
             title="You hit me up?",
             description=f"""
                 My Prefix for this server is: `{prefix}`
-                Use the help command to get smart enough to use me: `{prefix}help` """,
+                Use the help command to get smart enough to use me: \
+                    `{prefix}help` """,
             color=ctx.guild.me.color,
         )
         embed.add_field(
@@ -410,7 +414,8 @@ class settings(commands.Cog):
         )
         embed.add_field(
             name="Invite Link",
-            value="[Click me](https://discordapp.com/api/oauth2/authorize?client_id=675589737372975124&permissions=378944&scope=bot)",
+            value="[Click me](https://discordapp.com/api/oauth2/authorize?\
+                client_id=675589737372975124&permissions=378944&scope=bot)",
         )
         await ctx.send(embed=embed)
         await ctx.invoke(cmd_cog)
@@ -437,8 +442,8 @@ class settings(commands.Cog):
                     "Adding Data to the Database. New Configuration")
                 await connection.execute(
                     """
-            INSERT INTO prefixesandstuff (on_message_perm,server_id,command_prefix)
-            VALUES (True,$1,'do ');""",
+        INSERT INTO prefixesandstuff (on_message_perm,server_id,command_prefix)
+        VALUES (True,$1,'do ');""",
                     str(g_id)
                 )
                 await connection.execute(

@@ -253,7 +253,8 @@ class image(commands.Cog):
     async def achievement(self, ctx, *, text):
         await ctx.trigger_typing()
         inta = random.randint(1, 44)
-        url = f"https://api.alexflipnote.dev/achievement?text={text}&icon={inta}"
+        url = f"https://api.alexflipnote.dev/achievement?\
+            text={text}&icon={inta}"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as y:
                 z = y.content
@@ -281,7 +282,8 @@ class image(commands.Cog):
             self,
             ctx,
             *,
-            text="I forgot to add text,split with a comma to indicate top and bottom text",
+            text="I forgot to add text,split with a comma to indicate top \
+                and bottom text",
     ):
         await ctx.trigger_typing()
         txtl = text.split(",")
@@ -332,7 +334,7 @@ class image(commands.Cog):
             self,
             ctx,
             *,
-            text="I forgot to add text,split with a comma for white and orange",
+            text="I forgot to add text,split with a comma for white and orange"
     ):
         await ctx.trigger_typing()
         txtl = text.split(",")

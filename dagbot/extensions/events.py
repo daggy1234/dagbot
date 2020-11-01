@@ -35,7 +35,9 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 )
                 embed.add_field(
                     name="Invite Link",
-                    value="[Click me](https://discordapp.com/api/oauth2/authorize?client_id=675589737372975124&permissions=378944&scope=bot)",
+                    value="[Click me](https://discordapp.com/api/oauth2/ \
+                        authorize?client_id=675589737372975124&permissions= \
+                            378944&scope=bot)",
                 )
                 await channel.send(embed=embed)
         # await self.bot.process_commands(message)
@@ -47,7 +49,9 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
             async with connection.transaction():
                 await connection.execute(
                     """
-            INSERT INTO prefixesandstuff (on_message_perm,server_id,command_prefix)
+            INSERT INTO prefixesandstuff (on_message_perm,
+                                        server_id,
+                                        command_prefix)
             VALUES (True,$1,'do ');""",
                     str(g_id)
                 )

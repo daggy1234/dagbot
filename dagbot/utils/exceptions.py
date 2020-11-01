@@ -18,7 +18,8 @@ class NoImageFound(Exception):
 
     def __str__(self):
         return (
-            f'There was no valid image at your source.\n Please provide a valid ```-attachment\n-User\n-Link\n-Emoji\n-Attachment```')
+            'There was no valid image at your source.\n Please provide a valid \
+            ```-attachment\n-User\n-Link\n-Emoji\n-Attachment```')
 
 
 class CustomError(Exception):

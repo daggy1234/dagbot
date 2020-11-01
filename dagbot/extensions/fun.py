@@ -268,8 +268,8 @@ class fun(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     async def wrongopinion(self, ctx):
         msg = (
-                "DAGBOTS RESPONSE TO YOUR OPINION"
-                + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/ \
+            "DAGBOTS RESPONSE TO YOUR OPINION"
+            + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/ \
                     695401408429817916/Nice_opinion_just_one_tiny_problem.mp4"
         )
         return await ctx.send(msg)

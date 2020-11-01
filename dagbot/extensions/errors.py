@@ -94,8 +94,8 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             times = error.number
             cat = error.per
             rets = random.choice(data.concur)
-            st = rets + \
-                 f"\nIt can only be used {times} time per {cat} concurrently."
+            st = rets + f"\nIt can only be used {times} \
+                time per {cat} concurrently."
             st = st.replace("BucketType.", "")
             return await ctx.send(
                 rets +
@@ -133,13 +133,15 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 return await ctx.send((error))
             elif isinstance(error, dagpibrok):
                 return await ctx.send('The API at https://dagpi.tk broke')
+            elif isinstance(error, dagpi_code_broke):
+                return await ctx.send('The code for dagpi broke')
             elif isinstance(error, dagpi_error.FileTooLarge):
                 return await ctx.send(
                     'The image your provided was too large to process')
             elif isinstance(error, dagpi_error.ImageUnaccesible):
                 return await ctx.send(
-                    'There was no image the bot could access at your url' + str(
-                        error))
+                    'There was no image the bot could access at your url' +
+                    str(error))
             else:
                 name = ctx.author.display_name
                 server = ctx.guild.name

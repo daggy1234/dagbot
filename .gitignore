@@ -5,3 +5,6 @@ memes.json
 *.yml
 .idea
 dagbot/Dagbot.log
+pythonenv3.8/
+*.assert
+*.snap

@@ -50,8 +50,8 @@ class DagbotHelp(commands.HelpCommand):
                     try:
                         reaction, user = await ctx.bot.wait_for('reaction_add',
                                                                 check=lambda
-                                                                    reaction,
-                                                                    user: str(
+                                                                reaction,
+                                                                user: str(
                                                                     reaction) in emoji_list and reaction.message.channel == ctx.channel and not user.bot,
                                                                 timeout=20)
                     except asyncio.TimeoutError:
