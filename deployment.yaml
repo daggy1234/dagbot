@@ -14,5 +14,19 @@ spec:
     spec:
       containers:
       - name: dagbot
-        image: Daggy1234/dagbot
-        imagePullPolicy: Always
+        image: daggy1234/dagbot:latest
+        volumeMounts:
+          - mountPath: configuration.yml
+            name: config
+        resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 50m
+              memory: 200Mi
+      volumes:
+        - name: config
+          hostPath:
+              path: configuration.yml
+              type: File
