@@ -1,6 +1,6 @@
 class caching:
     def __init__(self, bot):
-        print("will cache")
+        bot.logger.debug("WILL CACHE")
         self.bot = bot
 
     async def prefixcache(self):

@@ -1863,9 +1863,9 @@ class games(commands.Cog):
     async def wtp(self, ctx):
         obj = await self.bot.dagpi.wtp()
         rjs = obj.dict
-        q = rjs['question_image']
-        a = rjs['answer_image']
-        name = rjs['pokemon']['name']
+        q = rjs['question']
+        a = rjs['answer']
+        name = rjs['Data']['name']
         embed = discord.Embed(
             title='Whose That Pokemon?',
             color=ctx.guild.me.color)
