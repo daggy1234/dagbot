@@ -32,10 +32,19 @@ echo "Starting Dagbot"
 
 
 FILE=/configuration.yml
-if test -f "$FILE"; then
-    echo "$FILE exists."
+if  [ -z "$token" ]; then
+      if test -f "$FILE"; then
+          echo "$FILE exists."
+      else
+          echo "No env vars or configuration.yml found. Exiting"
+          exit 1
+      fi
 else
-  echo "PLEASE ADD a configuration.yml file"
+      echo "Generating Config.yml from enviroment vraibles"
+      python3 gen-config.py
+      cat configuration.yml
+      echo "Generated Config"
+
 fi
 
 exec python3 -m dagbot

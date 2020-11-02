@@ -8,3 +8,4 @@ dagbot/Dagbot.log
 pythonenv3.8/
 *.assert
 *.snap
+sample.env

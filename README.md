@@ -7,9 +7,16 @@ Dagbot needs 3 Tables in an SQL databse to function. You can use get the SQL fro
 
 Do note this is postgresql database
 
-### configuration.yml
+### configuration
 
+#### configuration.yml
 This is a file which stores all of dagbots data. You can view a sample in the repository
+
+#### .env
+**ONLY FOR DOCKER/k8s**
+Customise the `dagbot.env`
+
+If you do not want to use yaml you can set env vars and dagbot will autp generate the yml. This will only work whn using the container system.
 
 ### Dagbot Website
 
@@ -34,16 +41,36 @@ https://github.com/Gorialis/discord.py-docker/tree/master/dockerfiles
 
 #### Cloningf Repo and Building Image locally
 
-```
+Build Image
+
+```shell script
 docker build -t dagbot .
- docker run -v ${PWD}/configuration.yml:/configuration.yml dagbot   
 ```
 
+Run with configuration.yml
+
+```shell script
+docker run -v ${PWD}/configuration.yml:/configuration.yml dagbot   
+```
+
+Run with `.env`
+
+```shell script
+docker run --env-file dagbot.env dagbot   
+```
 
 #### Using the dockerhub image
 
+Run with configuration.yml
+
+```shell script
+docker run -v ${PWD}/configuration.yml:/configuration.yml daggy1234/dagbot:latest   
 ```
- docker run -v ${PWD}/configuration.yml:/configuration.yml daggy1234/dagbot:latest   
+
+Run with `.env`
+
+```shell script
+docker run --env-file dagbot.env daggy1234/dagbot:latest
 ```
 
 #### WIP
