@@ -15,9 +15,8 @@ spec:
       containers:
       - name: dagbot
         image: daggy1234/dagbot:latest
-        volumeMounts:
-          - mountPath: configuration.yml
-            name: config
+        envFrom:
+          - name: config
         resources:
             limits:
               cpu: 500m
@@ -25,8 +24,3 @@ spec:
             requests:
               cpu: 50m
               memory: 200Mi
-      volumes:
-        - name: config
-          hostPath:
-              path: configuration.yml
-              type: File
