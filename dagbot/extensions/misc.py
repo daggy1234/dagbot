@@ -49,8 +49,8 @@ class misc(commands.Cog):
         auth = ctx.author.display_name
         embed = discord.Embed(
             title="DAGBOT SUGGESTION ADDED",
-            description=f"```yaml\n{suggest}\n```\n**\
-            FROM:***{auth}\n**SERVER:**{fro}",
+            description=f"```yaml\n{suggest}\n```\n**"
+                        f"FROM:***{auth}\n**SERVER:**{fro}",
             color=ctx.guild.me.color,
         )
         embed.add_field(
@@ -407,9 +407,8 @@ class misc(commands.Cog):
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.add_field(
             name="Invite Link",
-            value="[Click me](https://discordapp.com/api/oauth2/\
-                authorize?client_id=675589737372975124&permissions=378944&\
-                    scope=bot)"
+            value="[Click me](https://discordapp.com/api/oauth2/authorize?"
+                  "client_id=675589737372975124&permissions=378944&scope=bot)"
 
         )
         return await ctx.send(embed=embed)
@@ -513,8 +512,8 @@ class misc(commands.Cog):
             com = self.bot.get_command(command)
             if com is None:
                 return await ctx.send(
-                    'There is no command with that name. Maybe check the repo\n\
-                        https://github.com/Daggy1234/dagbot')
+                    'There is no command with that name. Maybe check repo\n'
+                    'https://github.com/Daggy1234/dagbot')
             else:
                 code = com.callback.__code__
                 filename = code.co_filename

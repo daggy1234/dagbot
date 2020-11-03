@@ -2,6 +2,7 @@ import asyncio
 from contextlib import suppress
 
 import discord
+import difflib
 from async_timeout import timeout
 from discord.ext import commands
 
@@ -238,6 +239,27 @@ class DagbotHelp(commands.HelpCommand):
                 value=f"This command may be used only {rate}  per {typ}",
                 inline=False)
         return await ctx.send(embed=embed)
+
+    def command_not_found(self, string):
+        ctx = self.context
+        com = [command.qualified_name for command in ctx.bot.commands]
+        matches = difflib.get_close_matches(string, com)
+        base = f"No command named {string}\nDid you mean:\n"
+        if len(matches) == 0:
+            return f"No command named {string}"
+        coms = "\n".join([f"`{match}`" for match in matches])
+        return base + coms
+
+    def get_destination(self):
+        return self.context.channel
+
+    async def send_error_message(self, error):
+        ctx = self.context
+        destination = self.get_destination()
+        embed = discord.Embed(title="Help Error",
+                              color=ctx.guild.me.color)
+        embed.description = error
+        await destination.send(embed=embed)
 
 
 class help(commands.Cog):

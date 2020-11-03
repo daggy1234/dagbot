@@ -22,6 +22,7 @@ import traceback
 import discord
 from discord.ext import commands, menus
 from tabulate import tabulate
+from jishaku.codeblocks import codeblock_converter
 
 
 class TabulateData(menus.ListPageSource):
@@ -247,6 +248,35 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
                                                                  f'{cc}'),
                                 clear_reactions_after=True)
         return await pages.start(ctx)
+
+    @commands.command()
+    @commands.is_owner()
+    async def cleanup(self, ctx, message: int = 100):
+        async for message in ctx.channel.history(limit=message):
+            if message.author == self.bot.user:
+                await message.delete()
+
+    @commands.command()
+    @commands.is_owner()
+    async def cache(self, ctx):
+        await self.bot.caching.cogcache()
+        await self.bot.caching.prefixcache()
+        await self.bot.caching.automemecache()
+        await ctx.send("Cached Everything")
+
+    @commands.command()
+    @commands.is_owner()
+    async def eval(self, ctx, *, code: str):
+        cog = self.bot.get_cog("Jishaku")
+        res = codeblock_converter(code)
+        await cog.jsk_python(ctx, argument=res)
+
+    @commands.command()
+    @commands.is_owner()
+    async def shell(self, ctx, *, command: str):
+        cog = self.bot.get_cog("Jishaku")
+        code = codeblock_converter(command)
+        await cog.jsk_shell(ctx, argument=code)
 
 
 def setup(bot):
