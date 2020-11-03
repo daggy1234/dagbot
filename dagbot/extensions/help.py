@@ -44,18 +44,19 @@ class DagbotHelp(commands.HelpCommand):
         msg = await ctx.send(embed=embed)
         for emoji in emoji_list:
             await msg.add_reaction(emoji)
+
+        def check(reaction, user) -> bool:
+            return str(reaction) in emoji_list \
+                   and reaction.message.channel == ctx.channel \
+                   and not user.bot and user == ctx.author
         try:
             async with timeout(300):
                 while True:
                     try:
                         reaction, user = await ctx.bot.wait_for('reaction_add',
-                                                                check=lambda
-                                                                reaction,
-                                                                user: str(
-                                                                    reaction) in emoji_list and reaction.message.channel == ctx.channel and not user.bot,
+                                                                check=check,
                                                                 timeout=20)
                     except asyncio.TimeoutError:
-
                         continue
                     else:
 

@@ -30,8 +30,8 @@ def linecount():
                         else:
                             total += 1
     return (
-        f"I am made of {total:,} lines of Python, spread across  \
-        {file_amount:,} files!"
+        f"I am made of {total:,} lines of Python, spread across  "
+        f"{file_amount:,} files!"
     )
 
 
@@ -438,10 +438,11 @@ class misc(commands.Cog):
     async def about(self, ctx):
         embed = discord.Embed(
             title="About Dagbot",
-            description="A ~~low effort and kinda useless~~ bot, \
-            that does memes. With a bunch of hapahazardly thrown together \
-            features dagbot should fullfill the need to entertain."
-                        + linecount(), color=ctx.guild.me.color
+            description="A ~~low effort and kinda useless~~ bot, "
+                        "that does memes. With a bunch of hapahazardly "
+                        "thrown together features dagbot should fullfill the "
+                        "need to entertain." + linecount(),
+            color=ctx.guild.me.color
         )
         channels = 0
         for guild in self.bot.guilds:
@@ -449,35 +450,41 @@ class misc(commands.Cog):
                 channels += 1
         embed.add_field(
             name="Url's",
-            value="[Invite Link]\
-            (https://discordapp.com/api/oauth2/authorize?client_id=\
-            675589737372975124&permissions=378944&scope=bot)\n[Support Server]\
-            (https://discord.gg/grGkdeS)\n[API](https://dagpi.tk)\n[Website]\
-            (https://dagbot.daggy.tech)\n[Source]\
-            (https://github.com/Daggy1234/dagbot)",
+            value="[Invite Link](https://discordapp.com/api/"
+                  "oauth2/authorize?client_id=675589737372975124"
+                  "&permissions=378944&scope=bot)\n"
+                  "[Support Server](https://discord.gg/grGkdeS)\n"
+                  "[API](https://dagpi.tk)\n"
+                  "[Website](https://dagbot.daggy.tech)\n"
+                  "[Source](https://github.com/Daggy1234/dagbot)",
+            inline=True
         )
         embed.add_field(
             name="Stats",
-            value=f"{len(self.bot.guilds)} servers\n{len(self.bot.users)} users \
-                \n{channels} channels\n{len(self.bot.commands)} commands",)
+            value=f"{len(self.bot.guilds)} servers\n{len(self.bot.users)} "
+                  f"users \n{channels} channels\n{len(self.bot.commands)}"
+                  f" commands",
+            inline=True)
+        embed.add_field(name="<:python:737012280037736550>",
+                        value=platform.python_version(),
+                        inline=False)
+        embed.add_field(name="<:dpy:737012375747821650>",
+                        value=discord.__version__,
+                        inline=True)
         owner = self.bot.get_user(491174779278065689)
         embed.set_author(
             name=str(owner),
             icon_url=owner.avatar_url,
             url="https://github.com/Daggy1234/",
         )
-        versions = f"<:python:737012280037736550> Python \
-            {platform.python_version()}\n<:dpy:737012375747821650> \
-                discord.py {discord.__version__}"
-        embed.set_footer(text=versions)
         embed.timestamp = datetime.utcnow()
         return await ctx.send(embed=embed)
 
     @commands.command()
     async def credits(self, ctx):
-        return await ctx.send(
-            "Support Server my duded! Join and dm to get credit! \
-                This command will come soon"
+        await ctx.send(
+            "Support Server my duded! Join and dm to get credit! "
+            "This command will come soon"
         )
         cmd = self.bot.get_command("support")
         await ctx.invoke(cmd)
@@ -513,8 +520,8 @@ class misc(commands.Cog):
                 filename = code.co_filename
                 lines, firstline = inspect.getsourcelines(code)
                 location = os.path.relpath(filename).replace('\\', '/')
-                final_url = f'{repo}/blob/master/{location}#L{firstline}-L \
-                {firstline + len(lines) - 1}'
+                final_url = f'{repo}/blob/master/{location}#L{firstline}-L' \
+                            f'{firstline + len(lines) - 1}'
                 return await ctx.send(final_url)
 
 

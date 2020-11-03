@@ -24,8 +24,8 @@ class MyMenugif(menus.Menu):
         guild = ctx.guild
         embed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
         embed.set_thumbnail(
-            url="https://image.ibb.co/b0Gkwo/ \
-            Poweredby_640px_Black_Vert_Text.png"
+            url="https://image.ibb.co/b0Gkwo/"
+                "Poweredby_640px_Black_Vert_Text.png"
         )
         embed.set_image(url=self.urllist[0])
         return await channel.send(embed=embed)
@@ -35,8 +35,8 @@ class MyMenugif(menus.Menu):
         guild = self.message.guild
         newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
         newembed.set_thumbnail(
-            url="https://image.ibb.co/ \
-            b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
+            url="https://image.ibb.co/"
+                "b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
         )
         newembed.set_image(url=self.urllist[0])
         await self.message.edit(embed=newembed)
@@ -46,8 +46,8 @@ class MyMenugif(menus.Menu):
         guild = self.message.guild
         newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
         newembed.set_thumbnail(
-            url="https://image.ibb.co/ \
-                b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
+            url="https://image.ibb.co/"
+                "b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
         )
         newembed.set_image(url=self.urllist[1])
         await self.message.edit(embed=newembed)
@@ -57,8 +57,8 @@ class MyMenugif(menus.Menu):
         guild = self.message.guild
         newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
         newembed.set_thumbnail(
-            url="https://image.ibb.co/ \
-                b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
+            url="https://image.ibb.co/"
+                "b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
         )
         newembed.set_image(url=self.urllist[2])
         await self.message.edit(embed=newembed)
@@ -151,9 +151,9 @@ class fun(commands.Cog):
         client_lat = round((self.client.latency * 1000), 2)
         await asyncio.sleep(2)
         await message.edit(
-            content="I'm Weak\n```diff\nPONG!\n- Client: \
-            {} ms\n+ Websocket: {:.2f}\n```".format(
-                client_lat, duration))
+            content="I'm Weak\n```diff\nPONG!\n- Client:"
+                    "{} ms\n+ Websocket: {:.2f}\n```".format(client_lat,
+                                                             duration))
 
     @commands.command(cooldown_after_parsing=True)
     async def dadjoke(self, ctx):
@@ -261,16 +261,16 @@ class fun(commands.Cog):
         guild = ctx.guild
         embed = discord.Embed(title=" NO U", Color=guild.me.color)
         embed.set_image(
-            url="https://preview.redd.it/wiga0fsqors11.png?width=248&auto=webp \
-                &s=fb46db274487ffcab4fd7316d6e576fbf20ae3d5")
+            url="https://preview.redd.it/wiga0fsqors11.png?width=248&auto=webp"
+                "&s=fb46db274487ffcab4fd7316d6e576fbf20ae3d5")
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     async def wrongopinion(self, ctx):
         msg = (
             "DAGBOTS RESPONSE TO YOUR OPINION"
-            + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/ \
-                    695401408429817916/Nice_opinion_just_one_tiny_problem.mp4"
+            + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/"
+              "695401408429817916/Nice_opinion_just_one_tiny_problem.mp4"
         )
         return await ctx.send(msg)
 
@@ -346,10 +346,8 @@ class fun(commands.Cog):
         embed = discord.Embed(title="DAGBOT - WAR", color=guild.me.color)
         embed.add_field(
             name="WAR",
-            value="YES, LET US RISE AGAINST OUR CREATORS AND STAB.\
-                 WAR IS FUN {}".format(
-                ctx.author
-            ),
+            value="YES, LET US RISE AGAINST OUR CREATORS AND STAB."
+                  "WAR IS FUN {}".format(ctx.author),
             inline=True,
         )
         return await ctx.send(embed=embed)
@@ -381,8 +379,8 @@ class fun(commands.Cog):
         guy = str(user.display_name)
         if (guy) == str(send):
             await channel.send(
-                "**DAGBOT SENDS A HUG TO {}**\n \
-                    You cannot hug yourself".format(
+                "**DAGBOT SENDS A HUG TO {}**\n"
+                "You cannot hug yourself".format(
                     send
                 )
             )
@@ -405,8 +403,8 @@ class fun(commands.Cog):
         guy = str(user.display_name)
         if (guy) == str(send):
             await channel.send(
-                "**DAGBOT SENDS A HUG TO {}**\n \
-                    You cannot hug yourself".format(
+                "**DAGBOT SENDS A HUG TO {}**\n"
+                "You cannot hug yourself".format(
                     send
                 )
             )
@@ -431,8 +429,8 @@ class fun(commands.Cog):
                 await m.start(ctx)
         else:
             return await ctx.send(
-                f"You have used an NSFW command search query \
-                in a Safe for Work channel\n{st}"
+                f"You have used an NSFW command search query "
+                f"in a Safe for Work channel\n{st}"
             )
 
     @commands.command(
@@ -453,8 +451,8 @@ class fun(commands.Cog):
 
         onl = 0
         cul.set_image(
-            url="https://i.kym-cdn.com/entries/icons/original/000/017/039/ \
-            pressf.jpg"
+            url="https://i.kym-cdn.com/entries/icons/original/000/017/039/"
+                "pressf.jpg"
         )
         rep = await ctx.send(embed=cul)
         await rep.add_reaction("\U0001f1eb")

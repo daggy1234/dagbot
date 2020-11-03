@@ -43,8 +43,9 @@ class ai(commands.Cog):
                     return False
 
     async def ocra(self, ur):
-        url = f"https://eu-vision.googleapis.com/v1/ \
-        images:annotate?key={self.gapikey}"
+        url = f"https://eu-vision.googleapis.com/v1/" \
+              f"images:annotate?key={self.gapikey}"
+        print(url)
         payload = {
             "requests": [
                 {
@@ -73,8 +74,8 @@ class ai(commands.Cog):
         return mst
 
     async def labela(self, ur):
-        url = f"https://vision.googleapis.com/v1/ \
-        images:annotate?key={self.gapikey}"
+        url = f"https://vision.googleapis.com/v1/" \
+              f"images:annotate?key={self.gapikey}"
         payload = {
             "requests": [
                 {

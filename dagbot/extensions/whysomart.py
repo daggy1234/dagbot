@@ -53,8 +53,8 @@ class smart(commands.Cog):
 
     async def characterhpget(self, y):
         response = await self.client.session.get(
-            f"https://www.potterapi.com/v1/characters?\
-                key={self.client.data['hpapikey']}"
+            f"https://www.potterapi.com/v1/characters?"
+            f"key={self.client.data['hpapikey']}"
         )
         flist = await (response.json())
         vallist = []
@@ -139,8 +139,8 @@ class smart(commands.Cog):
             soup.body.find(
                 "div",
                 attrs={
-                    "class": "pokemon-ability-info color-bg \
-                        color-lightblue match active"
+                    "class": "pokemon-ability-info color-bg "
+                             "color-lightblue match active"
                 },
             )
         )
@@ -163,8 +163,8 @@ class smart(commands.Cog):
 
     async def get_spell(self, y):
         response = await self.client.session.get(
-            f"https://www.potterapi.com/v1/spells?key=\
-                {self.client.data['hpapikey']}"
+            f"https://www.potterapi.com/v1/spells?key="
+            f"{self.client.data['hpapikey']}"
         )
         flist = await (response.json())
         vallist = []
@@ -188,8 +188,8 @@ class smart(commands.Cog):
             return charstring
 
     async def getapod(self):
-        url = f"https://api.nasa.gov/planetary/apod?\
-            api_key={self.client.data['nasaapikey']}"
+        url = f"https://api.nasa.gov/planetary/apod?" \
+              f"api_key={self.client.data['nasaapikey']}"
         y = await self.client.session.get(url)
         js = await y.json()
         return js
@@ -257,8 +257,8 @@ hp spell <spell> : gets information about spell    `"""
         guild = ctx.guild
         if not y:
             return await ctx.send(
-                "no results for {}, The api is case sensitive so do ensure the \
-                    first letter is Caps".format(
+                "no results for {}, The api is case sensitive so do ensure the"
+                "first letter is Caps".format(
                     query
                 )
             )
@@ -334,8 +334,8 @@ hp spell <spell> : gets information about spell    `"""
         guild = ctx.guildß
         if not y:
             return await ctx.send(
-                "no results for {}, The api is case sensitive so do ensure the \
-                    first letter is Caps".format(
+                "no results for {}, The api is case sensitive so do "
+                "ensure the first letter is Caps".format(
                     query
                 )
             )

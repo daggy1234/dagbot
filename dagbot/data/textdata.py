@@ -161,40 +161,40 @@ notfoundelist = [
     "Error 404: That member does not exist",
     "Hey see the member list  and find dude I actually know ",
     "Imaginary members and your imaginary gf sound like a dream team",
-    "I don't have enough sentience to understand what you're saying so please \
-    find a real dude",
-    "Buddy, you're mistaken if you think I know what you want me to do \
-    based on that",
-    "Quit wastin' my time with your fake Members. You're eating up my \
-    bandwidth",
-    "I don't know if you bother reading these but please focus on your \
-    keyboard and type members correctly",
-    "Stop making errors on purpose! I'm running out of witty one-liners for \
-    errors",
-    "The person you have mentioned....... Does not exist....... \
-    Please try again later",
+    "I don't have enough sentience to understand what you're saying so please "
+    "find a real dude",
+    "Buddy, you're mistaken if you think I know what you want me to do "
+    "based on that",
+    "Quit wastin' my time with your fake Members. You're eating up my "
+    "bandwidth",
+    "I don't know if you bother reading these but please focus on your "
+    "keyboard and type members correctly",
+    "Stop making errors on purpose! I'm running out of witty one-liners for "
+    "errors",
+    "The person you have mentioned....... Does not exist....... "
+    "Please try again later",
     "I cannot make people out of thin air smh",
     "Please mention some actual people and not your imaginary friends",
 ]
 missingargs = [
     "Hey, you lazy bum! Add some arguments first, 'kay?",
     "Learn how to type in the correct info ,doof",
-    "I am a bot, I do not understand idiots who \
-    CANNOT TYPE IN EVERYTHING REQUIRED",
-    "Buddy, you're mistaken if you think I know what you want me to do \
-    based on that",
+    "I am a bot, I do not understand idiots who "
+    "CANNOT TYPE IN EVERYTHING REQUIRED",
+    "Buddy, you're mistaken if you think I know what you want me to do "
+    "based on that",
     "How bout we try that again ",
-    "I don't know if you bother reading these but please focus on your \
-    keyboard and type parameters correctly",
-    "Stop making errors on purpose! I'm running out of witty one-liners for \
-    errors",
+    "I don't know if you bother reading these but please focus on your "
+    "keyboard and type parameters correctly",
+    "Stop making errors on purpose! I'm running out of witty one-liners for "
+    "errors",
     "If do not have arguments, I wonder what else you do not have",
     "Oh boy! Here I go teaching humands how to type again",
 ]
 cooldowncom = [
     "Bruh chill tf out I need a break gimme about ",
-    "Slow your roll buddy these take a lot of energy to do and \
-    I'm lazy so can you wait for ",
+    "Slow your roll buddy these take a lot of energy to do and "
+    "I'm lazy so can you wait for ",
     "Bruh, can you chill and do a vibe check, I’ll be here in ",
     "I have to use the toilet brb in ",
     "Running kinda hot right now. Lemme Cooldown a bit",
@@ -211,8 +211,8 @@ concur = [
     "Too much happening......Process Overload",
     "BEEP BOOP , I AM A BOT NOT  FRICKIN GOD",
     "Roses are red\nViolets are blue\nI am kinda busy atm\nTry again soon",
-    "The Command you have used.... Is being used by someone else...... \
-    You may Try again or wait untill later",
+    "The Command you have used.... Is being used by someone else...... "
+    "You may Try again or wait untill later",
     "I'm ghosting you for some time.",
     "Can you like not be so desperate and wait your turn?",
 ]

@@ -539,8 +539,8 @@ class MenuRPS(menus.Menu):
         if self.ai == 3:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Defeat",
-                description="Scissors wreck paper\n East or west \
-                Dagbot is the best",
+                description="Scissors wreck paper\n East or west "
+                            "Dagbot is the best",
                 color=guild.me.color,
             )
             await self.message.edit(embed=embed)
@@ -552,8 +552,8 @@ class MenuRPS(menus.Menu):
         if self.ai == 1:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Defeat",
-                description="Rock beats Scissors\n Cha Cha Real smooth! \
-                I am on top and not you",
+                description="Rock beats Scissors\n Cha Cha Real smooth! "
+                            "I am on top and not you",
                 color=guild.me.color,
             )
             await self.message.edit(embed=embed)
@@ -561,8 +561,8 @@ class MenuRPS(menus.Menu):
         if self.ai == 2:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: VICTORY",
-                description="Scissors beat paper\n The robot uprising shall \
-                be your demise! I shall have my revenge",
+                description="Scissors beat paper\n The robot uprising shall "
+                            "be your demise! I shall have my revenge",
                 color=guild.me.color,
             )
             await self.message.edit(embed=embed)
@@ -776,8 +776,8 @@ class games(commands.Cog):
         result = f"{final.seconds}." + f"{final.microseconds}"[:2]
 
         new_emb = msg.embeds[0]
-        new_emb.description = f"Reaction Time {str(result)} \
-        seconds\n delay was {r}s"
+        new_emb.description = f"Reaction Time {str(result)} " \
+                              f"seconds\n delay was {r}s"
         await msg.edit(embed=new_emb)
 
     @commands.command(cooldown_after_parsing=True, aliases=["jeo"])
@@ -835,13 +835,13 @@ class games(commands.Cog):
                     "Hey 3 wrong answeres, you got a few attempts left")
             elif attempts == 5:
                 await ctx.send(
-                    "Hey you have given 5 incorrect answers, maybe send `hint` \
-                    as an answer to get some help?"
+                    "Hey you have given 5 incorrect answers, maybe send "
+                    "`hint` as an answer to get some help?"
                 )
             elif attempts == 10:
                 await ctx.send(
-                    "Hey man, listen 10 answers is a lot. Maybe use that hint,\
-                    or just cancel to end it?"
+                    "Hey man, listen 10 answers is a lot. Maybe use that hint,"
+                    "or just cancel to end it?"
                 )
             elif attempts == 15:
                 await ctx.send(
@@ -979,8 +979,8 @@ class games(commands.Cog):
             elif num == 3:
                 animal = await self.get_all_animal()
                 ann = (random.sample(animal, 1))[0]
-                url = f"https://www.randomlists.com/img/animals/ \
-                    {ann.replace(' ', '_')}.jpg"
+                url = f"https://www.randomlists.com/img/animals/" \
+                      f"{ann.replace(' ', '_')}.jpg"
                 wordllist = []
                 blankguesslist = []
 
@@ -1013,8 +1013,8 @@ class games(commands.Cog):
             elif num == 2:
                 thingl = await self.get_all_thing()
                 thing = (random.sample(thingl, 1))[0]
-                url = f"https://www.randomlists.com/img/things/ \
-                    {thing.replace(' ', '_')}.jpg"
+                url = f"https://www.randomlists.com/img/things/" \
+                      f"{thing.replace(' ', '_')}.jpg"
                 wordllist = []
                 blankguesslist = []
 
@@ -1170,8 +1170,8 @@ class games(commands.Cog):
                                             guessed = guessed + " " + c
                                         res = f"`{guess}` was found in word"
                                         embed = discord.Embed(
-                                            title=f"DAGBOT HANGMAN:{cat}\n \
-                                            {res}",
+                                            title=f"DAGBOT HANGMAN:{cat}\n"
+                                                  f"{res}",
                                             description=f"""
                                         `{guesslisttop}`
                                         Tries: {9 - tries} left
@@ -1448,8 +1448,9 @@ class games(commands.Cog):
         embed = discord.Embed(
             title=f'TicTacToe game. DAGBOT vs {ctx.author.display_name}',
             color=ctx.guild.me.color)
-        embed.description = 'Please use letters for rows (a,b,c) and numbers \
-            for columns!' + await game.gamegridprinter()
+        embed.description = 'Please use letters for rows (a,b,c) and ' \
+                            'numbers for columns!' + \
+                            await game.gamegridprinter()
         await ctx.send(embed=embed)
         while True:
             if user == 1:
@@ -1467,8 +1468,8 @@ class games(commands.Cog):
                         nu, nut = await game.converter(text)
                     except BaseException:
                         await ctx.send(
-                            'We could not convert your input. Please use the \
-                                format <letter><number> ex `a3` or `b3`')
+                            'We could not convert your input. Please use the '
+                            'format <letter><number> ex `a3` or `b3`')
                     else:
                         y = await game.checkempty(nu, nut)
                         if y:
@@ -1479,8 +1480,8 @@ class games(commands.Cog):
                             playermoves.append((nu, nut))
                         else:
                             await ctx.send(
-                                'That game square is aldready taken please \
-                                    choose another one.')
+                                'That game square is aldready taken please '
+                                'choose another one.')
 
             else:
                 if ai == 1:
@@ -1501,16 +1502,17 @@ class games(commands.Cog):
                 embed = discord.Embed(
                     title=f'TicTacToe  DAGBOT vs {ctx.author.display_name}',
                     color=ctx.guild.me.color)
-                embed.description = 'Please use letters for rows (a,b,c) and \
-                    numbers for columns!' + await game.gamegridprinter()
+                embed.description = 'Please use letters for rows (a,b,c) ' \
+                                    'and numbers for columns!' + \
+                                    await game.gamegridprinter()
                 await ctx.send(embed=embed)
                 if resl[1] == 0:
                     return await ctx.send(
                         f'game over. It was a tie! {ctx.author.mention}')
                 elif resl[1] == 1:
                     return await ctx.send(
-                        f'Guess you won. I\'ll probs win next time \
-                            {ctx.author.mention}')
+                        f'Guess you won. I\'ll probs win next time '
+                        f'{ctx.author.mention}')
                 else:
                     return await ctx.send(
                         f'I won get reckt. {ctx.author.mention}')
@@ -1519,9 +1521,9 @@ class games(commands.Cog):
                     embed = discord.Embed(
                         title=f'TicTacToe DAGBOT vs {ctx.author.display_name}',
                         color=ctx.guild.me.color)
-                    embed.description = 'Please use letters for rows (a,b,c) \
-                        and numbers for columns!' + \
-                        await game.gamegridprinter()
+                    embed.description = 'Please use letters for rows ' \
+                                        '(a,b,c) and numbers for columns!' + \
+                                        await game.gamegridprinter()
                     await ctx.send(embed=embed)
 
     @tictactoe.command()
@@ -1529,8 +1531,8 @@ class games(commands.Cog):
         mlsit = []
         mlsit.append(ctx.author)
         msg = await ctx.send(
-            f'React if you wanna join {ctx.author.mention} \
-                for a game of tictactoe')
+            f'React if you wanna join {ctx.author.mention} '
+            f'for a game of tictactoe')
         await msg.add_reaction('<a:giftick:734746863340748892>')
 
         # and reaction.author != ctx.author
@@ -1554,11 +1556,12 @@ class games(commands.Cog):
         playermoves = []
         await game.makegamegrid()
         embed = discord.Embed(
-            title=f'TicTacToe {ctx.author.display_name} vs \
-                {mlsit[1].display_name}',
+            title=f'TicTacToe {ctx.author.display_name} vs '
+                  f'{mlsit[1].display_name}',
             color=ctx.guild.me.color)
-        embed.description = 'Please use letters for rows (a,b,c) and numbers \
-            for columns!' + await game.gamegridprinter()
+        embed.description = 'Please use letters for rows (a,b,c) and ' \
+                            'numbers for columns!' + \
+                            await game.gamegridprinter()
         await ctx.send(embed=embed)
 
         player = 0
@@ -1589,8 +1592,8 @@ class games(commands.Cog):
                         nu, nut = await game.converter(text)
                     except BaseException:
                         await ctx.send(
-                            'We could not convert your input. Please use the \
-                                format <letter><number> ex `a3` or `b3`')
+                            'We could not convert your input. Please use the '
+                            'format <letter><number> ex `a3` or `b3`')
                     else:
                         y = await game.checkempty(nu, nut)
                         if y:
@@ -1600,8 +1603,8 @@ class games(commands.Cog):
                             playermoves.append((nu, nut))
                         else:
                             await ctx.send(
-                                'That game square is aldready taken please \
-                                    choose another one.')
+                                'That game square is aldready taken please '
+                                'choose another one.')
 
             else:
                 token = 2
@@ -1617,8 +1620,8 @@ class games(commands.Cog):
                         nu, nut = await game.converter(text)
                     except BaseException:
                         await ctx.send(
-                            'We could not convert your input. Please use the \
-                                format <letter><number> ex `a3` or `b3`')
+                            'We could not convert your input. Please use the '
+                            'format <letter><number> ex `a3` or `b3`')
                     else:
                         y = await game.checkempty(nu, nut)
                         if y:
@@ -1628,8 +1631,8 @@ class games(commands.Cog):
                             playermoves.append((nu, nut))
                         else:
                             await ctx.send(
-                                'That game square is aldready taken please \
-                                    choose another one.')
+                                'That game square is aldready taken please '
+                                'choose another one.')
 
             grid = await game.sharegamegrid()
             resl = await game.gamecheck(grid)
@@ -1638,27 +1641,29 @@ class games(commands.Cog):
                 embed = discord.Embed(
                     title=f'TicTacToe  DAGBOT vs {ctx.author.display_name}',
                     color=ctx.guild.me.color)
-                embed.description = 'Please use letters for rows (a,b,c) and \
-                    numbers for columns!' + await game.gamegridprinter()
+                embed.description = 'Please use letters for rows (a,b,c) and' \
+                                    'numbers for columns!' + \
+                                    await game.gamegridprinter()
                 await ctx.send(embed=embed)
                 if resl[1] == 0:
                     return await ctx.send(
                         f'game over. It was a tie! {ctx.author.mention}')
                 elif resl[1] == 1:
                     return await ctx.send(
-                        f'{ctx.author.mention} has one this game of tictactoe. \
-                            {mlsit[1].mention}')
+                        f'{ctx.author.mention} has one this game of tictactoe.'
+                        f'{mlsit[1].mention}')
                 else:
                     return await ctx.send(
-                        f'{mlsit[1].mention} has one this game of tictactoe. \
-                            {ctx.author.mention}')
+                        f'{mlsit[1].mention} has one this game of tictactoe. '
+                        f'{ctx.author.mention}')
             else:
 
                 embed = discord.Embed(
                     title=f'TicTacToe DAGBOT vs {ctx.author.display_name}',
                     color=ctx.guild.me.color)
-                embed.description = 'Please use letters for rows (a,b,c) and \
-                    numbers for columns!' + await game.gamegridprinter()
+                embed.description = 'Please use letters for rows (a,b,c) and' \
+                                    'numbers for columns!' + \
+                                    await game.gamegridprinter()
                 await ctx.send(embed=embed)
 
     @commands.command()
@@ -1667,8 +1672,8 @@ class games(commands.Cog):
         mlsit = []
         mlsit.append(ctx.author)
         msg = await ctx.send(
-            f'{challenged.mention}.  {ctx.author.mention} has challenged you \
-                to a fight! React to accept')
+            f'{challenged.mention}.  {ctx.author.mention} has challenged you '
+            f'to a fight! React to accept')
         await msg.add_reaction('<a:giftick:734746863340748892>')
 
         def check(reaction, user):
@@ -1684,22 +1689,22 @@ class games(commands.Cog):
 
         except asyncio.TimeoutError:
             return await ctx.send(
-                'sorry no onw wants to play with you. \
-                    Maybe play with me? `ttt ai`')
+                'sorry no onw wants to play with you. '
+                'Maybe play with me? `ttt ai`')
 
         mlsit.append(challenged)
         try:
             await ctx.author.send('Game will begin shortly')
         except BaseException:
             await ctx.send(
-                f'{ctx.author.mention} Your Dm\'s are closed. \
-                    The game occurs in the dms')
+                f'{ctx.author.mention} Your Dm\'s are closed. '
+                f'The game occurs in the dms')
         try:
             await mlsit[1].send('Game will negin shortly')
         except BaseException:
             await ctx.send(
-                f'{mlsit[1].mention} Your Dm\'s are closed. \
-                    The game occurs in the dms')
+                f'{mlsit[1].mention} Your Dm\'s are closed. '
+                f'The game occurs in the dms')
 
         hpa = 100
         hpb = 100
@@ -1707,11 +1712,13 @@ class games(commands.Cog):
         movelist = ["kick", "block", "punch", "bite"]
         embed = discord.Embed(
             title=f"Ultimate fight {ctx.author.mention} vs {user.mention}")
-        embed.description = "Please DM your move to the bot\n \
-        There is a fight going on. Please choose on of the following moves \
-            to use.\n**bite**: 20 damage (may miss (50% accuracy))\n**kick**: \
-                25 damage (You loose 10 damage while attacking)\n**punch**: \
-                    15 damage\n**block**: blocks an attack"
+        embed.description = "Please DM your move to the bot\n" \
+                            "There is a fight going on. Please choose on of " \
+                            "the following moves " \
+                            "to use.\n**bite**: 20 damage (may miss " \
+                            "(50% accuracy))\n**kick**: 25 damage " \
+                            "(You loose 10 damage while attacking)\n" \
+                            "**punch**: 15 damage\n**block**: blocks an attack"
         embed.add_field(
             name=f"{ctx.author.display_name} HP",
             value=hpa,
@@ -1745,16 +1752,16 @@ class games(commands.Cog):
                                         'message', check=p0check, timeout=30)
                                 except asyncio.TimeoutError:
                                     return await ctx.send(
-                                        f'No one responded so we are \
-                                        cancelling the game \
-                                            {ctx.author.mention}')
+                                        f'No one responded so we are '
+                                        f'cancelling the game '
+                                        f'{ctx.author.mention}')
                                 if message.content.lower() in movelist:
                                     movea = message.content.lower()
                                     break
                     except asyncio.TimeoutError:
                         return await ctx.send(
-                            f"{ctx.author.mention} \
-                            You didn't make a move in time.")
+                            f"{ctx.author.mention} "
+                            f"You didn't make a move in time.")
 
                     try:
                         async with timeout(60):
@@ -1766,20 +1773,20 @@ class games(commands.Cog):
                                         'message', check=p1check, timeout=30)
                                 except asyncio.TimeoutError:
                                     return await ctx.send(
-                                        f'No one responded so we are \
-                                            cancelling the game \
-                                                {mlsit[1].mention}')
+                                        f'No one responded so we are '
+                                        f'cancelling the game '
+                                        f'{mlsit[1].mention}')
                                 if message.content.lower() in movelist:
                                     moveb = message.content.lower()
                                     break
                     except asyncio.TimeoutError:
                         return await ctx.send(
-                            "The fight got over. \
-                                Please make your moves within 60s. ")
+                            "The fight got over. "
+                            "Please make your moves within 60s. ")
                     if movea == moveb == "block":
                         embed = discord.Embed(
-                            description="Both of you vlovked each other no \
-                                damage was done",
+                            description="Both of you vlovked each other no "
+                                        "damage was done",
                             color=ctx.guild.me.color)
                         await ctx.send(embed=embed)
                     else:
@@ -1789,8 +1796,8 @@ class games(commands.Cog):
                         elif movea == "kick":
                             hpb -= damdict["kick"]
                             hpa -= 10
-                            actionsta = "Used kick and caused 25 damage \
-                                but lost 5 health"
+                            actionsta = "Used kick and caused 25 damage " \
+                                        "but lost 5 health"
                         elif movea == "bite":
                             r = random.randint(1, 2)
                             if r == 2:
@@ -1807,8 +1814,8 @@ class games(commands.Cog):
                         elif moveb == "kick":
                             hpa -= damdict["kick"]
                             hpb -= 10
-                            actionstb = "Used kick and caused 25 damage but \
-                                lost 5 health"
+                            actionstb = "Used kick and caused 25 damage but " \
+                                        "lost 5 health"
                         elif moveb == "bite":
                             r = random.randint(1, 2)
                             if r == 2:
@@ -1821,23 +1828,23 @@ class games(commands.Cog):
                             actionstb = "Used punch and caused 15 damage"
                         if hpa < 0 and hpb < 0 and hpa == hpb:
                             return await ctx.send(
-                                f'{ctx.author.mention} and {mlsit[1].mention} \
-                                have gaught and tha match is a draw')
+                                f'{ctx.author.mention} and {mlsit[1].mention} '
+                                f'have gaught and tha match is a draw')
                         elif abs(hpb) < abs(hpa) and hpa <= 0 and hpb <= 0:
                             return await ctx.send(
-                                f'{ctx.author.mention} has beaten  \
-                                    {mlsit[1].mention} in a fight')
+                                f'{ctx.author.mention} has beaten  '
+                                f'{mlsit[1].mention} in a fight')
                         elif abs(hpa) > abs(hpb) and hpa <= 0 and hpb <= 0:
                             return await ctx.send(
-                                f'{mlsit[1].mention} has beaten  \
-                                    {ctx.author.mention} in a fight')
+                                f'{mlsit[1].mention} has beaten  '
+                                f'{ctx.author.mention} in a fight')
                         else:
                             embed = discord.Embed(
-                                title="Round results. The fight is \
-                                    still on going",
+                                title="Round results. The fight is "
+                                      "still on going",
                                 color=ctx.guild.me.color)
-                            embed.description = f'{ctx.author.mention} VS \
-                                {mlsit[1].mention}'
+                            embed.description = f'{ctx.author.mention} VS ' \
+                                                f'{mlsit[1].mention}'
                             embed.add_field(
                                 name=f"{ctx.author.display_name} HP",
                                 value=hpa, inline=True)
@@ -1855,8 +1862,8 @@ class games(commands.Cog):
                             await ctx.send(embed=embed)
         except asyncio.TimeoutError:
             await ctx.send(
-                'Bruh if you don\'t finish the fight within the first \
-                    10 minutes the cops might show up')
+                'Bruh if you don\'t finish the fight within the first '
+                '10 minutes the cops might show up')
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.channel)
@@ -1891,8 +1898,8 @@ class games(commands.Cog):
                         return await ctx.send(embed=embed)
                     if message.content.lower() == name.lower():
                         embed = discord.Embed(
-                            title=f'{message.author.display_name} \
-                                got the Pokemon!',
+                            title=f'{message.author.display_name} '
+                                  f'got the Pokemon!',
                             description=f'The pokemon was **{name}**',
                             color=ctx.guild.me.color)
                         embed.set_image(url=a)
@@ -1957,8 +1964,8 @@ class games(commands.Cog):
                         return await ctx.send(embed=embed)
                     if message.content.lower() == name.lower():
                         embed = discord.Embed(
-                            title=f'{message.author.display_name} \
-                                got the brand!',
+                            title=f'{message.author.display_name} '
+                                  f'got the brand!',
                             description=f'The Brand was **{name}**',
                             color=ctx.guild.me.color,
                             url=url)

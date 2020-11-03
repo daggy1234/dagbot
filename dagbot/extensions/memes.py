@@ -103,8 +103,8 @@ class memes(commands.Cog):
                         timplist.append(e["id"])
                 if len(timplist) == 0:
                     return await ctx.send(
-                        "No results\nUse the command `create` to view the \
-                            options!"
+                        "No results\nUse the command `create` to view the "
+                        "options!"
                     )
                 elif len(timplist) > 1:
                     return await ctx.send(

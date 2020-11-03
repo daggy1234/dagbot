@@ -365,8 +365,8 @@ class settings(commands.Cog):
                     byt = await self.bot.user.avatar_url.read()
                     hook = await channel.create_webhook(name="Dagbot Automeme",
                                                         avatar=byt,
-                                                        reason="Dagbot \
-                                                            Automeme Setup")
+                                                        reason="Dagbot "
+                                                               "Automem Setup")
                     await ctx.send("Created Webhook")
                 except discord.Forbidden or discord.HTTPException:
                     return await ctx.send("Dagbot needs the `create_webhook` "
@@ -403,9 +403,8 @@ class settings(commands.Cog):
         embed = discord.Embed(
             title="You hit me up?",
             description=f"""
-                My Prefix for this server is: `{prefix}`
-                Use the help command to get smart enough to use me: \
-                    `{prefix}help` """,
+My Prefix for this server is: `{prefix}`
+Use the help command to get smart enough to use me: `{prefix}help` """,
             color=ctx.guild.me.color,
         )
         embed.add_field(
@@ -414,8 +413,8 @@ class settings(commands.Cog):
         )
         embed.add_field(
             name="Invite Link",
-            value="[Click me](https://discordapp.com/api/oauth2/authorize?\
-                client_id=675589737372975124&permissions=378944&scope=bot)",
+            value="[Click me](https://discordapp.com/api/oauth2/authorize?"
+                  "client_id=675589737372975124&permissions=378944&scope=bot)",
         )
         await ctx.send(embed=embed)
         await ctx.invoke(cmd_cog)

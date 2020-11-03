@@ -16,8 +16,7 @@ spec:
       - name: dagbot
         image: daggy1234/dagbot:latest
         envFrom:
-          - configMapRef:
-              name: config
+          - name: config
         resources:
             limits:
               cpu: 500m

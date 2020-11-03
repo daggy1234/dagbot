@@ -1,4 +1,3 @@
-import time
 
 
 class bword:
@@ -7,8 +6,8 @@ class bword:
 
     def loadbword(self):
         with open("dagbot/data/dirtywords.txt", "r") as file:
-            l = file.readlines()
-            for i in l:
+            lines = file.readlines()
+            for i in lines:
                 i = i.strip("\n")
                 self.bord.add(i)
 
@@ -20,9 +19,9 @@ class bword:
             return (True, f)
 
     async def constructwordset(self, sent):
-        l = sent.split(" ")
+        split = sent.split(" ")
         nset = set()
-        for w in l:
+        for w in split:
             w = w.lower()
             nset.add(w)
         return nset
@@ -39,7 +38,6 @@ class bword:
         return (False, "nothing")
 
     async def bwordcheck(self, sent):
-        start = time.perf_counter()
         s = await self.constructwordset(sent)
         r, f = await self.setcheck(s)
         if r:

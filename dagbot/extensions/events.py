@@ -35,9 +35,9 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
                 )
                 embed.add_field(
                     name="Invite Link",
-                    value="[Click me](https://discordapp.com/api/oauth2/ \
-                        authorize?client_id=675589737372975124&permissions= \
-                            378944&scope=bot)",
+                    value="[Click me](https://discordapp.com/api/oauth2/"
+                          "authorize?client_id=675589737372975124&permissions="
+                          "378944&scope=bot)",
                 )
                 await channel.send(embed=embed)
         # await self.bot.process_commands(message)

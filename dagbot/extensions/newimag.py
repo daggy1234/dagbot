@@ -282,8 +282,8 @@ class image(commands.Cog):
             self,
             ctx,
             *,
-            text="I forgot to add text,split with a comma to indicate top \
-                and bottom text",
+            text="I forgot to add text,split with a comma to indicate top "
+                 "and bottom text",
     ):
         await ctx.trigger_typing()
         txtl = text.split(",")
