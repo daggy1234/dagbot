@@ -73,7 +73,7 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
         embed.set_thumbnail(url=guild.icon_url_as(static_format="png"))
         embed.add_field(
             name="**Members**",  # Basic stats about the guild
-            value=f"""**Total:** {len(guild.member_count)}\n"
+            value=f"""**Total:** {guild.member_count}\n"
 **Owner: ** {guild.owner}\n""",
             inline=False,
         )
@@ -112,8 +112,13 @@ Run `@dagbotrepair`
 """
         try:
             await guild.system_channel.send(message)
-        except BaseException:
-            pass
+        except Exception:
+            for channel in guild.channels:
+                try:
+                    await channel.send(message)
+                    break
+                except Exception:
+                    continue
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):

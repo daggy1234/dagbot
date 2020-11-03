@@ -23,9 +23,9 @@ class DagbotHelp(commands.HelpCommand):
             icon_url=ctx.author.avatar_url,
             name="Dagot Help Command")
         embed.description = '''`[]` means that a parameter is optional\n`<>`
-        means that a parameter is required\nYou can use do `help <command>`/`
-        help <category>` for help with specific commands or react with the
-        reactions below.'''
+        means that a parameter is required\nYou can use do `help <command> \
+help <category>` for help with specific commands or react with the
+reactions below.'''
         cog_moji = []
         cog_list = []
         for record in ctx.bot.cogdata:
