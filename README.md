@@ -73,9 +73,24 @@ Run with `.env`
 docker run --env-file dagbot.env daggy1234/dagbot:latest
 ```
 
-#### WIP
 
-Currently uts docker however wil will soon move the kubernetes. WIll update ths readme when thats done.
+### kubernetes
+
+This assumes you have a working kubernetes cluster with kubectl
+
+Create a configmap named `config` with your env file
+
+```shell script
+kubectl create configmap config --from-env-file=dagbot.env
+```
+
+Create a pod using the `deployment.yaml` file.
+
+```shell script
+kubectl apply -f deployment.yaml
+```
+
+Thats it you now have a dagbot kubernetes pod deployed!
 
 ### Server
 
