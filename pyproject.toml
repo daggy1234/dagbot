@@ -34,7 +34,7 @@ validator-collection = "^1.5.0"
 matplotlib = "^3.3.2"
 RandomWords = "^0.3.0"
 "prettify.py" = {git = "https://github.com/ShineyDev/prettify.py"}
-Pillow = "7.2.0"
+Pillow = "8.0.1"
 numpy = "1.19.3"
 
 
