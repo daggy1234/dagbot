@@ -35,7 +35,7 @@ matplotlib = "^3.3.2"
 RandomWords = "^0.3.0"
 "prettify.py" = {git = "https://github.com/ShineyDev/prettify.py"}
 Pillow = "7.2.0"
-numpy = "1.19.3"
+numpy = "1.19.4"
 
 
 [tool.poetry.dev-dependencies]
