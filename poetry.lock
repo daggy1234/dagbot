@@ -284,7 +284,7 @@ futures = "*"
 
 [[package]]
 name = "humanize"
-version = "3.1.0"
+version = "3.2.0"
 description = "Python humanize utilities"
 category = "main"
 optional = false
@@ -678,7 +678,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "597b578b81b98b4a220c29be7dabd981b39882b3a8883ff4c6665ae79e38659c"
+content-hash = "17eb86e3408548afc01d1665562e8aa6899e9f7aeeaada256856a37975616f1c"
 
 [metadata.files]
 aiohttp = [
@@ -858,8 +858,8 @@ goslate = [
     {file = "goslate-1.5.1.tar.gz", hash = "sha256:dee7cf08fd7d744fbb3477d28ea6a98a11b363c138d7577b4b097f517581f864"},
 ]
 humanize = [
-    {file = "humanize-3.1.0-py3-none-any.whl", hash = "sha256:6790d9ba139ce09761ae901be9b22bd32a131fa65ecc82cdfc4d86f377f7395d"},
-    {file = "humanize-3.1.0.tar.gz", hash = "sha256:fd3eb915310335c63a54d4507289ecc7b3a7454cd2c22ac5086d061a3cbfd592"},
+    {file = "humanize-3.2.0-py3-none-any.whl", hash = "sha256:d47d80cd47c1511ed3e49ca5f10c82ed940ea020b45b49ab106ed77fa8bb9d22"},
+    {file = "humanize-3.2.0.tar.gz", hash = "sha256:ab69004895689951b79f2ae4fdd6b8127ff0c180aff107856d5d98119a33f026"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
