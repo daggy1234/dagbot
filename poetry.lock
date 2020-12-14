@@ -403,7 +403,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "owotext"
-version = "1.0.3"
+version = "1.1.1"
 description = "A Python library for converting text strings into OwO"
 category = "main"
 optional = false
@@ -678,7 +678,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "597b578b81b98b4a220c29be7dabd981b39882b3a8883ff4c6665ae79e38659c"
+content-hash = "a4abcb27217b64ce5a6908e20f97dd9bb28bb2ac795d20d32fc1526bb4078afa"
 
 [metadata.files]
 aiohttp = [
@@ -982,8 +982,8 @@ numpy = [
     {file = "numpy-1.19.3.zip", hash = "sha256:35bf5316af8dc7c7db1ad45bec603e5fb28671beb98ebd1d65e8059efcfd3b72"},
 ]
 owotext = [
-    {file = "owotext-1.0.3-py3-none-any.whl", hash = "sha256:5683d5119594fdf261b46484ef4d6f6b770a7503c8a966b950b74c5c14b4b197"},
-    {file = "owotext-1.0.3.tar.gz", hash = "sha256:b2cd921c24dd675057baebddd9249c6dd759453ac77bd2dcc752cfdea99c61ec"},
+    {file = "owotext-1.1.1-py3-none-any.whl", hash = "sha256:cf7653d7b31609443be33fc49d4e1b494cd0d0fa4f48048e0a83c773ad8ae554"},
+    {file = "owotext-1.1.1.tar.gz", hash = "sha256:7ed4c07130911df9aa47fc94e12335a20ad972d471ac4cd43bb4747defb88236"},
 ]
 pillow = [
     {file = "Pillow-7.2.0-cp35-cp35m-macosx_10_10_intel.whl", hash = "sha256:1ca594126d3c4def54babee699c055a913efb01e106c309fa6b04405d474d5ae"},
