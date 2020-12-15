@@ -20,8 +20,6 @@ spec:
               name: config
         resources:
             limits:
-              cpu: 500m
               memory: 1024Mi
             requests:
-              cpu: 50m
               memory: 200Mi
