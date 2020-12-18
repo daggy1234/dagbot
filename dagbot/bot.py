@@ -15,15 +15,16 @@ from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from .utils.badwordcheck import bword
 from .utils.caching import caching
 from .utils.logger import create_logger
-
+from .utils.context import MyContext
 
 async def get_prefix(bot, message):
-    g_id = message.guild.id
-    for e in bot.prefdict:
-        if e["server_id"] == str(g_id):
-            prefix = e["command_prefix"]
-            break
-    return commands.when_mentioned_or(prefix)(bot, message)
+    #g_id = message.guild.id
+    #for e in bot.prefdict:
+    #    if e["server_id"] == str(g_id):
+    #        prefix = e["command_prefix"]
+    #        break
+    #return commands.when_mentioned_or(prefix)(bot, message)
+    return "dagbot "
 
 
 def make_intents() -> discord.Intents:
@@ -92,7 +93,6 @@ class Dagbot(commands.AutoShardedBot):
             release="dagbot@2.0.0"
         )
         self.logger.info("Ready to roll")
-        self.run(self.data['token'])
 
     async def process_commands(self, message):
         if message.author.bot and message.guild.id != 491175207122370581:
@@ -100,6 +100,12 @@ class Dagbot(commands.AutoShardedBot):
 
         ctx = await self.get_context(message)
         await self.invoke(ctx)
+
+    async def get_context(self, message, *, cls=MyContext):
+        # when you override this method, you pass your new Context
+        # subclass to the super() method, which tells the bot to
+        # use the new MyContext class
+        return await super().get_context(message, cls=cls)
 
     async def startdagbot(self):
         await self.makesession()

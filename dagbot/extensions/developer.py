@@ -48,7 +48,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def byebyebot(self, ctx):
         await self.bot.session.close()
-        await self.bot.pg_con.close()
+        await self.bot.pool.close()
         await ctx.send('Shutting Down Now <a:catroll:720695153601282068>')
         await self.bot.logout()
 

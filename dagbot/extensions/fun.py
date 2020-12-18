@@ -93,7 +93,7 @@ class fun(commands.Cog):
     async def getinpir(self):
         r = await self.client.session.get(
             'https://inspirobot.me/api?generate=true')
-        text = await r.Text()
+        text = await r.text()
         return text
 
     async def get_giffy(self, query):
@@ -135,7 +135,7 @@ class fun(commands.Cog):
         y = random.randint(1, 2325)
         url = f"https://xkcd.com/{y}/"
         r = await self.client.session.get(url)
-        html = await r.Text()
+        html = await r.text()
         soup = BeautifulSoup(html, "html.parser")
         res = soup.find("div", id="comic")
         title = res.img["title"]

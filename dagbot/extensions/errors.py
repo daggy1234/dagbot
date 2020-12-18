@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import random
 import traceback
-
+import prettify_exceptions
 import asyncdagpi.errors as dagpi_error
 import discord
 from discord import AsyncWebhookAdapter, Webhook
@@ -36,11 +36,8 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         ers = f"{error}"
-        etype = type(error)
-        trace = error.__traceback__
-        verbosity = 4
-        lines = traceback.format_exception(etype, error, trace, verbosity)
-        traceback_text = "".join(lines)
+        traceback_text = ''.join(prettify_exceptions.DefaultFormatter().format_exception(type(error), error,  error.__traceback__, limit=4))
+        print(traceback_text)
         if hasattr(ctx.command, "on_error"):
             return
         cog = ctx.cog
@@ -132,7 +129,7 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             elif isinstance(error, NoImageFound):
                 return await ctx.send((error))
             elif isinstance(error, dagpibrok):
-                return await ctx.send('The API at https://dagpi.tk broke')
+                return await ctx.send('The API at https://dagpi.xyz broke')
             elif isinstance(error, dagpi_code_broke):
                 return await ctx.send('The code for dagpi broke')
             elif isinstance(error, dagpi_error.FileTooLarge):
@@ -145,6 +142,7 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             else:
                 name = ctx.author.display_name
                 server = ctx.guild.name
+                print(traceback_text)
                 embed = discord.Embed(
                     title="Dagbot UNKOWN ERROR OCCURED",
                     description=f"```python\n{repr(error)}\n ```\n"
