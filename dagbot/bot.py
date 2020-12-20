@@ -91,7 +91,7 @@ class Dagbot(commands.AutoShardedBot):
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
-            release="dagbot@2.0.0"
+            release="dagbot@2.5.0"
         )
         self.logger.info("Ready to roll")
 
