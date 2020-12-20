@@ -712,7 +712,7 @@ class games(commands.Cog):
         channel = ctx.channel
         guy = ctx.author
         if c == 1:
-            await channel.send("YOU DIED, Wait for dagbot to revive")
+            await ctx.reply("YOU DIED, Wait for dagbot to revive")
             await guy.send("Revived you dude,Say thanks")
         else:
             await channel.send("You survived, You can dance with death later")
@@ -763,7 +763,7 @@ class games(commands.Cog):
             description="TEST YOUR REACTION TIME.....NOW", color=guild.me.color
         )
         await asyncio.sleep(r)
-        msg = await ctx.send(embed=emb)
+        msg = await ctx.reply(embed=emb)
         await msg.add_reaction("👍🏻")
         begin = datetime.utcnow()
 
@@ -1467,7 +1467,7 @@ class games(commands.Cog):
                     try:
                         nu, nut = await game.converter(text)
                     except BaseException:
-                        await ctx.send(
+                        await message.reply(
                             'We could not convert your input. Please use the '
                             'format <letter><number> ex `a3` or `b3`')
                     else:
@@ -1479,7 +1479,7 @@ class games(commands.Cog):
                             turns += 1
                             playermoves.append((nu, nut))
                         else:
-                            await ctx.send(
+                            await message.reply(
                                 'That game square is aldready taken please '
                                 'choose another one.')
 
@@ -1591,9 +1591,9 @@ class games(commands.Cog):
                     try:
                         nu, nut = await game.converter(text)
                     except BaseException:
-                        await ctx.send(
+                        await message.reply(
                             'We could not convert your input. Please use the '
-                            'format <letter><number> ex `a3` or `b3`')
+                            'format <letter><number>   ex `a3` or `b3`')
                     else:
                         y = await game.checkempty(nu, nut)
                         if y:
@@ -1602,7 +1602,7 @@ class games(commands.Cog):
                             turns += 1
                             playermoves.append((nu, nut))
                         else:
-                            await ctx.send(
+                            await message.reply(
                                 'That game square is aldready taken please '
                                 'choose another one.')
 
@@ -1619,7 +1619,7 @@ class games(commands.Cog):
                     try:
                         nu, nut = await game.converter(text)
                     except BaseException:
-                        await ctx.send(
+                        await message.reply(
                             'We could not convert your input. Please use the '
                             'format <letter><number> ex `a3` or `b3`')
                     else:
@@ -1630,7 +1630,7 @@ class games(commands.Cog):
                             turns += 1
                             playermoves.append((nu, nut))
                         else:
-                            await ctx.send(
+                            await message.reply(
                                 'That game square is aldready taken please '
                                 'choose another one.')
 

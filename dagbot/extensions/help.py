@@ -48,8 +48,8 @@ reactions below.'''
 
         def check(reaction, user) -> bool:
             return str(reaction) in emoji_list \
-                   and reaction.message.channel == ctx.channel \
-                   and not user.bot and user == ctx.author
+                and reaction.message.channel == ctx.channel \
+                and not user.bot and user == ctx.author
         try:
             async with timeout(300):
                 while True:

@@ -64,7 +64,7 @@ class text(commands.Cog):
             return await ctx.send(maste)
 
     @commands.command(cooldown_after_parsing=True)
-    async def ascii(self, ctx, *, text: str):
+    async def ascii_text(self, ctx, *, text: str):
         art = text2art(text)
         return await ctx.send(f"```{art}```")
 

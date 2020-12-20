@@ -21,6 +21,7 @@ import traceback
 
 import discord
 from discord.ext import commands, menus
+from discord.ext.commands import bot
 from tabulate import tabulate
 from jishaku.codeblocks import codeblock_converter
 
@@ -277,6 +278,16 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         cog = self.bot.get_cog("Jishaku")
         code = codeblock_converter(command)
         await cog.jsk_shell(ctx, argument=code)
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def dev_stats(self, ctx):
+        res = await self.bot.session.get("https://dagbot-site.herokuapp.com/api/botstats", headers={"Token": self.bot.data["stats"]})
+        our = await res.read()
+        url = await self.bot.session.post("https://paste.rs/", data=our)
+        t = await url.text()
+        self.bot.logger.debug(t)
+        await ctx.author.send(t)
 
 
 def setup(bot):

@@ -36,11 +36,12 @@ class ImageConverter(commands.Converter):
             return (str(emoji.url))
         if ctx.message.attachments:
             with suppress(Exception):
-                return ctx.message.attachments[0].url
+                return ctx.message.attachments[0].url.replace(".webp", ".png")
         elif checkers.is_url(str(argument)):
             return str(argument)
         else:
             raise NoImageFound('')
+
 
 class StaticImageConverter(commands.Converter):
     async def convert(self, ctx, argument):
@@ -52,7 +53,7 @@ class StaticImageConverter(commands.Converter):
             return (str(emoji.url_as(format="png")))
         if ctx.message.attachments:
             with suppress(Exception):
-                return ctx.message.attachments[0].url
+                return ctx.message.attachments[0].url.replace(".webp", ".png")
         elif checkers.is_url(str(argument)):
             return str(argument)
         else:

@@ -5,6 +5,7 @@ from ipaddress import IPv4Address, IPv6Address
 from random import getrandbits
 
 import discord
+from discord.ext.commands.core import command
 import sr_api
 from PyDictionary import PyDictionary
 from bs4 import BeautifulSoup
@@ -122,7 +123,7 @@ class fun(commands.Cog):
     async def get_advice(self):
         url = "https://api.adviceslip.com/advice"
         response = self.client.session.get(url)
-        file = await response.json(content_type=None)
+        file = await response.json()
         return file["slip"]["advice"]
 
     async def chuck_norris(self):
@@ -256,7 +257,7 @@ class fun(commands.Cog):
         else:
             await channel.send("**{} SENDS A SLAP TO {}**".format(send, guy))
 
-    @commands.command(cooldown_after_parsing=True)
+    @commands.command(cooldown_after_parsing=True, hidden=True)
     async def nou(self, ctx):
         guild = ctx.guild
         embed = discord.Embed(title=" NO U", Color=guild.me.color)
@@ -265,7 +266,7 @@ class fun(commands.Cog):
                 "&s=fb46db274487ffcab4fd7316d6e576fbf20ae3d5")
         return await ctx.send(embed=embed)
 
-    @commands.command(cooldown_after_parsing=True)
+    @commands.command(cooldown_after_parsing=True, hidden=True)
     async def wrongopinion(self, ctx):
         msg = (
             "DAGBOTS RESPONSE TO YOUR OPINION"
@@ -565,6 +566,21 @@ class fun(commands.Cog):
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.set_image(url=url)
         return await ctx.send(embed=embed)
+
+    @commands.command(hidden=True)
+    async def sex(self, ctx):
+        await ctx.send(f"Go to horny Jail <:bonk:790280836754833409>")
+
+    @commands.command(name="barrel_roll",
+                      aliased=["barrel-roll", "a-barrel-roll",
+                               "a_barrel_role"],
+                      hidden=True)
+    async def barrelrole(self, ctx):
+        await ctx.send("Yes I can")
+
+    @commands.command(hidden=True)
+    async def play(self, ctx, *, song="Despacito"):
+        await ctx.send(f"Go get a music bot. I cannot play {song} because it sucks anyway ")
 
 
 def setup(bot):

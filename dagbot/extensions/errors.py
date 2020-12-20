@@ -17,7 +17,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import random
 import traceback
-import prettify_exceptions
 import asyncdagpi.errors as dagpi_error
 import discord
 from discord import AsyncWebhookAdapter, Webhook
@@ -36,8 +35,8 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         ers = f"{error}"
-        traceback_text = ''.join(prettify_exceptions.DefaultFormatter().format_exception(type(error), error,  error.__traceback__, limit=4))
-        print(traceback_text)
+        traceback_text = "".join(traceback.format_exception(
+            type(error), error, error.__traceback__, 4))
         if hasattr(ctx.command, "on_error"):
             return
         cog = ctx.cog
@@ -120,74 +119,71 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             if "not found" in (ers):
                 rest = random.choice(data.notfoundelist)
                 await ctx.send(rest)
+        print(repr(error))
+        error = getattr(error, "original", error)
+        if isinstance(error, NoMemberFound):
+            return await ctx.send((error))
+        elif isinstance(error, NoImageFound):
+            return await ctx.send("No Valid Image was detected at your location\nPlease Specify a Valid Loaction Like\n```\n- Attachment (Add dummy text)\n- Member (ping or id)\n- Emoji (No standard emojis)\n- Url (Valid URL's only)\n```")
+        elif isinstance(error, dagpibrok):
+            return await ctx.send('The API at https://dagpi.xyz broke')
+        elif isinstance(error, dagpi_code_broke):
+            return await ctx.send('The code for dagpi broke')
+        elif isinstance(error, dagpi_error.FileTooLarge):
+            return await ctx.send(
+                'The image your provided was too large to process')
+        elif isinstance(error, dagpi_error.ImageUnaccesible):
+            return await ctx.send(
+                'There was no image the bot could access at your url' +
+                str(error))
         else:
+            name = ctx.author.display_name
+            server = ctx.guild.name
+            embed = discord.Embed(
+                title="Dagbot UNKOWN ERROR OCCURED",
+                description=f"```python\n{repr(error)}\n ```\n"
+                            f"The command {ctx.invoked_with} caused the "
+                            f"error\n**Author:**{name}\n"
+                            f"**Server:**{server}",
+                color=ctx.guild.me.color,
+            )
+            embed.add_field(
+                name="SENT",
+                value="Your error has been sent to the bug channel",
+            )
+            embed.add_field(
+                name="Support Server",
+                value="[Join Now](https://discord.gg/5Y2ryNq)"
+            )
+            nemb = discord.Embed(
+                title="Dagbot UNKOWN ERROR OCCURED",
+                description=f"```python\n{traceback_text}\n ```\n"
+                            f"The command {ctx.invoked_with} caused the "
+                            f"error\n"
+                            f"**Author:**{name}\n**Server:**{server}",
+                color=ctx.guild.me.color,
+            )
+            try:
+                webhook = Webhook.from_url(
+                    self.bot.data['errorwebhook'],
+                    adapter=AsyncWebhookAdapter(
+                        self.bot.session))
+                await webhook.send('New Error', embed=nemb)
+            except RuntimeError:
+                channel = self.bot.get_channel(682199468375932928)
+                await channel.send(embed=nemb)
+            with configure_scope() as scope:
+                scope.user = {
+                    "id": ctx.author.id,
+                    "username": ctx.author.name}
+                scope.set_tag("message_id", ctx.message.id)
+                scope.set_tag("guild_id", ctx.guild.id)
+                scope.set_tag('guild_name', ctx.guild.name)
+                scope.set_tag("channel_id", ctx.channel.id)
+                scope.set_tag('channel_name', ctx.channel.name)
+                scope.set_tag('command', ctx.invoked_with)
             capture_exception(error)
-        if isinstance(error, commands.CommandInvokeError):
-            error = getattr(error, "original", error)
-            if isinstance(error, NoMemberFound):
-                return await ctx.send((error))
-            elif isinstance(error, NoImageFound):
-                return await ctx.send((error))
-            elif isinstance(error, dagpibrok):
-                return await ctx.send('The API at https://dagpi.xyz broke')
-            elif isinstance(error, dagpi_code_broke):
-                return await ctx.send('The code for dagpi broke')
-            elif isinstance(error, dagpi_error.FileTooLarge):
-                return await ctx.send(
-                    'The image your provided was too large to process')
-            elif isinstance(error, dagpi_error.ImageUnaccesible):
-                return await ctx.send(
-                    'There was no image the bot could access at your url' +
-                    str(error))
-            else:
-                name = ctx.author.display_name
-                server = ctx.guild.name
-                print(traceback_text)
-                embed = discord.Embed(
-                    title="Dagbot UNKOWN ERROR OCCURED",
-                    description=f"```python\n{repr(error)}\n ```\n"
-                                f"The command {ctx.invoked_with} caused the "
-                                f"error\n**Author:**{name}\n"
-                                f"**Server:**{server}",
-                    color=ctx.guild.me.color,
-                )
-                embed.add_field(
-                    name="SENT",
-                    value="Your error has been sent to the bug channel",
-                )
-                embed.add_field(
-                    name="Support Server",
-                    value="[Join Now](https://discord.gg/5Y2ryNq)"
-                )
-                nemb = discord.Embed(
-                    title="Dagbot UNKOWN ERROR OCCURED",
-                    description=f"```python\n{traceback_text}\n ```\n"
-                                f"The command {ctx.invoked_with} caused the "
-                                f"error\n"
-                                f"**Author:**{name}\n**Server:**{server}",
-                    color=ctx.guild.me.color,
-                )
-                try:
-                    webhook = Webhook.from_url(
-                        self.bot.data['errorwebhook'],
-                        adapter=AsyncWebhookAdapter(
-                            self.bot.session))
-                    await webhook.send('New Error', embed=nemb)
-                except RuntimeError:
-                    channel = self.bot.get_channel(682199468375932928)
-                    await channel.send(embed=nemb)
-                with configure_scope() as scope:
-                    scope.user = {
-                        "id": ctx.author.id,
-                        "username": ctx.author.name}
-                    scope.set_tag("message_id", ctx.message.id)
-                    scope.set_tag("guild_id", ctx.guild.id)
-                    scope.set_tag('guild_name', ctx.guild.name)
-                    scope.set_tag("channel_id", ctx.channel.id)
-                    scope.set_tag('channel_name', ctx.channel.name)
-                    scope.set_tag('command', ctx.invoked_with)
-                capture_exception(error)
-                await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_error(self, error, *args, **kwargs):

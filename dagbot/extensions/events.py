@@ -9,13 +9,12 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         if before.content != after.content:
             ctx = await self.bot.get_context(after)
             await self.bot.invoke(ctx)
-    
+
     @commands.Cog.listener()
     async def on_message(self, message):
         channel = message.channel

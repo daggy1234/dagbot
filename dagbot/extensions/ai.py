@@ -136,18 +136,17 @@ class ai(commands.Cog):
             await ctx.send('An error occurred! We will try and fix')
 
         else:
-            return await ctx.send(f"> {query}\n{ctx.author.mention} {r.text}")
+            return await ctx.reply(f"{r.text}")
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
-    async def caption(self, ctx, *, source=None):
-        image_url = await ImageConverter().convert(ctx, source)
-        f = await self.captioni(image_url)
+    async def caption(self, ctx, *, image: ImageConverter):
+        f = await self.captioni(image)
         if not f:
             return await ctx.send("No results as of now. Shit be wonky")
         else:
             embed = discord.Embed(title=f, color=ctx.guild.me.color)
-            embed.set_image(url=image_url)
+            embed.set_image(url=image)
             return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
@@ -163,9 +162,8 @@ class ai(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 20, commands.BucketType.user)
-    async def ocr(self, ctx, *, source=None):
-        image_url = await ImageConverter().convert(ctx, source)
-        f = await self.ocra(image_url)
+    async def ocr(self, ctx, *, image: ImageConverter):
+        f = await self.ocra(image)
         if not f:
             return await ctx.send("No results rn")
         else:
@@ -174,14 +172,13 @@ class ai(commands.Cog):
                 description=f,
                 color=ctx.guild.me.color,
             )
-            embed.set_image(url=image_url)
+            embed.set_image(url=image)
             return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def label(self, ctx, *, source=None):
-        image_url = await ImageConverter().convert(ctx, source)
-        y = await self.labela(image_url)
+    async def label(self, ctx, *, image: ImageConverter):
+        y = await self.labela(image)
         if not y:
             return await ctx.send("No results as of now. Shit be wonky")
         else:

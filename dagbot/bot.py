@@ -17,14 +17,14 @@ from .utils.caching import caching
 from .utils.logger import create_logger
 from .utils.context import MyContext
 
+
 async def get_prefix(bot, message):
-    #g_id = message.guild.id
-    #for e in bot.prefdict:
-    #    if e["server_id"] == str(g_id):
-    #        prefix = e["command_prefix"]
-    #        break
-    #return commands.when_mentioned_or(prefix)(bot, message)
-    return "dagbot "
+    g_id = message.guild.id
+    for e in bot.prefdict:
+       if e["server_id"] == str(g_id):
+           prefix = e["command_prefix"]
+           break
+    return commands.when_mentioned_or(prefix)(bot, message)
 
 
 def make_intents() -> discord.Intents:
@@ -52,6 +52,7 @@ class Dagbot(commands.AutoShardedBot):
         self.logger = create_logger("Dagbot", logging.DEBUG)
         with open('./configuration.yml', 'r') as file:
             self.data = yaml.load(file, Loader=yaml.FullLoader)
+        self.data.pop("PWD")
         self.logger.info("Loaded Config File")
         self.launch_time = None
         self.session = None
@@ -73,7 +74,7 @@ class Dagbot(commands.AutoShardedBot):
             "whysomart", "animals", "memes",
             "tags", "misc", "settings",
             "ai", "events", "errors",
-            "developer", "help", "automeme"
+            "developer", "help", "automeme", "uploader"
         ]
         for extension in extensions:
             try:

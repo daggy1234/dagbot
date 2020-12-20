@@ -142,6 +142,7 @@ class memes(commands.Cog):
                                 f"sense please report it using the bug "
                                 f"command!\nError:`{me['error_message']}`"
                             )
+
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def motiv(self, ctx):
@@ -249,7 +250,7 @@ class memes(commands.Cog):
             msg = await self.client.wait_for("message", timeout=60.0,
                                              check=check)
         except asyncio.TimeoutError:
-            return await ctx.send(
+            return await ctx.reply(
                 "No Image was provided, "
                 "If you want me to make your meme at least give me "
                 "something to work with"
@@ -266,7 +267,7 @@ class memes(commands.Cog):
                     image_url = msg.attachments[0].url
 
                 except KeyError or AttributeError:
-                    return await ctx.send(
+                    return await msg.reply(
                         "I was unable to use the attachment you provided"
                     )
             elif len(msg.mentions) != 0:
@@ -278,10 +279,10 @@ class memes(commands.Cog):
                 if val_stat:
                     image_url = str(source)
                 else:
-                    return await ctx.send('The URL provided was invalid.')
+                    return await msg.reply('The URL provided was invalid.')
             # byt = await self.getav(image_url)
 
-            await ctx.send(
+            await msg.reply(
                 "Great, now hit me we with the top_text for the meme. "
                 "Please note whatever message you send is the content cool?"
             )
@@ -290,7 +291,7 @@ class memes(commands.Cog):
                     "message", timeout=60.0, check=check
                 )
             except asyncio.TimeoutError:
-                return await ctx.send(
+                return await msg.reply(
                     "No top text was provided, If you want me to make your "
                     "meme at least give me something to work with"
                 )
@@ -305,7 +306,7 @@ class memes(commands.Cog):
                     "message", timeout=60.0, check=check
                 )
             except asyncio.TimeoutError:
-                return await ctx.send(
+                return await msg.reply(
                     "No top text was provided, If you want me to make your "
                     "meme at least give me something to work with"
                 )
@@ -349,19 +350,19 @@ class memes(commands.Cog):
             "Lets begin. Please send an image. It can be a url or an "
             "attachment or a mention of a member!"
         )
-        
+
         def check(message):
             return (
                 message.author == ctx.author
                 and message.channel == ctx.channel
                 and not message.author.bot
             )
-        
+
         try:
             msg = await self.client.wait_for("message", timeout=60.0,
                                              check=check)
         except asyncio.TimeoutError:
-            return await ctx.send(
+            return await ctx.reply(
                 "No Image was provided, If you want me to make your meme at "
                 "least give me something to work with"
             )
@@ -370,15 +371,15 @@ class memes(commands.Cog):
                 cont = msg.content
                 member = await BetterMemberConverter().convert(ctx, cont)
                 image_url = member.avatar_url(static_format='png',
-         size='1024')
+                                              size='1024')
             except BaseException:
                 pass
             if len(msg.attachments) != 0:
                 try:
                     image_url = msg.attachments[0].url
-        
+
                 except BaseException:
-                    return await ctx.send(
+                    return await msg.reply(
                         "I was unable to use the attachment you provided"
                     )
             elif len(msg.mentions) != 0:
@@ -390,8 +391,8 @@ class memes(commands.Cog):
                 if val_stat:
                     image_url = str(source)
                 else:
-                    return await ctx.send('The URL provided was invalid.')
-            await ctx.send(
+                    return await msg.reply('The URL provided was invalid.')
+            await msg.reply(
                 "Great, now hit me we with the \
         puncline/top text/joke for the "
                 "meme. Please note whatever message you send is the content."
@@ -400,12 +401,12 @@ class memes(commands.Cog):
                 tm = await self.client.wait_for("message", timeout=60.0,
                                                 check=check)
             except asyncio.TimeoutError:
-                return await ctx.send(
+                return await msg.reply(
                     "No top text was provided, If you want me to make your "
                     "meme at least give me something to work with"
                 )
             else:
                 toptext = tm.content
                 img = await self.client.dagpi.image_process(
-                ImageFeatures.modern_meme(), url=image_url, text=toptext)
+                    ImageFeatures.modern_meme(), url=image_url, text=toptext)
                 await self.client.get_cog("image").to_embed(ctx, img, "Meme")

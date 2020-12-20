@@ -1,13 +1,17 @@
+from dagbot.utils.exceptions import NoImageFound
 import random
 from datetime import datetime
 from io import BytesIO
 
 import aiohttp
+import time
+import typing
+import asyncdagpi
 import discord
 from asyncdagpi import ImageFeatures, Image
 from discord.ext import commands
 
-from ..utils.converters import BetterMemberConverter, ImageConverter
+from ..utils.converters import BetterMemberConverter, ImageConverter, StaticImageConverter
 
 
 # atMoMn2Pg3EUmZ065QBvdJN4IcjNxCQRMv1oZTZWg98i7HelIdvJwHtZFKPgCtf
@@ -22,6 +26,83 @@ class image(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+        self.dynamic = [
+            (ImageFeatures.night(),
+             ImageConverter),
+            (ImageFeatures.gay(),
+             ImageConverter),
+            (ImageFeatures.wanted(),
+             ImageConverter),
+            (ImageFeatures.ascii(),
+             StaticImageConverter),
+            (ImageFeatures.sobel(),
+             StaticImageConverter),
+            (ImageFeatures.hog(),
+             StaticImageConverter),
+            (ImageFeatures.colors(),
+             StaticImageConverter),
+            (ImageFeatures.rgb(),
+             StaticImageConverter),
+            (ImageFeatures.sith(),
+             StaticImageConverter),
+            (ImageFeatures.triggered(),
+             StaticImageConverter),
+            (ImageFeatures.deepfry(),
+             ImageConverter),
+            (ImageFeatures.invert(),
+             ImageConverter),
+            (ImageFeatures.wasted(),
+             ImageConverter),
+            (ImageFeatures.communism(),
+             StaticImageConverter),
+            (ImageFeatures.america(),
+             StaticImageConverter),
+            (ImageFeatures.pixel(),
+             ImageConverter),
+            (ImageFeatures.fedora(),
+             ImageConverter),
+            (ImageFeatures.jail(),
+             ImageConverter),
+            (ImageFeatures.magik(),
+             StaticImageConverter),
+            (ImageFeatures.rainbow(),
+             ImageConverter),
+            (ImageFeatures.triangle(),
+             StaticImageConverter)]
+        for command in self.dynamic:
+            self.make_fn(command[0], command[1])
+        self.make_fn_alex("salty", StaticImageConverter)
+        self.make_fn_alex("jokeoverhead", StaticImageConverter)
+
+    def make_fn(self, feature: asyncdagpi.ImageFeatures,
+                converter: typing.Union
+                [ImageConverter, StaticImageConverter]):
+        @commands.command(name=feature.value.replace("/", ""),
+                          help=feature.description)
+        async def _command(_self, ctx, *, source: converter = None):
+            if converter == None:
+                raise NoImageFound('')
+            img = await self.client.dagpi.image_process(feature,
+                                                        source)
+            await self.to_embed(ctx, img, feature.value.replace("/", ""))
+        _command.cog = self
+        self.__cog_commands__ += (_command,)
+
+    async def process_alex(self, url: str) -> BytesIO:
+        out = await self.client.session.get(url, headers={"Authorization": self.client.data["alex"]})
+        return BytesIO(await out.read())
+
+    def make_fn_alex(self, feature: str, converter: typing.Union
+                     [ImageConverter, StaticImageConverter]):
+        @commands.command(name=feature)
+        async def _command(_self, ctx, *, source: converter):
+            start = time.perf_counter()
+            url = f"https://api.alexflipnote.dev/{feature}?image={source}"
+            img = await self.process_alex(url)
+            end = time.perf_counter()
+            await self.to_embed_alex(ctx, img, end-start, feature)
+        _command.cog = self
+        self.__cog_commands__ += (_command,)
 
     async def cog_check(self, ctx):
         g_id = str(ctx.guild.id)
@@ -44,21 +125,23 @@ class image(commands.Cog):
             embed.title = f"Processed Image {feature}"
             embed.set_footer(icon_url=str(ctx.author.avatar_url),
                              text=f"Called by {ctx.author.display_name}")
-            await ctx.send(embed=embed, file=file)
+            await ctx.reply(embed=embed, file=file)
 
-    @commands.command(cooldown_after_parsing=True)
-    async def gay(self, ctx, *, source: ImageConverter):
-        img = await self.client.dagpi.image_process(ImageFeatures.gay(),
-                                                    source)
-        await self.to_embed(ctx, img, "gay")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def triggered(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.triggered(),
-                                                    source)
-        await self.to_embed(ctx, img, "triggered")
+    async def to_embed_alex(self, ctx, img: BytesIO, time: typing.Optional[float], feature: str):
+        async with ctx.typing():
+            embed = discord.Embed(color=ctx.guild.me.color)
+            filename = f"dagbot=process-image-{feature}.png"
+            file = discord.File(fp=img, filename=filename)
+            if time:
+                embed.description = f"Image Processed in {round(time,2)}s | " \
+                    f"Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
+            else:
+                embed.description = "Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
+            embed.timestamp = datetime.utcnow()
+            embed.title = f"Processed Image {feature}"
+            embed.set_footer(icon_url=str(ctx.author.avatar_url),
+                             text=f"Called by {ctx.author.display_name}")
+            await ctx.reply(embed=embed, file=file)
 
     @commands.command(cooldown_after_parsing=True)
     async def tweet(self, ctx, user: BetterMemberConverter = None, *, text):
@@ -87,139 +170,17 @@ class image(commands.Cog):
         await self.to_embed(ctx, img, "message")
 
     @commands.command(cooldown_after_parsing=True)
-    async def wanted(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.wanted(),
-                                                    source)
-        await self.to_embed(ctx, img, "wanted")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def asciiimage(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.ascii(),
-                                                    source)
-        await self.to_embed(ctx, img, "ascii")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def sobel(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.sobel(),
-                                                    source)
-        await self.to_embed(ctx, img, "sobel")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def hog(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.hog(),
-                                                    source)
-        await self.to_embed(ctx, img, "hog")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def colors(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.colors(),
-                                                    source)
-        await self.to_embed(ctx, img, "colors")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def evil(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.sith(),
-                                                    source)
-        await self.to_embed(ctx, img, "evil")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def deepfry(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.deepfry(),
-                                                    source)
-        await self.to_embed(ctx, img, "deepfry")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def invert(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.invert(),
-                                                    source)
-        await self.to_embed(ctx, img, "invert")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def blur(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.blur(),
-                                                    source)
-        await self.to_embed(ctx, img, "blur")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def wasted(
-            self, ctx, *, source: ImageConverter
-    ):
-
-        img = await self.client.dagpi.image_process(ImageFeatures.wasted(),
-                                                    source)
-        await self.to_embed(ctx, img, "wasted")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def hitler(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.hitler(),
-                                                    source)
-        await self.to_embed(ctx, img, "hitler")
-
-    @commands.command(cooldown_after_parsing=True, aliases=["8bit", "retro"])
-    async def pixel(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.pixel(),
-                                                    source)
-        await self.to_embed(ctx, img, "pixel")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def thoughtimage(
-            self,
-            ctx,
-            source: ImageConverter,
-            *,
-            text: str = "I was too dumb to add text",
-    ):
-        img = await self.client.dagpi.image_process(
-            ImageFeatures.thought_image(),
-            url=source, text=text
-        )
-        await self.to_embed(ctx, img, "thought image")
-
-    @commands.command
-    async def trash(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.trash(),
-                                                    source)
-        await self.to_embed(ctx, img, "trash")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def angel(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.angel(),
-                                                    source)
-        await self.to_embed(ctx, img, "angel")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def satan(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.satan(),
-                                                    source)
-        await self.to_embed(ctx, img, "satan")
+    async def comment(self, ctx, user: BetterMemberConverter = None, *, text):
+        if user is None:
+            user = ctx.author
+        uname = user.display_name
+        text = str(text)
+        pfp = str(user.avatar_url_as(format="png", size=1024))
+        img = await self.client.dagpi.image_process(ImageFeatures.youtube(),
+                                                    url=pfp,
+                                                    username=uname,
+                                                    text=text)
+        await self.to_embed(ctx, img, "comment")
 
     @commands.command(cooldown_after_parsing=True, aliases=['av', 'pfp'])
     async def avatar(self, ctx, *, user=None):
@@ -237,140 +198,58 @@ class image(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
-    async def salty(
-            self, ctx, *, source: ImageConverter
-    ):
-        url = f"https://api.alexflipnote.dev/salty?image={source}"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as y:
-                z = y.content
-                file = await z.read()
-                bio = BytesIO(file)
-                bio.seek(0)
-                await (ctx.send(file=discord.File(bio, filename="salty.png")))
-
-    @commands.command(cooldown_after_parsing=True)
     async def achievement(self, ctx, *, text):
-        await ctx.trigger_typing()
-        inta = random.randint(1, 44)
-        url = f"https://api.alexflipnote.dev/achievement?\
-            text={text}&icon={inta}"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as y:
-                z = y.content
-                file = await z.read()
-                bio = BytesIO(file)
-                bio.seek(0)
-                await (
-                    ctx.send(file=discord.File(bio, filename="achieve.png")))
+        url = f"https://api.alexflipnote.dev/achievement?text={text}&icon={random.randint(1, 44)}"
+        await self.to_embed_alex(ctx, await self.process_alex(url), None, "achievement")
 
     @commands.command(cooldown_after_parsing=True)
     async def challenge(self, ctx, *, text):
-        await ctx.trigger_typing()
-        inta = random.randint(1, 44)
-        url = f"https://api.alexflipnote.dev/challenge?text={text}&icon={inta}"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as y:
-                z = y.content
-                file = await z.read()
-                bio = BytesIO(file)
-                bio.seek(0)
-                await (ctx.send(file=discord.File(bio, filename="chal.png")))
+        url = f"https://api.alexflipnote.dev/challenge?text={text}&icon={random.randint(1, 44)}"
+        await self.to_embed_alex(ctx, await self.process_alex(url), None, "challenge")
 
     @commands.command(cooldown_after_parsing=True)
     async def didyoumean(
             self,
             ctx,
             *,
-            text="I forgot to add text,split with a comma to indicate top "
-                 "and bottom text",
+            text=None,
     ):
-        await ctx.trigger_typing()
-        txtl = text.split(",")
+        txtl = str(text).split(
+            ",") if text else "Oops I forgot to add text, Seperated by a comma"
         try:
             ttop = txtl[0]
             tbot = txtl[1]
-        except BaseException:
+        except IndexError:
             return await ctx.send(
                 "Please use a comma to split top and bottom text")
-        else:
-            url = f"https://api.alexflipnote.dev/didyoumean?top={ttop}" \
-                  f"&bottom={tbot}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as y:
-                    z = y.content
-                    file = await z.read()
-                    bio = BytesIO(file)
-                    bio.seek(0)
-                    await (
-                        ctx.send(file=discord.File(bio, filename="dym.png")))
 
-    @commands.command(cooldown_after_parsing=True)
-    async def paint(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.paint(),
-                                                    source)
-        await self.to_embed(ctx, img, "paint")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def sepia(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.sepia(),
-                                                    source)
-        await self.to_embed(ctx, img, "sepia")
-
-    @commands.command(cooldown_after_parsing=True)
-    async def charcoal(
-            self, ctx, *, source: ImageConverter
-    ):
-        img = await self.client.dagpi.image_process(ImageFeatures.charcoal(),
-                                                    source)
-        await self.to_embed(ctx, img, "charcoal")
+        url = f"https://api.alexflipnote.dev/didyoumean?top={ttop}" \
+              f"&bottom={tbot}"
+        await self.to_embed_alex(ctx, await self.process_alex(url), None, "didyoumean")
 
     @commands.command(cooldown_after_parsing=True)
     async def pornhub(
             self,
             ctx,
             *,
-            text="I forgot to add text,split with a comma for white and orange"
+            text=None
     ):
-        await ctx.trigger_typing()
-        txtl = text.split(",")
+        txtl = str(text).split(
+            ",") if text else "Oops I forgot to add text, Seperated by comma"
         try:
             ttop = txtl[0]
             tbot = txtl[1]
-        except BaseException:
+        except IndexError:
             return await ctx.send(
-                "Please use a comma to split your white and orange  text")
-        else:
-            url = f"https://api.alexflipnote.dev/pornhub?text={ttop}" \
-                  f"&text2={tbot}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as y:
-                    z = y.content
-                    file = await z.read()
-                    bio = BytesIO(file)
-                    bio.seek(0)
-                    await (
-                        ctx.send(file=discord.File(bio, filename="phub.png")))
+                "Please use a comma to split top and bottom text")
 
-    @commands.command(cooldown_after_parsing=True)
-    async def bad(self, ctx, *, source: ImageConverter):
-        url = f"https://api.alexflipnote.dev/bad?image={source}"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as y:
-                z = y.content
-                file = await z.read()
-                bio = BytesIO(file)
-                bio.seek(0)
-                await (ctx.send(file=discord.File(bio, filename="bad.png")))
+        url = f"https://api.alexflipnote.dev/pornhub?top={ttop}" \
+              f"&bottom={tbot}"
+        await self.to_embed_alex(ctx, await self.process_alex(url), None, "pornhub")
 
     @commands.command(cooldown_after_parsing=True)
     async def ship(self, ctx, user: BetterMemberConverter,
                    usert: BetterMemberConverter):
-        await ctx.trigger_typing()
         urla = str(user.avatar_url_as(format="png", size=1024))
         guya = user.display_name
         urlb = str(usert.avatar_url_as(format="png", size=1024))
@@ -380,25 +259,4 @@ class image(commands.Cog):
         else:
             url = f"https://api.alexflipnote.dev//ship?user={urla}" \
                   f"&user2={urlb}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as y:
-                    z = y.content
-                    file = await z.read()
-                    bio = BytesIO(file)
-                    bio.seek(0)
-                    await (
-                        ctx.send(file=discord.File(bio, filename="ship.png")))
-
-    @commands.command(cooldown_after_parsing=True, aliases=["jokeoverhead"])
-    async def woosh(
-            self, ctx, *, source: ImageConverter
-    ):
-        url = f"https://api.alexflipnote.dev/jokeoverhead?image={source}"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as y:
-                z = y.content
-                file = await z.read()
-                bio = BytesIO(file)
-                bio.seek(0)
-                await (ctx.send(
-                    file=discord.File(bio, filename="jokeoverhead.png")))
+            await self.to_embed_alex(ctx, await self.process_alex(url), None, "ship")
