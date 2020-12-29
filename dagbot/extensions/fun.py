@@ -1,5 +1,6 @@
 import asyncio
 import random
+import json
 import time
 from ipaddress import IPv4Address, IPv6Address
 from random import getrandbits
@@ -123,7 +124,7 @@ class fun(commands.Cog):
     async def get_advice(self):
         url = "https://api.adviceslip.com/advice"
         response = self.client.session.get(url)
-        file = await response.json()
+        file = await json.loads(response.text())
         return file["slip"]["advice"]
 
     async def chuck_norris(self):
@@ -151,10 +152,11 @@ class fun(commands.Cog):
         duration = (end - start) * 1000
         client_lat = round((self.client.latency * 1000), 2)
         await asyncio.sleep(2)
+        dp = round(await self.client.dagpi.data_ping(),2)
         await message.edit(
-            content="I'm Weak\n```diff\nPONG!\n- Client:"
-                    "{} ms\n+ Websocket: {:.2f}\n```".format(client_lat,
-                                                             duration))
+            content="I'm Weak\n```diff\nPONG!\n- Websocket Latency:"
+                    "{} ms\n+ Message {:.2f}\nDagpi: {}```".format(client_lat,
+                                                             duration, dp))
 
     @commands.command(cooldown_after_parsing=True)
     async def dadjoke(self, ctx):

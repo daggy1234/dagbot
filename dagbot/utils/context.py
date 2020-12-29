@@ -20,7 +20,10 @@ class MyContext(commands.Context):
         if embed:
             desc = embed.description
             if desc:
-                for key, val in bot.data.items():
+                newdi = bot.data.copy()
+                newdi.pop("imgflipuser")
+                newdi.pop("database")
+                for key, val in newdi.items():
                     desc = desc.replace(val, f"[ Ommited {key}]")
                 embed.description = desc
             embed.color = self.guild.me.color

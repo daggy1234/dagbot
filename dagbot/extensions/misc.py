@@ -521,7 +521,7 @@ class misc(commands.Cog):
                 location = os.path.relpath(filename).replace('\\', '/')
                 final_url = f'{repo}/blob/master/{location}#L{firstline}-L' \
                             f'{firstline + len(lines) - 1}'
-                return await ctx.send(final_url)
+                return await ctx.send(f"{final_url} is the source. Please follow the License used and don't forget to :star:")
 
 
 def setup(bot):
