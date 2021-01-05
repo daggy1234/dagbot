@@ -24,8 +24,7 @@ async def get_prefix(bot, message):
        if e["server_id"] == str(g_id):
            prefix = e["command_prefix"]
            break
-    return "dex "
-    #return commands.when_mentioned_or(prefix)(bot, message)
+    return commands.when_mentioned_or(prefix)(bot, message)
 
 
 def make_intents() -> discord.Intents:
@@ -92,7 +91,7 @@ class Dagbot(commands.AutoShardedBot):
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
-            release="dagbot@2.5.0"
+            release="dagbot@2.6.0"
         )
         self.logger.info("Ready to roll")
 
