@@ -288,7 +288,11 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         t = await url.text()
         self.bot.logger.debug(t)
         await ctx.author.send(t)
-
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def new_stats(self, ctx):
+        res = await self.bot.session.post("https://dagbot-site.herokuapp.com/api/newstats", headers={"Token": self.bot.data["stats"]})
+        return await ctx.send(f"Code: {res.status}")
 
 def setup(bot):
     bot.add_cog(Developer(bot))

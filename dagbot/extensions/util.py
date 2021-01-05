@@ -449,6 +449,7 @@ pressure:              {}hPa```""".format(
             return await ctx.send(js["file"])
         elif not ctx.message.attachments:
             paste = codeblocks.codeblock_converter(paste)
+            lang = paste[0] if paste[0] else ""
             url = await self.client.session.post("https://paste.daggy.tech/upload",data=paste[1])
             js = await url.json()
-            return await ctx.send(f'{js["file"]}.{paste[0]}')
+            return await ctx.send(f'{js["file"]}.{lang}')

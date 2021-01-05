@@ -20,11 +20,9 @@ class MyContext(commands.Context):
         if embed:
             desc = embed.description
             if desc:
-                newdi = bot.data.copy()
-                newdi.pop("imgflipuser")
-                newdi.pop("database")
-                for key, val in newdi.items():
-                    desc = desc.replace(val, f"[ Ommited {key}]")
+                for key, val in bot.data.items():
+                    if not key in ["imgflipuser", "database"]:
+                        desc = desc.replace(val, f"[ Ommited {key}]")
                 embed.description = desc
             embed.color = self.guild.me.color
             if len(embed) > 2048:

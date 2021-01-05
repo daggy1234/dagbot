@@ -91,7 +91,7 @@ class Dagbot(commands.AutoShardedBot):
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
-            release="dagbot@2.6.0"
+            release="dagbot@2.6.1"
         )
         self.logger.info("Ready to roll")
 
@@ -121,6 +121,7 @@ class Dagbot(commands.AutoShardedBot):
         await self.caching.getkeydict()
         await self.caching.automemecache()
         await self.get_cog("reddit").memecache()
+        await self.session.post("https://dagbot-site.herokuapp.com/api/newstats", headers={"Token": self.data["stats"]})
 
     async def makesession(self):
         self.session = aiohttp.ClientSession(loop=self.loop)
