@@ -24,7 +24,8 @@ async def get_prefix(bot, message):
        if e["server_id"] == str(g_id):
            prefix = e["command_prefix"]
            break
-    return commands.when_mentioned_or(prefix)(bot, message)
+    return "dex "
+    #return commands.when_mentioned_or(prefix)(bot, message)
 
 
 def make_intents() -> discord.Intents:

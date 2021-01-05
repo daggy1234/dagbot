@@ -1,6 +1,8 @@
 import asyncio
+import humanize
 import json
 import os
+from datetime import datetime
 import random
 
 import discord
@@ -229,7 +231,7 @@ class reddit(commands.Cog):
             "Please use the animals instead. r/aww is pretty meh")
 
     @commands.command(cooldown_after_parsing=True,
-                      aliases=["dankex", "exchange"])
+                      aliases=["dankex", "exchange"], hidden=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def dex(self, ctx):
         await ctx.trigger_typing()
@@ -248,6 +250,59 @@ class reddit(commands.Cog):
         else:
             return await ctx.send(meme["error"])
 
+
+    @commands.command(cooldown_after_parsing=True, aliases=["ii"], hidden=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def investorinfo(self, ctx, *, ruser: str=None):
+        if not ruser:
+            return await ctx.send("Hey please specify a reddit user")
+        r  = await self.client.session.get(f"https://dankexchange.io/api/investors/{ruser}")
+        if r.status == 404:
+            return await ctx.send(f"`{ruser}` does not exist on r/DankExchange. Ask them to create a profile.")
+        elif r.status == 200:
+            js = await r.json()
+            embed = discord.Embed(title=f"Investor: u/{js['username']}")
+            embed.description = f"[Reddit](https://reddit.com/u/{ruser}) | [Dankexchange.io](https://dankexchange.io/investor/{ruser}) "
+            embed.add_field(name="Balance",value=js["balance"])
+            embed.add_field(name="Net Worth", value=js["net_worth"])
+            embed.add_field(name="Rank (NW)", value=js["net_worth_rank"])
+            embed.add_field(name="RP", value=f"Ranked `{js['ranked_points']}` with tier `{js['ranked_tier']}`")
+            embed.add_field(name="Firm", value=f"In firm id:`{js['firm_id']}` with position `{js['firm_role']}`")
+            rs_info = await self.client.session.get(f"https://www.reddit.com/user/{ruser}/about.json")
+            jso = await rs_info.json()
+            im = jso["data"]["icon_img"].split("?")[0]
+            embed.set_thumbnail(url=im)
+            embed.set_footer(text=f"Reddit Account created: {humanize.naturaltime(datetime.utcnow() - datetime.fromtimestamp(jso['data']['created_utc']))}")
+            return await ctx.send(embed=embed)
+        else:
+            return await ctx.send("Error Occured. Status code {r.status}")
+    @commands.command(cooldown_after_parsing=True, aliases=["fi", "firm"], hidden=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def firminfo(self, ctx, *, firm: str=None):
+        if not firm:
+            return await ctx.send("Please specify a valid firm id")
+        try:
+            firm = int(firm)
+        except ValueError:
+            return await ctx.send("Please specify a valid firm id. Not the name of the firm")
+        r  = await self.client.session.get(f"https://dankexchange.io/api/firms/{firm}")
+        if r.status == 404:
+            return await ctx.send(f"Firm of id `{firm}` does not exist.")
+        elif r.status == 200:
+            js = await r.json()
+            embed = discord.Embed(title=f"Firm Info: {js['name']}")
+            embed.add_field(name="Id", value=firm)
+            embed.add_field(name="Ceo", value=f"[{js['ceo']}](https://dankexchange.io/investor/{js['ceo']})")
+            embed.add_field(name="Member Count", value=f"{js['member_count']}/{js['member_limit']}")
+            embed.add_field(name="Status", value=f"Firm is {js['status']}")
+            embed.add_field(name="location", value=f"Moved to {js['location_name']} {humanize.naturaltime(datetime.utcnow() - datetime.fromtimestamp(js['last_move_time']))}")
+            embed.add_field(name="Stats", value=f"Tax Rate: {js['location_tax_rate']}\nBenifit: {js['location_bonus']}")
+            members = js['members']
+            members.remove(js['ceo'])
+            embed.description = "**Members**\n" + ",".join([f"[{mem}](https://dankexchange.io/investor/{mem})" for mem in members])
+            return await ctx.send(embed=embed)
+        else:
+            return await ctx.send("Error Occured. Status code {r.status}")
     @commands.command(cooldown_after_parsing=True, aliases=["dm"])
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def discord(self, ctx):

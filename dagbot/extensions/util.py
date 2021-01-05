@@ -2,8 +2,10 @@ import random
 
 import async_cse
 import discord
+from jishaku import codeblocks
 from bs4 import BeautifulSoup
 from discord.ext import commands, menus
+from discord.ext.commands import BucketType
 
 
 def setup(client):
@@ -423,3 +425,30 @@ pressure:              {}hPa```""".format(
                     f"You have used an NSFW command search query in a "
                     f"Safe for Work channel\n{st}"
                 )
+
+    @commands.command(aliases=["dagpaste"])
+    @commands.cooldown(1, 30, BucketType.user)
+    async def paste(self, ctx, *, paste: str = None):
+        if not paste and not ctx.message.attachments:
+            return await ctx.send("No Paste Data")
+        elif not paste:
+            attachments = ctx.message.attachments
+            if attachments[0].height:
+                return await ctx.send(
+                    "That file has a height, meaning it's probably an image. I can't paste those!")
+            if attachments[0].size // 1000000 > 8:
+                return await ctx.send("That's too large of a file!")
+            split_attachment = attachments[0].filename.split(".")
+            if split_attachment[1] in ["zip", "exe", "nbt"]:
+                return await ctx.send(
+                    f"Invalid file type: `{split_attachment[1]}` is invalid.")
+            file = await attachments[0].read()
+            text = file.decode('UTF-8')
+            url = await self.client.session.post("https://paste.daggy.tech/upload",data=text)
+            js = await url.json()
+            return await ctx.send(js["file"])
+        elif not ctx.message.attachments:
+            paste = codeblocks.codeblock_converter(paste)
+            url = await self.client.session.post("https://paste.daggy.tech/upload",data=paste[1])
+            js = await url.json()
+            return await ctx.send(f'{js["file"]}.{paste[0]}')
