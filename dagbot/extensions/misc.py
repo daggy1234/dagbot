@@ -449,13 +449,13 @@ class misc(commands.Cog):
                 channels += 1
         embed.add_field(
             name="Url's",
-            value="[Invite Link](https://discordapp.com/api/"
-                  "oauth2/authorize?client_id=675589737372975124"
-                  "&permissions=378944&scope=bot)\n"
-                  "[Support Server](https://discord.gg/grGkdeS)\n"
-                  "[API](https://dagpi.tk)\n"
-                  "[Website](https://dagbot.daggy.tech)\n"
-                  "[Source](https://github.com/Daggy1234/dagbot)",
+            value=f"[Invite Link](https://discordapp.com/api/"
+                  f"oauth2/authorize?client_id=675589737372975124"
+                  f"&permissions=378944&scope=bot)\n"
+                  f"[Support Server](https://discord.gg/grGkdeS)\n"
+                  f"[API](https://dagpi.tk)\n"
+                  f"[Website](https://dagbot.daggy.tech)\n"
+                  f"[Source]({self.bot.repo})",
             inline=True
         )
         embed.add_field(
@@ -505,22 +505,21 @@ class misc(commands.Cog):
 
         # This is inspired by R.danny source at
         # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/meta.py#L328-L366
-        repo = "https://github.com/Daggy1234/dagbot"
         if command is None:
-            return await ctx.send(repo)
+            return await ctx.send(self.bot.repo)
         else:
             com = self.bot.get_command(command)
             if com is None:
                 return await ctx.send(
-                    'There is no command with that name. Maybe check repo\n'
-                    'https://github.com/Daggy1234/dagbot')
+                    f'There is no command with that name. Maybe check repo\n'
+                    f'{self.bot.repo}')
             else:
                 code = com.callback.__code__
                 filename = code.co_filename
                 lines, firstline = inspect.getsourcelines(code)
                 location = os.path.relpath(filename).replace('\\', '/')
-                final_url = f'{repo}/blob/master/{location}#L{firstline}-L' \
-                            f'{firstline + len(lines) - 1}'
+                final_url = (f'{self.bot.repo}/blob/master/{location}'
+                             f'#L{firstline}-L{firstline + len(lines) - 1}')
                 return await ctx.send(f"{final_url} is the source. Please follow the License used and don't forget to :star:")
 
 

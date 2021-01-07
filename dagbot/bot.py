@@ -58,6 +58,7 @@ class Dagbot(commands.AutoShardedBot):
         self.session = None
         self.pool = None
         self.dagpi = None
+        self.repo = "https://github.com/Daggy1234/dagbot"
         self.caching = caching(self)
         self.bwordchecker = bword()
         self.bwordchecker.loadbword()
