@@ -36,6 +36,7 @@ RandomWords = "^0.3.0"
 "prettify.py" = {git = "https://github.com/ShineyDev/prettify.py"}
 Pillow = "8.0.0"
 numpy = "1.19.3"
+polaroid = "^0.2.10"
 
 
 [tool.poetry.dev-dependencies]

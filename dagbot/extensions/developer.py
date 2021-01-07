@@ -22,7 +22,9 @@ import traceback
 import discord
 from discord.ext import commands, menus
 from discord.ext.commands import bot
+from discord.ext.commands.core import command
 from tabulate import tabulate
+from jishaku.shell import ShellReader
 from jishaku.codeblocks import codeblock_converter
 
 
@@ -138,7 +140,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     async def reload(self, ctx, *, extension: str):
         mst = ""
         if extension == '~':
-            files = [('extensions.' + f.replace('.py', '')) for f in
+            files = [('dagbot.extensions.' + f.replace('.py', '')) for f in
                      os.listdir('./dagbot/extensions') if f.endswith('.py')]
             for file in files:
                 try:
@@ -284,7 +286,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     async def dev_stats(self, ctx):
         res = await self.bot.session.get("https://dagbot-site.herokuapp.com/api/botstats", headers={"Token": self.bot.data["stats"]})
         our = await res.read()
-        url = await self.bot.session.post("https://paste.rs/", data=our)
+        url = await self.bot.session.post("https://paste.daggy.tech/upload", data=our)
         t = await url.text()
         self.bot.logger.debug(t)
         await ctx.author.send(t)
@@ -293,6 +295,26 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     async def new_stats(self, ctx):
         res = await self.bot.session.post("https://dagbot-site.herokuapp.com/api/newstats", headers={"Token": self.bot.data["stats"]})
         return await ctx.send(f"Code: {res.status}")
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def neofetch(self, ctx):
+
+        l = list()
+        with ShellReader("neofetch --logo") as read:
+            async for line in read:
+                l.append(line)
+        l.pop()
+        mstr = ("\n".join(l)).rstrip()
+        mstr = mstr.rstrip()
+        mstrb = "\n"
+        with ShellReader("neofetch --stdout") as read:
+            async for line in read:
+                mstrb += (line + "\n")
+        mstrb += "\n"
+        embed = discord.Embed(title="Neofetch")
+        embed.description = f"```shell\n{mstr}\n```\n\n```shell\n{mstrb}\n```"
+        return await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Developer(bot))

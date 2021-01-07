@@ -8,9 +8,10 @@ class MyContext(commands.Context):
                    delete_after=None, nonce=None, allowed_mentions=None):
         bot = self.bot
 
-        if content and content.find(bot.repo) == -1:
+        if content:
             for key, val in bot.data.items():
-                content = content.replace(val, f"[ Omitted {key} ]")
+                if key not in ["imgflipuser", "database"]:
+                    content = content.replace(val, f"[ Omitted {key} ]")
         else:
             content = ""
         if embed:
@@ -28,7 +29,7 @@ class MyContext(commands.Context):
             return await super().send("Little long there woul you like me to "
                                       "upload this?")
 
-        await super().send(content, file=file, embed=embed, files=files,
+        return await super().send(content, file=file, embed=embed, files=files,
                            delete_after=delete_after, nonce=nonce,
                            allowed_mentions=allowed_mentions, tts=tts)
 
