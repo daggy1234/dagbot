@@ -24,7 +24,6 @@ async def get_prefix(bot, message):
        if e["server_id"] == str(g_id):
            prefix = e["command_prefix"]
            break
-    return "dev "
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
