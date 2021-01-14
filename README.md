@@ -36,7 +36,7 @@ poetry run python -m dagbot
 
 ### Docker Build
 
-`PLease note these docker configs are special to dagbot. For general purpose discord.py Dockerfiles please use these ones insteas.`
+`Please note these docker configs are special to dagbot. For general purpose discord.py Dockerfiles please use these ones instead.`
 https://github.com/Gorialis/discord.py-docker/tree/master/dockerfiles
 
 #### Cloningf Repo and Building Image locally
