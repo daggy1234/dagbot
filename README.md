@@ -1,5 +1,5 @@
 # dagbot
-The official Repository for dagbot, the self proclaimmed n1 meme bot. https://dagbot-is.the-be.st 
+The official Repository for dagbot, the self proclaimed n1 meme bot. https://dagbot-is.the-be.st 
 
 ### SQL Data
 
