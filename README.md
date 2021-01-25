@@ -1,5 +1,5 @@
 # dagbot
-The official Repository for dagbot, the self proclaimmed n1 meme bot. https://dagbot-is.the-be.st 
+The official Repository for dagbot, the self proclaimed n1 meme bot. https://dagbot-is.the-be.st 
 
 ### SQL Data
 
@@ -36,7 +36,7 @@ poetry run python -m dagbot
 
 ### Docker Build
 
-`PLease note these docker configs are special to dagbot. For general purpose discord.py Dockerfiles please use these ones insteas.`
+`Please note these docker configs are special to dagbot. For general purpose discord.py Dockerfiles please use these ones instead.`
 https://github.com/Gorialis/discord.py-docker/tree/master/dockerfiles
 
 #### Cloningf Repo and Building Image locally
