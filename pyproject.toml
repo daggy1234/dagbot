@@ -31,7 +31,7 @@ cryptography = "3.2"
 vaporwavely = "^1.0.1"
 PyDictionary = "^2.0.1"
 validator-collection = "^1.5.0"
-matplotlib = "^3.3.3"
+matplotlib = "^3.3.4"
 RandomWords = "^0.3.0"
 "prettify.py" = {git = "https://github.com/ShineyDev/prettify.py"}
 Pillow = "8.0.0"
