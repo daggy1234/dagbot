@@ -25,7 +25,7 @@ asyncpg = "^0.21.0"
 beautifulsoup4 = "4.9.3"
 zalgoify = "^1.1"
 PyYAML = "^5.3.1"
-sentry-sdk = "^0.19.5"
+sentry-sdk = "^0.20.2"
 discord-ext-menus = {git = "https://github.com/Rapptz/discord-ext-menus"}
 cryptography = "3.2"
 vaporwavely = "^1.0.1"
