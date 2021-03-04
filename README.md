@@ -1,6 +1,5 @@
 # dagbot
-The official Repository for dagbot, the self proclaimed n1 meme bot. https://dagbot-is.the-be.st 
-
+The official Repository for dagbot, the self proclaimed n1 meme bot. https://dagbot.daggy.tech
 ### SQL Data
 
 Dagbot needs 3 Tables in an SQL databse to function. You can use get the SQL from the migration.sql file and run em
