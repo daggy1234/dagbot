@@ -69,8 +69,8 @@ class image(commands.Cog):
              ImageConverter),
             (ImageFeatures.triangle(),
              StaticImageConverter),
-            (ImageFeatures.stringify(), StaticImageConverter),
-            ()
+            (ImageFeatures.stringify(), StaticImageConverter)
+
         ]
         for command in self.dynamic:
             self.make_fn(command[0], command[1])
