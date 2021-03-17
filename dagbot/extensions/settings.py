@@ -43,26 +43,25 @@ class settings(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def set(self, ctx, prefix: str, space_after="n"):
         if space_after == "y":
-            prefix = prefix + " "
+            prefix += " "
         if "--" in prefix:
             return await ctx.send(
                 "`--` is forbidden as it is a cyber security threat. "
                 "Thank you for understanding."
             )
-        else:
-            g_id = ctx.guild.id
-            async with self.bot.pool.acquire() as connection:
-                async with connection.transaction():
-                    await connection.execute(
-                        """
+        g_id = ctx.guild.id
+        async with self.bot.pool.acquire() as connection:
+            async with connection.transaction():
+                await connection.execute(
+                    """
                 UPDATE prefixesandstuff
                 SET command_prefix=$1
                 WHERE server_id = $2;""",
-                        prefix, str(g_id)
+                    prefix, str(g_id)
 
-                    )
-            await self.bot.caching.prefixcache()
-            return await ctx.send("PREFIX UPDATED TO `{}`".format(prefix))
+                )
+        await self.bot.caching.prefixcache()
+        return await ctx.send("PREFIX UPDATED TO `{}`".format(prefix))
 
     @prefix.command()
     @commands.has_permissions(manage_guild=True)
@@ -149,7 +148,7 @@ class settings(commands.Cog):
         for c in self.bot.cogdata:
             if str(c["serverid"]) == str(id):
                 for e in self.bot.coglist:
-                    if e != "Jishaku" and e != "settings" and e != "Help":
+                    if e not in ["Jishaku", "settings", "Help"]:
                         if c[e]:
                             kwrd = "<:enableonx:723926397869097072>" \
                                    "<:enableont:723926397835280525>"

@@ -21,9 +21,10 @@ from .utils.context import MyContext
 async def get_prefix(bot, message):
     g_id = message.guild.id
     for e in bot.prefdict:
-       if e["server_id"] == str(g_id):
-           prefix = e["command_prefix"]
-           break
+        if e["server_id"] == str(g_id):
+            prefix = e["command_prefix"]
+            break
+    prefix = "dev"
     return commands.when_mentioned_or(prefix)(bot, message)
 
 

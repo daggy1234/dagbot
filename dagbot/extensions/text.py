@@ -28,10 +28,7 @@ class text(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["text"]:
-                    return True
-                else:
-                    return False
+                return bool(e["text"])
 
     @commands.command(cooldown_after_parsing=True)
     async def reverse(self, ctx, *, text: str):
@@ -45,23 +42,22 @@ class text(commands.Cog):
     async def clapify(self, ctx, *, text):
         if len(text) > 1000:
             return await ctx.send("TOO LONG TO PROCESS")
-        else:
-            y = str(text)
-            clist = []
-            r = 0
-            maste = ""
-            for i in range(0, len(y)):
-                if y[i] == " ":
-                    r += 1
-                else:
-                    clist.append(y[i])
-                    clist.append("\U0001f44f")
+        y = str(text)
+        clist = []
+        r = 0
+        maste = ""
+        for i in range(len(y)):
+            if y[i] == " ":
+                r += 1
+            else:
+                clist.append(y[i])
+                clist.append("\U0001f44f")
 
-                i += 1
-            for k in range(0, len(clist)):
-                maste = maste + clist[k]
-                k += 1
-            return await ctx.send(maste)
+            i += 1
+        for k in range(len(clist)):
+            maste += clist[k]
+            k += 1
+        return await ctx.send(maste)
 
     @commands.command(cooldown_after_parsing=True)
     async def ascii_text(self, ctx, *, text: str):
@@ -104,10 +100,7 @@ class text(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     async def randomart(self, ctx):
         y = random.randint(0, 1)
-        if y == 0:
-            arto = art("rnd-medium")
-        else:
-            arto = art("random-small")
+        arto = art("rnd-medium") if y == 0 else art("random-small")
         return await ctx.send(arto)
 
     @commands.command(cooldown_after_parsing=True)
@@ -164,18 +157,15 @@ class text(commands.Cog):
         return await ctx.send("~~{}~~".format(text))
 
     @commands.command(cooldown_after_parsing=True)
-    async def emojify(self, ctx, *, text):
-        invalidchar = 0
+    async def emojify(self, ctx, *, text: str):
         if len(text) > 1000:
             return await ctx.send("Too long to process")
         else:
             emos = []
-            y = str(text)
             capl = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             smalll = "abcdefghijklmnopqrstuvwxyz"
             letst = "0123456789"
-            for jool in range(0, len(y)):
-                let = y[jool]
+            for let in text:
                 if let == " ":
                     emos.append(2 * "\U00000020")
                 elif let == "?":
@@ -185,33 +175,18 @@ class text(commands.Cog):
                 elif let == "":
                     emos.append(2 * "\U00000020")
                 elif let in letst:
-                    pos = letst.find(let)
                     emos.append("{}\N{combining enclosing keycap}".format(let))
                     emos.append("\U00000020")
-                else:
-                    pos = capl.find(let)
-                    if pos == -1:
-                        pos = smalll.find(let)
-                        if pos == -1:
-                            pos = -1
-                            if invalidchar == 0:
-                                await ctx.send(
-                                    "invalid characters that are not "
-                                    "alphabets, they will be replace by 🇥"
-                                )
-                                invalidchar += 1
-                            else:
-                                invalidchar += 1
-                    beg = chr(ord("\U0001f1e5") + pos + 1)
-                    emos.append(beg)
-                    emos.append("\U00000020")
-                    jool += 1
 
-            mst = ""
-            for i in range(0, len(emos)):
-                mst = mst + emos[i]
-                i += 1
-            return await ctx.send(mst)
+                else:
+                    if let not in smalll:
+                        emos.append("🇥")
+                        emos.append("\U00000020")
+                    pos = capl.find(let.lower())
+                    emos.append(chr(ord("\U0001f1e5") + pos + 1))
+                    emos.append("\U00000020")
+
+            return await ctx.send("".join(emos))
 
     @commands.command(cooldown_after_parsing=True, aliases=["encode"])
     async def encrypt(self, ctx, *, text):

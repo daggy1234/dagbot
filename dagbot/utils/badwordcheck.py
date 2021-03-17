@@ -42,9 +42,8 @@ class bword:
         r, f = await self.setcheck(s)
         if r:
             return (True, f"NSFW: {f}")
+        rt, w = await self.itercheck(sent)
+        if rt:
+            return (True, f"NSFW word: {w}")
         else:
-            rt, w = await self.itercheck(sent)
-            if rt:
-                return (True, f"NSFW word: {w}")
-            else:
-                return (False, "PASSED SFW")
+            return (False, "PASSED SFW")

@@ -15,11 +15,12 @@ class Uploader(commands.Cog):
         url = "https://dagbot-site.herokuapp.com/api/newstats"
         stats = {
             "servers": len(self.bot.guilds),
-            "users": sum([g.member_count for g in self.bot.guilds]),
+            "users": sum(g.member_count for g in self.bot.guilds),
             "commands_called": self.bot.commands_called,
             "socket_stats": [self.bot.socket_stats],
-            "command_stats": [self.bot.useage]
+            "command_stats": [self.bot.useage],
         }
+
         headers = {"Token": self.bot.data["stats"]}
         r = await self.bot.session.post(url, data=stats, headers=headers)
         if r.status != 200:

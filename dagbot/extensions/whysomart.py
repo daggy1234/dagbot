@@ -46,10 +46,7 @@ class smart(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["smart"]:
-                    return True
-                else:
-                    return False
+                return bool(e["smart"])
 
     async def characterhpget(self, y):
         response = await self.client.session.get(
@@ -58,20 +55,20 @@ class smart(commands.Cog):
         )
         flist = await (response.json())
         vallist = []
-        for i in range(0, len(flist)):
+        for i in range(len(flist)):
             dictg = flist[i]
             name = dictg.get("name")
             if y in name:
                 vallist.append(i)
             else:
                 i += 1
-        if len(vallist) == 0:
+        if not vallist:
             return False
         elif len(vallist) == 1:
             return flist[vallist[0]]
         else:
             charstring = ""
-            for q in range(0, (len(vallist))):
+            for q in range(len(vallist)):
                 char = flist[vallist[q]]["name"]
                 charstring = charstring + "\n" + char
                 q += 1
@@ -92,7 +89,6 @@ class smart(commands.Cog):
         )
         pokimg = str(soup.body.find("img", attrs={"class": "active"})["src"])
         evoidlist = []
-        evoimg = []
         evoname = []
         evoidf = []
         evonamef = []
@@ -101,10 +97,9 @@ class smart(commands.Cog):
         for info in soupa.find_all("h3"):
             evoidlist.append(info.find("span").text)
             evoname.append(info.text)
-        for link in soupa.find_all("img"):
-            evoimg.append(link.get("src"))
+        evoimg = [link.get("src") for link in soupa.find_all("img")]
         try:
-            for i in range(0, len(evoname)):
+            for i in range(len(evoname)):
                 _id = evoidlist[i]
                 name = evoname[i]
                 fid = _id.replace(" ", "")
@@ -128,7 +123,6 @@ class smart(commands.Cog):
         except KeyError:
             evoidf = ['Error']
             evonamef = ['Error']
-        datafact = []
         infobox = str(
             soup.body.find(
                 "p", attrs={
@@ -145,8 +139,7 @@ class smart(commands.Cog):
             )
         )
         soupb = BeautifulSoup(pokinfo, "html.parser")
-        for datainfo in soupb.find_all("span"):
-            datafact.append(datainfo.get_text())
+        datafact = [datainfo.get_text() for datainfo in soupb.find_all("span")]
         pokedict = {
             "name": evonamef,
             "image": evoimg,
@@ -154,7 +147,7 @@ class smart(commands.Cog):
             "entry": infobox,
             "fimage": pokimg,
         }
-        for cul in range(0, len(datafact)):
+        for cul in range(len(datafact)):
             with suppress(Exception):
                 pokedict[datafact[cul]] = datafact[cul + 1]
 
@@ -168,20 +161,20 @@ class smart(commands.Cog):
         )
         flist = await (response.json())
         vallist = []
-        for i in range(0, len(flist)):
+        for i in range(len(flist)):
             dictg = flist[i]
             name = dictg.get("spell")
             if y in name:
                 vallist.append(i)
             else:
                 i += 1
-        if len(vallist) == 0:
+        if not vallist:
             return False
         elif len(vallist) == 1:
             return flist[vallist[0]]
         else:
             charstring = ""
-            for q in range(0, (len(vallist))):
+            for q in range(len(vallist)):
                 char = flist[vallist[q]]["spell"]
                 charstring = charstring + "\n" + char
                 q += 1
@@ -200,10 +193,9 @@ class smart(commands.Cog):
         data = js['collection']
         if data['metadata']['total_hits'] == 0:
             return (False)
-        else:
-            lik = data['items'][0]
-            resul = len(lik)
-            return ([lik, resul])
+        lik = data['items'][0]
+        resul = len(lik)
+        return ([lik, resul])
 
     async def getyoda(self, string):
         htmlst = string.replace(" ", "%20")
@@ -377,10 +369,9 @@ hp spell <spell> : gets information about spell    `"""
         resp = await self.getnpic(url)
         if not resp:
             return await ctx.send('No reults for your query')
-        else:
-            embed = discord.Embed(color=ctx.guild.me.color)
-            embed.set_image(url=resp[0])
-            embed.set_footer(text=f'Returned {resp[1]} results for your query')
+        embed = discord.Embed(color=ctx.guild.me.color)
+        embed.set_image(url=resp[0])
+        embed.set_footer(text=f'Returned {resp[1]} results for your query')
 
     @commands.command(cooldown_after_parsing=True)
     async def oeis(self, ctx, num: int = 891):
@@ -401,7 +392,7 @@ hp spell <spell> : gets information about spell    `"""
             l_dat = iti.replace("\n", "")
             char = 0
             chrli = []
-            for i in range(0, len(l_dat)):
+            for i in range(len(l_dat)):
                 if l_dat[i] == " " and char == 0:
                     chrli.append("")
                     char = 0
@@ -412,9 +403,7 @@ hp spell <spell> : gets information about spell    `"""
                     chrli.append(l_dat[i])
                     char = 1
                 i += 1
-            mst = ""
-            for e in chrli:
-                mst = mst + e
+            mst = "".join(chrli)
             # print(chrli)
             embed = discord.Embed(
                 title=f"`{mst}`", url=url, color=guild.me.color
@@ -448,10 +437,10 @@ hp spell <spell> : gets information about spell    `"""
         mast = ""
         for i in k:
             mli = dict_[i]
-            mast = mast + f"\n__TYPE__:**{i}**"
-            mast = mast + "\n__Meaning:__"
+            mast += f"\n__TYPE__:**{i}**"
+            mast += "\n__Meaning:__"
             for e in mli:
-                mast = mast + f"\n{e}"
+                mast += f"\n{e}"
         emed = discord.Embed(
             title=f"**WORD: {word}**",
             description=mast,
@@ -537,18 +526,18 @@ hp spell <spell> : gets information about spell    `"""
             embed.set_thumbnail(url=poke["fimage"])
             embed.set_thumbnail(url=poke["fimage"])
             mstring = ""
-            for i in range(0, len(stat_list)):
+            for i in range(len(stat_list)):
                 val = stat_list[i]["base_stat"]
                 name = stat_list[i]["stat"]["name"]
-                mstring = mstring + "\n{}: {}".format(name, val)
+                mstring += "\n{}: {}".format(name, val)
                 i += 1
             embed.add_field(name="STATS", value=mstring, inline=False)
             abilitylist = file["abilities"]
             mstringyu = ""
-            for qc in range(0, (len(abilitylist))):
+            for qc in range(len(abilitylist)):
                 try:
                     ablename = abilitylist[qc]["ability"]["name"]
-                    mstringyu = mstringyu + "\nAbility {}: {}".format(
+                    mstringyu += "\nAbility {}: {}".format(
                         qc + 1, ablename
                     )
                 except BaseException:
@@ -559,7 +548,7 @@ hp spell <spell> : gets information about spell    `"""
             embed.add_field(
                 name="Evolutions", value="------------", inline=False
             )
-            for evu in range(0, len(poke["image"])):
+            for evu in range(len(poke["image"])):
                 embed.add_field(
                     name=poke["id"][evu], value=poke["name"][evu], inline=True
                 )

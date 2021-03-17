@@ -26,26 +26,25 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
             else:
                 prefix = "@Dagbot (run repair to fix. Guild is broken)"
         ctx = await self.bot.get_context(message)
-        if not ctx.valid:
-            if self.bot.user in message.mentions:
-                embed = discord.Embed(
-                    title="You hit me up?",
-                    description=f"""
+        if not ctx.valid and self.bot.user in message.mentions:
+            embed = discord.Embed(
+                title="You hit me up?",
+                description=f"""
         My Prefix for this server is: `{prefix}`
         Use the help command to get smart enough to use me: `{prefix}help` """,
-                    color=message.guild.me.color,
-                )
-                embed.add_field(
-                    name="Support Server",
-                    value="[Invite Link](https://discord.gg/grGkdeS)"
-                )
-                embed.add_field(
-                    name="Invite Link",
-                    value="[Click me](https://discordapp.com/api/oauth2/"
-                          "authorize?client_id=675589737372975124&permissions="
-                          "378944&scope=bot)",
-                )
-                await channel.send(embed=embed)
+                color=message.guild.me.color,
+            )
+            embed.add_field(
+                name="Support Server",
+                value="[Invite Link](https://discord.gg/grGkdeS)"
+            )
+            embed.add_field(
+                name="Invite Link",
+                value="[Click me](https://discordapp.com/api/oauth2/"
+                      "authorize?client_id=675589737372975124&permissions="
+                      "378944&scope=bot)",
+            )
+            await channel.send(embed=embed)
         # await self.bot.process_commands(message)
 
     @commands.Cog.listener()

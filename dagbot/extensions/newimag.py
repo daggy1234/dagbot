@@ -68,7 +68,10 @@ class image(commands.Cog):
             (ImageFeatures.rainbow(),
              ImageConverter),
             (ImageFeatures.triangle(),
-             StaticImageConverter)]
+             StaticImageConverter),
+            (ImageFeatures.stringify(), StaticImageConverter),
+            ()
+        ]
         for command in self.dynamic:
             self.make_fn(command[0], command[1])
         self.make_fn_alex("salty", StaticImageConverter)
@@ -80,8 +83,8 @@ class image(commands.Cog):
         @commands.command(name=feature.value.replace("/", ""),
                           help=feature.description)
         async def _command(_self, ctx, *, source: converter = None):
-            if converter == None:
-                raise NoImageFound('')
+            if converter is None:
+                raise NoImageFound('Please provide a valid image')
             img = await self.client.dagpi.image_process(feature,
                                                         source)
             await self.to_embed(ctx, img, feature.value.replace("/", ""))
@@ -108,10 +111,7 @@ class image(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["image"]:
-                    return True
-                else:
-                    return False
+                return bool(e["image"])
 
     async def to_embed(self, ctx, img: Image, feature: str):
         async with ctx.typing():
@@ -155,6 +155,16 @@ class image(commands.Cog):
                                                     username=uname,
                                                     text=text)
         await self.to_embed(ctx, img, "tweet")
+
+    @commands.command(cooldown_after_parsing=True)
+    async def captcha(self, ctx, user: BetterMemberConverter = None, *, text: str):
+        if user is None:
+            user = ctx.author
+        pfp = str(user.avatar_url_as(format="png", size=1024))
+        img = await self.client.dagpi.image_process(ImageFeatures.captcha(),
+                                                    url=pfp,
+                                                    text=text)
+        await self.to_embed(ctx, img, "captcha")
 
     @commands.command(cooldown_after_parsing=True)
     async def message(self, ctx, user: BetterMemberConverter = None, *, text):
@@ -256,7 +266,6 @@ class image(commands.Cog):
         guyb = usert.display_name
         if guya == guyb:
             return await ctx.send("Thats just loving yourself.")
-        else:
-            url = f"https://api.alexflipnote.dev//ship?user={urla}" \
-                  f"&user2={urlb}"
-            await self.to_embed_alex(ctx, await self.process_alex(url), None, "ship")
+        url = f"https://api.alexflipnote.dev//ship?user={urla}" \
+              f"&user2={urlb}"
+        await self.to_embed_alex(ctx, await self.process_alex(url), None, "ship")

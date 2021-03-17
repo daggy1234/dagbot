@@ -12,10 +12,7 @@ class tags(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.bot.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["tags"]:
-                    return True
-                else:
-                    return False
+                return bool(e["tags"])
 
     @commands.group(invoke_without_command=True)
     async def tag(self, ctx, *, name):
@@ -38,17 +35,16 @@ class tags(commands.Cog):
 
                     if len(y) == 0:
                         return await ctx.send("Tag does not exist")
-                    else:
-                        return await ctx.send(y[0]["content"])
-                        uses = y[0]["uses"]
-                        uses += 1
-                        await connection.execute(
-                            """
+                    await ctx.send(y[0]["content"])
+                    uses = y[0]["uses"]
+                    uses += 1
+                    await connection.execute(
+                        """
                 UPDATE taglist
                 SET uses = $1
                 WHERE (server = $2 AND name= $3);""",
-                            int(uses), int(serverid), n
-                        )
+                        int(uses), int(serverid), n
+                    )
 
     @tag.command(cooldown_after_parsing=True)
     async def info(self, ctx, *, name):
@@ -59,27 +55,25 @@ class tags(commands.Cog):
                 "`--` is forbidden as it is a cyber security threat. "
                 "Thank you for understanding."
             )
-        else:
-            async with self.bot.pool.acquire() as connection:
-                async with connection.transaction():
-                    y = await connection.fetch(
-                        """
+        async with self.bot.pool.acquire() as connection:
+            async with connection.transaction():
+                y = await connection.fetch(
+                    """
                 SELECT * FROM taglist
                 WHERE (name = $1 AND server = $2); """,
-                        str(name).lower(), int(sid)
-                    )
-
-            if len(y) == 0:
-                return await ctx.send("Tag does not exist")
-            else:
-                auth_id = y[0]["author"]
-                guy = self.bot.get_user(int(auth_id))
-                embed = discord.Embed(
-                    title="Tag: {}".format(name), color=guild.me.color
+                    str(name).lower(), int(sid)
                 )
-                embed.add_field(name="Creator", value=guy.mention)
-                embed.add_field(name="Uses", value=y[0]["uses"])
-                return await ctx.send(embed=embed)
+
+        if len(y) == 0:
+            return await ctx.send("Tag does not exist")
+        auth_id = y[0]["author"]
+        guy = self.bot.get_user(int(auth_id))
+        embed = discord.Embed(
+            title="Tag: {}".format(name), color=guild.me.color
+        )
+        embed.add_field(name="Creator", value=guy.mention)
+        embed.add_field(name="Uses", value=y[0]["uses"])
+        return await ctx.send(embed=embed)
 
     @tag.command(cooldown_after_parsing=True)
     async def rename(self, ctx, name, newname):

@@ -227,9 +227,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         useage = {key: value for key, value in
                   sorted(self.bot.socket_stats.items(),
                          key=lambda item: item[1], reverse=True)}
-        fl = []
-        for key, val in zip(useage.keys(), useage.values()):
-            fl.append([key, val])
+        fl = [[key, val] for key, val in zip(useage.keys(), useage.values())]
         pages = menus.MenuPages(
             source=TabulateData(fl, ['Event', 'Occurences'], tit),
             clear_reactions_after=True)
@@ -241,11 +239,9 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         useage = {key: value for key, value in
                   sorted(self.bot.useage.items(), key=lambda item: item[1],
                          reverse=True)}
-        fl = []
         columns = ['commands', 'useage']
         cc = self.bot.commands_called
-        for key, val in zip(useage.keys(), useage.values()):
-            fl.append([key, val])
+        fl = [[key, val] for key, val in zip(useage.keys(), useage.values())]
         pages = menus.MenuPages(source=TabulateData(fl, columns, f'Command '
                                                                  f'Stats, '
                                                                  f'{cc}'),
@@ -286,10 +282,11 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     async def dev_stats(self, ctx):
         res = await self.bot.session.get("https://dagbot-site.herokuapp.com/api/botstats", headers={"Token": self.bot.data["stats"]})
         our = await res.read()
-        url = await self.bot.session.post("https://paste.daggy.tech/upload", data=our)
+        url = await self.bot.session.post("https://paste.rs/", data=our)
         t = await url.text()
         self.bot.logger.debug(t)
         await ctx.author.send(t)
+
     @commands.command(hidden=True)
     @commands.is_owner()
     async def new_stats(self, ctx):
@@ -300,7 +297,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()
     async def neofetch(self, ctx):
 
-        l = list()
+        l = []
         with ShellReader("neofetch --logo") as read:
             async for line in read:
                 l.append(line)
@@ -315,6 +312,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         embed = discord.Embed(title="Neofetch")
         embed.description = f"```shell\n{mstr}\n```\n\n```shell\n{mstrb}\n```"
         return await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Developer(bot))

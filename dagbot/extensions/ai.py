@@ -37,10 +37,7 @@ class ai(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["ai"]:
-                    return True
-                else:
-                    return False
+                return bool(e["ai"])
 
     async def ocra(self, ur):
         url = f"https://eu-vision.googleapis.com/v1/" \
@@ -70,7 +67,7 @@ class ai(commands.Cog):
 
         mst = ""
         e = df[0]
-        mst = mst + str(e["description"])
+        mst += str(e["description"])
         return mst
 
     async def labela(self, ur):
@@ -96,10 +93,7 @@ class ai(commands.Cog):
             f = js["responses"][0]["labelAnnotations"]
         except BaseException:
             return False
-        mst = ""
-        for e in f:
-            mst = mst + f"\n{e['description']}\t{e['score']}"
-        return mst
+        return "".join(f"\n{e['description']}\t{e['score']}" for e in f)
 
     async def captioni(self, ur):
         data = {
@@ -144,10 +138,9 @@ class ai(commands.Cog):
         f = await self.captioni(image)
         if not f:
             return await ctx.send("No results as of now. Shit be wonky")
-        else:
-            embed = discord.Embed(title=f, color=ctx.guild.me.color)
-            embed.set_image(url=image)
-            return await ctx.send(embed=embed)
+        embed = discord.Embed(title=f, color=ctx.guild.me.color)
+        embed.set_image(url=image)
+        return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
@@ -166,14 +159,13 @@ class ai(commands.Cog):
         f = await self.ocra(image)
         if not f:
             return await ctx.send("No results rn")
-        else:
-            embed = discord.Embed(
-                title="Your Image contains the following text",
-                description=f,
-                color=ctx.guild.me.color,
-            )
-            embed.set_image(url=image)
-            return await ctx.send(embed=embed)
+        embed = discord.Embed(
+            title="Your Image contains the following text",
+            description=f,
+            color=ctx.guild.me.color,
+        )
+        embed.set_image(url=image)
+        return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -181,13 +173,12 @@ class ai(commands.Cog):
         y = await self.labela(image)
         if not y:
             return await ctx.send("No results as of now. Shit be wonky")
-        else:
-            embed = discord.Embed(
-                title="We have generated labels for your image!",
-                description=y,
-                color=ctx.guild.me.color,
-            )
-            return await ctx.send(embed=embed)
+        embed = discord.Embed(
+            title="We have generated labels for your image!",
+            description=y,
+            color=ctx.guild.me.color,
+        )
+        return await ctx.send(embed=embed)
 
 
 def setup(client):

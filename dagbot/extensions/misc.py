@@ -21,13 +21,11 @@ def linecount():
             if name.endswith(".py"):
                 file_amount += 1
                 with codecs.open(
-                        "./" + str(pathlib.PurePath(path, name)), "r", "utf-8"
+                    "./" + str(pathlib.PurePath(path, name)), "r", "utf-8"
                 ) as f:
                     for i, l_c in enumerate(f):
                         stripped = l_c.strip()
-                        if (stripped.startswith("#") or len(stripped) == 0):
-                            pass
-                        else:
+                        if not stripped.startswith("#") and len(stripped) != 0:
                             total += 1
     return (
         f"I am made of {total:,} lines of Python, spread across  "
@@ -64,9 +62,9 @@ class misc(commands.Cog):
         embed.set_footer(text="id")
         channel = self.bot.get_channel(676031268009410570)
         msg = await channel.send(embed=embed)
-        return await ctx.send(embed=embed)
         await msg.add_reaction("\U00002705")
         await msg.add_reaction("\U0000274c")
+        return await ctx.send(embed=embed)
 
     @commands.command(aliases=["error", "problem"])
     @commands.cooldown(1, 60, commands.BucketType.user)
@@ -445,7 +443,7 @@ class misc(commands.Cog):
         )
         channels = 0
         for guild in self.bot.guilds:
-            for channel in guild.channels:
+            for _ in guild.channels:
                 channels += 1
         embed.add_field(
             name="Url's",
@@ -507,20 +505,18 @@ class misc(commands.Cog):
         # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/meta.py#L328-L366
         if command is None:
             return await ctx.send(self.bot.repo)
-        else:
-            com = self.bot.get_command(command)
-            if com is None:
-                return await ctx.send(
-                    f'There is no command with that name. Maybe check repo\n'
-                    f'{self.bot.repo}')
-            else:
-                code = com.callback.__code__
-                filename = code.co_filename
-                lines, firstline = inspect.getsourcelines(code)
-                location = os.path.relpath(filename).replace('\\', '/')
-                final_url = (f'{self.bot.repo}/blob/master/{location}'
-                             f'#L{firstline}-L{firstline + len(lines) - 1}')
-                return await ctx.send(f"{final_url} is the source. Please follow the License used and don't forget to :star:")
+        com = self.bot.get_command(command)
+        if com is None:
+            return await ctx.send(
+                f'There is no command with that name. Maybe check repo\n'
+                f'{self.bot.repo}')
+        code = com.callback.__code__
+        filename = code.co_filename
+        lines, firstline = inspect.getsourcelines(code)
+        location = os.path.relpath(filename).replace('\\', '/')
+        final_url = (f'{self.bot.repo}/blob/master/{location}'
+                     f'#L{firstline}-L{firstline + len(lines) - 1}')
+        return await ctx.send(f"{final_url} is the source. Please follow the License used and don't forget to :star:")
 
 
 def setup(bot):

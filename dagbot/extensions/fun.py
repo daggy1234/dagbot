@@ -80,10 +80,7 @@ class fun(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["fun"]:
-                    return True
-                else:
-                    return False
+                return bool(e["fun"])
 
     async def get_joke(self):
         header = {"Accept": "application/json"}
@@ -111,7 +108,7 @@ class fun(commands.Cog):
         if cul["pagination"]["total_count"] == 0:
             urllist[0] = 0
         else:
-            for i in range(0, 4):
+            for i in range(4):
                 urllist.append(cul["data"][i]["images"]["original"]["url"])
             return urllist
 
@@ -152,11 +149,11 @@ class fun(commands.Cog):
         duration = (end - start) * 1000
         client_lat = round((self.client.latency * 1000), 2)
         await asyncio.sleep(2)
-        dp = round(await self.client.dagpi.data_ping(),2)
+        dp = round(await self.client.dagpi.data_ping(), 2)
         await message.edit(
             content="I'm Weak\n```diff\nPONG!\n- Websocket Latency:"
                     "{} ms\n+ Message {:.2f}\nDagpi: {}```".format(client_lat,
-                                                             duration, dp))
+                                                                   duration, dp))
 
     @commands.command(cooldown_after_parsing=True)
     async def dadjoke(self, ctx):
@@ -252,8 +249,7 @@ class fun(commands.Cog):
                 "**DAGBOT DOES NOTHING {}**\n You cannot slap yourself".format(
                     send)
             )
-        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(
-                guy) == "Dagbot":
+        elif str(guy) in ["DAGBOT", "dagbot", "Dagbot"]:
             await channel.send(
                 "WELL **DAGBOT SENDS A SLAP TO {}**".format(send))
         else:
@@ -285,9 +281,9 @@ class fun(commands.Cog):
         if send is None:
             send = message.author.name
         embed = discord.Embed(title="DAGBOT - RATING", color=guild.me.color)
-        if (thing == "DAGBOT") or (thing == "dagbot") or thing == "Dagbot":
+        if thing in ["DAGBOT", "dagbot", "Dagbot"]:
             rating = 12
-        elif (thing == "daggy") or (thing == "Daggy") or thing == "DAGGY":
+        elif thing in ["daggy", "Daggy", "DAGGY"]:
             rating = 0
         else:
             rating = random.randint(0, 10)
@@ -387,8 +383,7 @@ class fun(commands.Cog):
                     send
                 )
             )
-        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(
-                guy) == "Dagbot":
+        elif str(guy) in ["DAGBOT", "dagbot", "Dagbot"]:
             await channel.send("I AM FLATTERED <3")
         else:
             embed = discord.Embed(
@@ -411,8 +406,7 @@ class fun(commands.Cog):
                     send
                 )
             )
-        elif (str(guy) == "DAGBOT") or (str(guy) == "dagbot") or str(
-                guy) == "Dagbot":
+        elif str(guy) in ["DAGBOT", "dagbot", "Dagbot"]:
             await channel.send("I AM FLATTERED <3")
         else:
             await channel.send("**{} SENDS A HUG TO {}**".format(send, guy))
@@ -422,19 +416,19 @@ class fun(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def gif(self, ctx, *, query: str):
         qu, st = await self.client.bwordchecker.bwordcheck(query)
-        if not qu:
-            await ctx.trigger_typing()
-            urllist = await self.get_giffy(query)
-            if urllist[0] == 0:
-                await ctx.channel.send("NO GIF")
-            else:
-                m = MyMenugif(urllist)
-                await m.start(ctx)
-        else:
+        if qu:
             return await ctx.send(
                 f"You have used an NSFW command search query "
                 f"in a Safe for Work channel\n{st}"
             )
+
+        await ctx.trigger_typing()
+        urllist = await self.get_giffy(query)
+        if urllist[0] == 0:
+            await ctx.channel.send("NO GIF")
+        else:
+            m = MyMenugif(urllist)
+            await m.start(ctx)
 
     @commands.command(
         cooldown_after_parsing=True,

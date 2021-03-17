@@ -30,8 +30,8 @@ class MyContext(commands.Context):
                                       "upload this?")
 
         return await super().send(content, file=file, embed=embed, files=files,
-                           delete_after=delete_after, nonce=nonce,
-                           allowed_mentions=allowed_mentions, tts=tts)
+                                  delete_after=delete_after, nonce=nonce,
+                                  allowed_mentions=allowed_mentions, tts=tts)
 
     async def safe_send(self, yes):
         await super().send("Yes this method is cool")

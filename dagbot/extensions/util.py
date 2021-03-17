@@ -167,10 +167,7 @@ class util(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["util"]:
-                    return True
-                else:
-                    return False
+                return bool(e["util"])
 
     async def get_wiki(self, query):
         url = "https://en.wikipedia.org/w/api.php?action=query&prop=" \
@@ -181,21 +178,17 @@ class util(commands.Cog):
         tit = file["query"]["pages"][0]["title"]
         conten = file["query"]["pages"][0]["extract"]
         furl = "https://en.wikipedia.org/wiki/" + tit
-        dict_ = {"title": tit, "content": conten, "url": furl}
-        return dict_
+        return {"title": tit, "content": conten, "url": furl}
 
     async def gettaco(self):
         response = await self.client.session.get(
             "http://taco-randomizer.herokuapp.com")
         file = await response.read()
         soup = BeautifulSoup(file, "html.parser")
-        ll = []
         head = str(soup.body.find("h1", attrs={"class": "light"}).Text)
-        for link in soup.find_all("a"):
-            ll.append(link.get("href"))
+        ll = [link.get("href") for link in soup.find_all("a")]
         perma = f"http://taco-randomizer.herokuapp.com{str(ll[1])}"
-        fdict = {"text": head, "link": perma}
-        return fdict
+        return {"text": head, "link": perma}
 
     async def ytget(self, query):
         url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q=" \
@@ -211,35 +204,33 @@ class util(commands.Cog):
         kindlist = []
         if len(resp["items"]) == 0:
             return {"title": False}
-        else:
-            for r in resp["items"]:
-                kind = r["id"]["kind"]
-                if kind == "youtube#channel":
-                    id = r["id"]["channelId"]
-                    urlist.append(f"https://www.youtube.com/channel/{id}")
-                elif kind == "youtube#video":
-                    id = r["id"]["videoId"]
-                    urlist.append(f"https://www.youtube.com/watch?v={id}")
-                else:
-                    urlist.append(
-                        "https://i1.wp.com/www.rattleandmum.co.za/wp-content/"
-                        "uploads/2015/02/IMG_0102.png"
-                    )
-                titlist.append(r["snippet"]["title"])
-                desclist.append(r["snippet"]["description"])
-                thumblist.append(r["snippet"]["thumbnails"]["default"]["url"])
-                timlist.append(r["snippet"]["publishedAt"])
-                chanlist.append(r["snippet"]["channelTitle"])
-            ytdict = {
-                "title": titlist,
-                "description": desclist,
-                "thumbnails": thumblist,
-                "urls": urlist,
-                "channel": chanlist,
-                "time": timlist,
-                "kind": kindlist,
-            }
-            return ytdict
+        for r in resp["items"]:
+            kind = r["id"]["kind"]
+            if kind == "youtube#channel":
+                id = r["id"]["channelId"]
+                urlist.append(f"https://www.youtube.com/channel/{id}")
+            elif kind == "youtube#video":
+                id = r["id"]["videoId"]
+                urlist.append(f"https://www.youtube.com/watch?v={id}")
+            else:
+                urlist.append(
+                    "https://i1.wp.com/www.rattleandmum.co.za/wp-content/"
+                    "uploads/2015/02/IMG_0102.png"
+                )
+            titlist.append(r["snippet"]["title"])
+            desclist.append(r["snippet"]["description"])
+            thumblist.append(r["snippet"]["thumbnails"]["default"]["url"])
+            timlist.append(r["snippet"]["publishedAt"])
+            chanlist.append(r["snippet"]["channelTitle"])
+        return {
+            "title": titlist,
+            "description": desclist,
+            "thumbnails": thumblist,
+            "urls": urlist,
+            "channel": chanlist,
+            "time": timlist,
+            "kind": kindlist,
+        }
 
     async def get_weather(self, y):
         response = await self.client.session.get(
@@ -267,7 +258,7 @@ class util(commands.Cog):
             realfeelf = round((realfeel * 1.8) - 460, 2)
             tempmaxf = round((tempmax * 1.8) - 460, 2)
             tempminf = round((tempmin * 1.8) - 460, 2)
-            ss = """```
+            return """```
 {},{}
 {}
 {}
@@ -292,33 +283,26 @@ pressure:              {}hPa```""".format(
                 humdidity,
                 pressure,
             )
-            return ss
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 20, type=commands.BucketType.user)
     async def google(self, ctx, *, query: str):
         channel = ctx.channel
         qu, st = await self.client.bwordchecker.bwordcheck(query)
-        if not qu:
-            reslist = await self.googlethingy.search(query, safesearch=True)
-            if len(reslist) == 0:
-                return await ctx.send("NO RESULTS")
-            else:
-                m = MyMenugoogle(reslist)
-                await m.start(ctx)
-        else:
-            if channel.is_nsfw():
-                reslist = await self.googlethingy.search(query)
-                if len(reslist) == 0:
-                    return await ctx.send("NO RESULTS")
-                else:
-                    m = MyMenugoogle(reslist)
-                    await m.start(ctx)
-            else:
+        if qu:
+            if not channel.is_nsfw():
                 return await ctx.send(
                     f"You have used an NSFW command search query in a "
                     f"Safe for Work channel\n{st}"
                 )
+
+            reslist = await self.googlethingy.search(query)
+        else:
+            reslist = await self.googlethingy.search(query, safesearch=True)
+        if len(reslist) == 0:
+            return await ctx.send("NO RESULTS")
+        m = MyMenugoogle(reslist)
+        await m.start(ctx)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 120, type=commands.BucketType.user)
@@ -340,14 +324,14 @@ pressure:              {}hPa```""".format(
         if z >= y:
             x = random.randint(y, z)
             embed.add_field(name="RANDOM INTEGER", value=x, inline=False)
-            await channel.send(embed=embed)
         else:
             embed.add_field(
                 name="RANDOM INTEGER EROOR",
                 value="Start range number is greater than end",
                 inline=False,
             )
-            await channel.send(embed=embed)
+
+        await channel.send(embed=embed)
 
     @commands.command(
         cooldown_after_parsing=True, aliases=["random taco", "rtaco", "rt"]
@@ -367,64 +351,39 @@ pressure:              {}hPa```""".format(
     async def wikipedia(self, ctx, *, query):
         channel = ctx.channel
         qu, st = await self.client.bwordchecker.bwordcheck(query)
-        if not qu:
-            await ctx.trigger_typing()
-            resp = await self.get_wiki(query)
-            color = ctx.guild.me.color
-            title = resp["title"]
-            url = resp["url"]
-            con = resp["content"]
-            embed = discord.Embed(
-                title=title,
-                url=url,
-                description=con,
-                color=color)
-            return await ctx.send(embed=embed)
-        else:
-            if channel.is_nsfw():
-                await ctx.trigger_typing()
-                resp = await self.get_wiki(query)
-                color = ctx.guild.me.color
-                title = resp["title"]
-                url = resp["url"]
-                con = resp["content"]
-                embed = discord.Embed(
-                    title=title, url=url, description=con, color=color
-                )
-                return await ctx.send(embed=embed)
-            else:
-                return await ctx.send(
-                    f"You have used an NSFW command search query in a "
-                    f"Safe for Work channel\n{st}"
-                )
+        if (not qu or not channel.is_nsfw()) and qu:
+            return await ctx.send(
+                f"You have used an NSFW command search query in a "
+                f"Safe for Work channel\n{st}"
+            )
+
+        await ctx.trigger_typing()
+        resp = await self.get_wiki(query)
+        color = ctx.guild.me.color
+        title = resp["title"]
+        url = resp["url"]
+        con = resp["content"]
+        embed = discord.Embed(
+            title=title, url=url, description=con, color=color
+        )
+        return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True, aliases=["yt"])
     async def youtube(self, ctx, *, query):
         channel = ctx.channel
         qu, st = await self.client.bwordchecker.bwordcheck(query)
-        if not qu:
-            await ctx.trigger_typing()
-            y = await self.ytget(query)
-            if not y["title"]:
-                return await ctx.send("No results")
-            else:
-                m = MyMenuyt(y)
-                await m.start(ctx)
-        else:
-            if channel.is_nsfw():
-                await ctx.trigger_typing()
-                y = await self.ytget(query)
-                if not y["title"]:
-                    return await ctx.send("No results")
-                else:
-                    m = MyMenuyt(y)
-                    await m.start(ctx)
+        if (not qu or not channel.is_nsfw()) and qu:
+            return await ctx.send(
+                f"You have used an NSFW command search query in a "
+                f"Safe for Work channel\n{st}"
+            )
 
-            else:
-                return await ctx.send(
-                    f"You have used an NSFW command search query in a "
-                    f"Safe for Work channel\n{st}"
-                )
+        await ctx.trigger_typing()
+        y = await self.ytget(query)
+        if not y["title"]:
+            return await ctx.send("No results")
+        m = MyMenuyt(y)
+        await m.start(ctx)
 
     @commands.command(aliases=["dagpaste"])
     @commands.cooldown(1, 30, BucketType.user)
@@ -444,12 +403,12 @@ pressure:              {}hPa```""".format(
                     f"Invalid file type: `{split_attachment[1]}` is invalid.")
             file = await attachments[0].read()
             text = file.decode('UTF-8')
-            url = await self.client.session.post("https://paste.daggy.tech/upload",data=text)
+            url = await self.client.session.post("https://paste.daggy.tech/upload", data=text)
             js = await url.json()
             return await ctx.send(js["file"])
         elif not ctx.message.attachments:
             paste = codeblocks.codeblock_converter(paste)
-            lang = paste[0] if paste[0] else ""
-            url = await self.client.session.post("https://paste.daggy.tech/upload",data=paste[1])
+            lang = paste[0] or ""
+            url = await self.client.session.post("https://paste.daggy.tech/upload", data=paste[1])
             js = await url.json()
             return await ctx.send(f'{js["file"]}.{lang}')

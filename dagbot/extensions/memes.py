@@ -75,17 +75,14 @@ class memes(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["memes"]:
-                    return True
-                else:
-                    return False
+                return bool(e["memes"])
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(3, commands.BucketType.channel)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def create(self, ctx, *, query: str = "none"):
         await ctx.trigger_typing()
-        if query == "none" or query == "help":
+        if query in ["none", "help"]:
             pages = menus.MenuPages(
                 source=Source(self.data, key=lambda t: t.key, per_page=10),
                 clear_reactions_after=True,
@@ -96,12 +93,9 @@ class memes(commands.Cog):
             tosearch = st[0].lower()
             with open("./dagbot/data/imgfliptemplates.json") as file:
                 f = json.load(file)
-                timplist = []
                 li = f["data"]["memes"]
-                for e in li:
-                    if tosearch in e["name"].lower():
-                        timplist.append(e["id"])
-                if len(timplist) == 0:
+                timplist = [e["id"] for e in li if tosearch in e["name"].lower()]
+                if not timplist:
                     return await ctx.send(
                         "No results\nUse the command `create` to view the "
                         "options!"
@@ -126,22 +120,21 @@ class memes(commands.Cog):
                         mastdict.update(dic)
                     if "text" not in str(mastdict):
                         return await ctx.send("No text was specified")
-                    else:
-                        me = await self.getgeneratedmeme(mastdict)
-                        if me["success"]:
-                            embed = discord.Embed(color=ctx.guild.me.color)
-                            embed.set_image(url=me["data"]["url"])
-                            embed.set_footer(
-                                text=f"Rendered by {ctx.author.display_name}",
-                                icon_url=ctx.author.avatar_url,
-                            )
-                            return await ctx.send(embed=embed)
-                        else:
-                            return await ctx.send(
-                                f"Error Occurred! If this bug does not make "
-                                f"sense please report it using the bug "
-                                f"command!\nError:`{me['error_message']}`"
-                            )
+                    me = await self.getgeneratedmeme(mastdict)
+                    if not me["success"]:
+                        return await ctx.send(
+                            f"Error Occurred! If this bug does not make "
+                            f"sense please report it using the bug "
+                            f"command!\nError:`{me['error_message']}`"
+                        )
+
+                    embed = discord.Embed(color=ctx.guild.me.color)
+                    embed.set_image(url=me["data"]["url"])
+                    embed.set_footer(
+                        text=f"Rendered by {ctx.author.display_name}",
+                        icon_url=ctx.author.avatar_url,
+                    )
+                    return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)

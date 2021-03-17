@@ -95,12 +95,12 @@ reactions below.'''
                 "This cog doesn't have any commands for some reason.")
         # command.clean_params
 
-        if cog.qualified_name == "image":
+        if cog.qualified_name == "animals":
+            addi = "Self explanatory get facts or images! \n Try them and see"
+        elif cog.qualified_name == "image":
             addi = "TRY THEM AND SEE, CANNOT EXPLAIN\n Please note `source` " \
                    "means you can attach an image, provide a url or mention " \
                    "someone\n `user` only accepts a member"
-        elif cog.qualified_name == "animals":
-            addi = "Self explanatory get facts or images! \n Try them and see"
         else:
             addi = ""
 
@@ -109,10 +109,10 @@ reactions below.'''
             title=f"{cog.qualified_name} help\n{addi}",
         )
 
-        if cog.qualified_name == "settings":
-            tmstr = 10
-        elif cog.qualified_name == "memes":
+        if cog.qualified_name == "memes":
             tmstr = 20
+        elif cog.qualified_name == "settings":
+            tmstr = 10
         else:
             tmstr = 30
         if ctx.author.id == 491174779278065689:
@@ -126,9 +126,7 @@ reactions below.'''
             try:
                 file = data.cmdhelp[f"{command}"]
             except BaseException:
-                if cog.qualified_name == "image":
-                    des = ""
-                elif cog.qualified_name == "animals":
+                if cog.qualified_name in ["image", "animals"]:
                     des = ""
                 else:
                     des = "No help just yet! We are working on it!"
@@ -138,11 +136,8 @@ reactions below.'''
             sp = tmstr - len(toadd)
             spc = sp * "\u2000"
             cmlist = cmlist + toadd + f"{spc}{des}"
-            if isinstance(command, commands.Group):
-                cmlist += "\u200b 🞵\n"
-            else:
-                cmlist += "\n"
-
+            cmlist += "\u200b 🞵\n" if isinstance(command,
+                                                 commands.Group) else "\n"
         embed.description = cmlist
         embed.set_footer(
             text=f"🞵 means that the command listed is a Group. Use "
@@ -211,10 +206,7 @@ reactions below.'''
         except BaseException:
             embed.description = "No help just yet!"
         alis = command.aliases
-        if len(alis) == 0:
-            als = "none"
-        else:
-            als = ', '.join(alis)
+        als = "none" if len(alis) == 0 else ', '.join(alis)
         embed.add_field(name="Aliases", value=als, inline=True)
         embed.add_field(
             name="Command Group",
@@ -247,7 +239,7 @@ reactions below.'''
         base = f"No command named {string}\nDid you mean:\n"
         if len(matches) == 0:
             return f"No command named {string}"
-        coms = "\n".join([f"`{match}`" for match in matches])
+        coms = "\n".join(f"`{match}`" for match in matches)
         return base + coms
 
     def get_destination(self):

@@ -19,10 +19,7 @@ class reddit(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["reddit"]:
-                    return True
-                else:
-                    return False
+                return bool(e["reddit"])
 
     async def randsub(self, subreddit, time="day"):
         url = f"https://api.ksoft.si/images/rand-reddit/{subreddit}"
@@ -72,21 +69,20 @@ class reddit(commands.Cog):
             data = meme["data"]
             if data["over_18"] or data['stickied']:
                 continue
-            else:
-                auth = "u/" + data["author"]
-                auth_url = f"https://reddit.com/user/{data['author']}"
-                if data["is_reddit_media_domain"]:
-                    purl = data["url"]
-                elif data["domain"] == "i.imgur.com":
-                    if data['url'].endswith('.gifv'):
-                        purl = data["url"].replace(".gifv", ".gif")
-                    else:
-                        purl = data['url'] + '.gif'
+            auth = "u/" + data["author"]
+            auth_url = f"https://reddit.com/user/{data['author']}"
+            if data["is_reddit_media_domain"]:
+                purl = data["url"]
+            elif data["domain"] == "i.imgur.com":
+                if data['url'].endswith('.gifv'):
+                    purl = data["url"].replace(".gifv", ".gif")
                 else:
-                    purl = data["url"]
-                title = data["title"]
-                score = data["score"]
-                permurl = "https://reddit.com" + data["permalink"]
+                    purl = data['url'] + '.gif'
+            else:
+                purl = data["url"]
+            title = data["title"]
+            score = data["score"]
+            permurl = "https://reddit.com" + data["permalink"]
             memdict = {
                 "author": auth,
                 "authorurl": auth_url,
@@ -155,9 +151,7 @@ class reddit(commands.Cog):
         with open("./dagbot/data/memes.json", "r") as file:
             js = json.load(file)
             memelist = js[sub]
-            memdict = random.choice(memelist)
-            return memdict
-            file.close()
+            return random.choice(memelist)
 
     async def meme_embed(self):
         r = random.randint(0, 2)
@@ -191,17 +185,17 @@ class reddit(commands.Cog):
         channel = ctx.channel
         guild = ctx.guild
         meme = await self.randsub("comics")
-        if meme["success"]:
-            embed = discord.Embed(
-                title=meme["title"], color=guild.me.color, url=meme["memeurl"]
-            )
-            embed.set_author(name=meme["auth"], url=meme["auth_url"])
-            embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-            url = str(meme["meme"])
-            embed.set_image(url=url)
-            await channel.send(embed=embed)
-        else:
+        if not meme["success"]:
             return await ctx.send(meme["error"])
+
+        embed = discord.Embed(
+            title=meme["title"], color=guild.me.color, url=meme["memeurl"]
+        )
+        embed.set_author(name=meme["auth"], url=meme["auth_url"])
+        embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
+        url = str(meme["meme"])
+        embed.set_image(url=url)
+        await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True,
                       aliases=["pqmeme", "PrequelMemes"])
@@ -211,17 +205,17 @@ class reddit(commands.Cog):
         channel = ctx.channel
         guild = ctx.guild
         meme = await self.randsub("PrequelMemes")
-        if meme["success"]:
-            embed = discord.Embed(
-                title=meme["title"], color=guild.me.color, url=meme["memeurl"]
-            )
-            embed.set_author(name=meme["auth"], url=meme["auth_url"])
-            embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-            url = str(meme["meme"])
-            embed.set_image(url=url)
-            await channel.send(embed=embed)
-        else:
+        if not meme["success"]:
             return await ctx.send(meme["error"])
+
+        embed = discord.Embed(
+            title=meme["title"], color=guild.me.color, url=meme["memeurl"]
+        )
+        embed.set_author(name=meme["auth"], url=meme["auth_url"])
+        embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
+        url = str(meme["meme"])
+        embed.set_image(url=url)
+        await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -238,71 +232,83 @@ class reddit(commands.Cog):
         channel = ctx.channel
         guild = ctx.guild
         meme = await self.randsub("DankExchange")
-        if meme["success"]:
-            embed = discord.Embed(
-                title=meme["title"], color=guild.me.color, url=meme["memeurl"]
-            )
-            embed.set_author(name=meme["auth"], url=meme["auth_url"])
-            embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-            url = str(meme["meme"])
-            embed.set_image(url=url)
-            await channel.send(embed=embed)
-        else:
+        if not meme["success"]:
             return await ctx.send(meme["error"])
 
+        embed = discord.Embed(
+            title=meme["title"], color=guild.me.color, url=meme["memeurl"]
+        )
+        embed.set_author(name=meme["auth"], url=meme["auth_url"])
+        embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
+        url = str(meme["meme"])
+        embed.set_image(url=url)
+        await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True, aliases=["ii"], hidden=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def investorinfo(self, ctx, *, ruser: str=None):
+    async def investorinfo(self, ctx, *, ruser: str = None):
         if not ruser:
             return await ctx.send("Hey please specify a reddit user")
-        r  = await self.client.session.get(f"https://dankexchange.io/api/investors/{ruser}")
+        r = await self.client.session.get(f"https://dankexchange.io/api/investors/{ruser}")
         if r.status == 404:
             return await ctx.send(f"`{ruser}` does not exist on r/DankExchange. Ask them to create a profile.")
         elif r.status == 200:
             js = await r.json()
             embed = discord.Embed(title=f"Investor: u/{js['username']}")
             embed.description = f"[Reddit](https://reddit.com/u/{ruser}) | [Dankexchange.io](https://dankexchange.io/investor/{ruser}) "
-            embed.add_field(name="Balance",value=js["balance"])
+            embed.add_field(name="Balance", value=js["balance"])
             embed.add_field(name="Net Worth", value=js["net_worth"])
             embed.add_field(name="Rank (NW)", value=js["net_worth_rank"])
-            embed.add_field(name="RP", value=f"Ranked `{js['ranked_points']}` with tier `{js['ranked_tier']}`")
-            embed.add_field(name="Firm", value=f"In firm id:`{js['firm_id']}` with position `{js['firm_role']}`")
+            embed.add_field(
+                name="RP", value=f"Ranked `{js['ranked_points']}` with tier `{js['ranked_tier']}`")
+            embed.add_field(
+                name="Firm", value=f"In firm id:`{js['firm_id']}` with position `{js['firm_role']}`")
             rs_info = await self.client.session.get(f"https://www.reddit.com/user/{ruser}/about.json")
             jso = await rs_info.json()
             im = jso["data"]["icon_img"].split("?")[0]
             embed.set_thumbnail(url=im)
-            embed.set_footer(text=f"Reddit Account created: {humanize.naturaltime(datetime.utcnow() - datetime.fromtimestamp(jso['data']['created_utc']))}")
+            embed.set_footer(
+                text=f"Reddit Account created: {humanize.naturaltime(datetime.utcnow() - datetime.fromtimestamp(jso['data']['created_utc']))}")
             return await ctx.send(embed=embed)
         else:
             return await ctx.send("Error Occured. Status code {r.status}")
+
     @commands.command(cooldown_after_parsing=True, aliases=["fi", "firm"], hidden=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def firminfo(self, ctx, *, firm: str=None):
+    async def firminfo(self, ctx, *, firm: str = None):
         if not firm:
             return await ctx.send("Please specify a valid firm id")
         try:
             firm = int(firm)
         except ValueError:
             return await ctx.send("Please specify a valid firm id. Not the name of the firm")
-        r  = await self.client.session.get(f"https://dankexchange.io/api/firms/{firm}")
+        r = await self.client.session.get(f"https://dankexchange.io/api/firms/{firm}")
         if r.status == 404:
             return await ctx.send(f"Firm of id `{firm}` does not exist.")
         elif r.status == 200:
             js = await r.json()
             embed = discord.Embed(title=f"Firm Info: {js['name']}")
             embed.add_field(name="Id", value=firm)
-            embed.add_field(name="Ceo", value=f"[{js['ceo']}](https://dankexchange.io/investor/{js['ceo']})")
-            embed.add_field(name="Member Count", value=f"{js['member_count']}/{js['member_limit']}")
+            embed.add_field(
+                name="Ceo", value=f"[{js['ceo']}](https://dankexchange.io/investor/{js['ceo']})")
+            embed.add_field(name="Member Count",
+                            value=f"{js['member_count']}/{js['member_limit']}")
             embed.add_field(name="Status", value=f"Firm is {js['status']}")
-            embed.add_field(name="location", value=f"Moved to {js['location_name']} {humanize.naturaltime(datetime.utcnow() - datetime.fromtimestamp(js['last_move_time']))}")
-            embed.add_field(name="Stats", value=f"Tax Rate: {js['location_tax_rate']}\nBenifit: {js['location_bonus']}")
+            embed.add_field(
+                name="location", value=f"Moved to {js['location_name']} {humanize.naturaltime(datetime.utcnow() - datetime.fromtimestamp(js['last_move_time']))}")
+            embed.add_field(
+                name="Stats", value=f"Tax Rate: {js['location_tax_rate']}\nBenifit: {js['location_bonus']}")
             members = js['members']
             members.remove(js['ceo'])
-            embed.description = "**Members**\n" + ",".join([f"[{mem}](https://dankexchange.io/investor/{mem})" for mem in members])
+            embed.description = "**Members**\n" + ",".join(
+                f"[{mem}](https://dankexchange.io/investor/{mem})"
+                for mem in members
+            )
+
             return await ctx.send(embed=embed)
         else:
             return await ctx.send("Error Occured. Status code {r.status}")
+
     @commands.command(cooldown_after_parsing=True, aliases=["dm"])
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def discord(self, ctx):
@@ -310,17 +316,17 @@ class reddit(commands.Cog):
         channel = ctx.channel
         guild = ctx.guild
         meme = await self.randsub("discord")
-        if meme["success"]:
-            embed = discord.Embed(
-                title=meme["title"], color=guild.me.color, url=meme["memeurl"]
-            )
-            embed.set_author(name=meme["auth"], url=meme["auth_url"])
-            embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-            url = str(meme["meme"])
-            embed.set_image(url=url)
-            await channel.send(embed=embed)
-        else:
+        if not meme["success"]:
             return await ctx.send(meme["error"])
+
+        embed = discord.Embed(
+            title=meme["title"], color=guild.me.color, url=meme["memeurl"]
+        )
+        embed.set_author(name=meme["auth"], url=meme["auth_url"])
+        embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
+        url = str(meme["meme"])
+        embed.set_image(url=url)
+        await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -329,17 +335,17 @@ class reddit(commands.Cog):
         channel = ctx.channel
         guild = ctx.guild
         meme = await self.randsub("facepalm")
-        if meme["success"]:
-            embed = discord.Embed(
-                title=meme["title"], color=guild.me.color, url=meme["memeurl"]
-            )
-            embed.set_author(name=meme["auth"], url=meme["auth_url"])
-            embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-            url = str(meme["meme"])
-            embed.set_image(url=url)
-            await channel.send(embed=embed)
-        else:
+        if not meme["success"]:
             return await ctx.send(meme["error"])
+
+        embed = discord.Embed(
+            title=meme["title"], color=guild.me.color, url=meme["memeurl"]
+        )
+        embed.set_author(name=meme["auth"], url=meme["auth_url"])
+        embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
+        url = str(meme["meme"])
+        embed.set_image(url=url)
+        await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -348,17 +354,17 @@ class reddit(commands.Cog):
         channel = ctx.channel
         guild = ctx.guild
         meme = await self.randsub("me_irl")
-        if meme["success"]:
-            embed = discord.Embed(
-                title=meme["title"], color=guild.me.color, url=meme["memeurl"]
-            )
-            embed.set_author(name=meme["auth"], url=meme["auth_url"])
-            embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-            url = str(meme["meme"])
-            embed.set_image(url=url)
-            await channel.send(embed=embed)
-        else:
+        if not meme["success"]:
             return await ctx.send(meme["error"])
+
+        embed = discord.Embed(
+            title=meme["title"], color=guild.me.color, url=meme["memeurl"]
+        )
+        embed.set_author(name=meme["auth"], url=meme["auth_url"])
+        embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
+        url = str(meme["meme"])
+        embed.set_image(url=url)
+        await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True,
                       aliases=["4chan", "fourchan"])
@@ -368,17 +374,17 @@ class reddit(commands.Cog):
         channel = ctx.channel
         guild = ctx.guild
         meme = await self.randsub("greentext")
-        if meme["success"]:
-            embed = discord.Embed(
-                title=meme["title"], color=guild.me.color, url=meme["memeurl"]
-            )
-            embed.set_author(name=meme["auth"], url=meme["auth_url"])
-            embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-            url = str(meme["meme"])
-            embed.set_image(url=url)
-            await channel.send(embed=embed)
-        else:
+        if not meme["success"]:
             return await ctx.send(meme["error"])
+
+        embed = discord.Embed(
+            title=meme["title"], color=guild.me.color, url=meme["memeurl"]
+        )
+        embed.set_author(name=meme["auth"], url=meme["auth_url"])
+        embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
+        url = str(meme["meme"])
+        embed.set_image(url=url)
+        await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -386,18 +392,18 @@ class reddit(commands.Cog):
         time = time.lower()
         guild = ctx.guild
         meme = await self.randsub(subreddit, time)
-        if meme["success"]:
-            embed = discord.Embed(
-                title=meme["title"], color=guild.me.color, url=meme["memeurl"]
-            )
-            embed.add_field(name="User", value=meme["maker"], inline=True)
-            embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-            url = str(meme["memeimage"])
-            embed.set_image(url=url)
-            embed.set_footer(text=meme["sub"])
-            return await ctx.send(embed=embed)
-        else:
+        if not meme["success"]:
             return await ctx.send(meme["error"])
+
+        embed = discord.Embed(
+            title=meme["title"], color=guild.me.color, url=meme["memeurl"]
+        )
+        embed.add_field(name="User", value=meme["maker"], inline=True)
+        embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
+        url = str(meme["memeimage"])
+        embed.set_image(url=url)
+        embed.set_footer(text=meme["sub"])
+        return await ctx.send(embed=embed)
 
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.user)

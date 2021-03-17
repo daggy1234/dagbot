@@ -34,10 +34,7 @@ class animals(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if e["serverid"] == g_id:
-                if e["animals"]:
-                    return True
-                else:
-                    return False
+                return bool(e["animals"])
 
     async def get_cat(self):
         response = await self.client.session.get("http://aws.random.cat/meow")
