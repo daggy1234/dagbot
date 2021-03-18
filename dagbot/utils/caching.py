@@ -1,4 +1,4 @@
-class caching:
+class Caching:
     def __init__(self, bot):
         bot.logger.debug("WILL CACHE")
         self.bot = bot
