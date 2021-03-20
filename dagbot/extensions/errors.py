@@ -119,7 +119,6 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             if "not found" in (ers):
                 rest = random.choice(data.notfoundelist)
                 await ctx.send(rest)
-        print(repr(error))
         error = getattr(error, "original", error)
         if isinstance(error, NoMemberFound):
             return await ctx.send("Member found doesn't exist")

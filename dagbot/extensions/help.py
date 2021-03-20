@@ -5,6 +5,7 @@ import discord
 import difflib
 from async_timeout import timeout
 from discord.ext import commands
+from discord.ext.commands import bot
 
 import dagbot.data.textdata as data
 
@@ -204,7 +205,7 @@ reactions below.'''
 
             embed.description = data.cmdhelp[f"{command}"]
         except BaseException:
-            embed.description = "No help just yet!"
+            embed.description = command.help or "No help just yet!"
         alis = command.aliases
         als = "none" if len(alis) == 0 else ', '.join(alis)
         embed.add_field(name="Aliases", value=als, inline=True)

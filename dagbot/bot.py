@@ -50,6 +50,7 @@ class Dagbot(commands.AutoShardedBot):
         )
 
         self.logger = create_logger("Dagbot", logging.DEBUG)
+        self.discprd_logger = create_logger('discord', logging.INFO)
         with open('./configuration.yml', 'r') as file:
             self.data = yaml.load(file, Loader=yaml.FullLoader)
         self.data.pop("PWD")
@@ -92,7 +93,7 @@ class Dagbot(commands.AutoShardedBot):
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
-            release="dagbot@2.7.3"
+            release="dagbot@2.8.0"
         )
         self.logger.info("Ready to roll")
 

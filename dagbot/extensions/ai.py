@@ -42,7 +42,6 @@ class ai(commands.Cog):
     async def ocra(self, ur):
         url = f"https://eu-vision.googleapis.com/v1/" \
               f"images:annotate?key={self.gapikey}"
-        print(url)
         payload = {
             "requests": [
                 {

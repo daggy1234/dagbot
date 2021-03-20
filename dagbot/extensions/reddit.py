@@ -124,7 +124,6 @@ class reddit(commands.Cog):
                 )
         with open("./dagbot/data/memes.json", "w") as file:
             json.dump(jsdict, file)
-        print("Memes Cached")
 
     @tasks.loop(seconds=7200)
     async def memcache(self):

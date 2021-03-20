@@ -37,10 +37,9 @@ class ImageConverter(commands.Converter):
         if ctx.message.attachments:
             with suppress(Exception):
                 return ctx.message.attachments[0].url.replace(".webp", ".png")
-        elif checkers.is_url(str(argument)):
+        if checkers.is_url(str(argument)):
             return str(argument)
-        else:
-            raise NoImageFound('')
+        raise NoImageFound('')
 
 
 class StaticImageConverter(commands.Converter):
@@ -54,7 +53,6 @@ class StaticImageConverter(commands.Converter):
         if ctx.message.attachments:
             with suppress(Exception):
                 return ctx.message.attachments[0].url.replace(".webp", ".png")
-        elif checkers.is_url(str(argument)):
+        if checkers.is_url(str(argument)):
             return str(argument)
-        else:
-            raise NoImageFound('')
+        raise NoImageFound('')
