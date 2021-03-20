@@ -1031,7 +1031,7 @@ class games(commands.Cog):
             elif num == 1:
                 r = RandomWords()
                 url = "No url found"
-                t = r.get_random_word()
+                t = r.random_word()
                 f = t.lower()
                 wordllist = []
                 blankguesslist = []

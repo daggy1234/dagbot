@@ -19,7 +19,7 @@ jishaku = {git="https://github.com/Gorialis/jishaku/"}
 tabulate = "^0.8.7"
 psutil = "^5.8.0"
 humanize = "^3.2.0"
-asyncdagpi = "^3.3.0"
+asyncdagpi = "^3.3.2"
 owotext = "^1.1.1"
 asyncpg = "^0.21.0"
 beautifulsoup4 = "4.9.3"

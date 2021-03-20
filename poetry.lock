@@ -79,7 +79,7 @@ python-versions = ">=3.5.3"
 
 [[package]]
 name = "asyncdagpi"
-version = "3.3.0"
+version = "3.3.2"
 description = "An Asynchronos API wrapper for https://dagpi.xyz"
 category = "main"
 optional = false
@@ -708,7 +708,7 @@ python-versions = "*"
 
 [[package]]
 name = "soupsieve"
-version = "2.2"
+version = "2.2.1"
 description = "A modern CSS selector implementation for Beautiful Soup."
 category = "main"
 optional = false
@@ -913,7 +913,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "ffee53ca52c6d346704c39b694a870b6457b5eb15657676f066d9858e7f2c338"
+content-hash = "3c73c3d70471856625ae03f7d7ed2ccfd7df998830077bb97a8d07a9de752bf4"
 
 [metadata.files]
 aiohttp = [
@@ -978,8 +978,8 @@ async-timeout = [
     {file = "async_timeout-3.0.1-py3-none-any.whl", hash = "sha256:4291ca197d287d274d0b6cb5d6f8f8f82d434ed288f962539ff18cc9012f9ea3"},
 ]
 asyncdagpi = [
-    {file = "asyncdagpi-3.3.0-py3-none-any.whl", hash = "sha256:ea0f4cd10fe5ce8b42ecfc17015ff3afa35d818c209c83134e4497341971e95d"},
-    {file = "asyncdagpi-3.3.0.tar.gz", hash = "sha256:2bc57693abff56b843704504aa1a29dce2ca616e26c77328e5315cd3e2d03f92"},
+    {file = "asyncdagpi-3.3.2-py3-none-any.whl", hash = "sha256:d7f86ab50e2a82de1dd7486d3944cf71f322da7306809ea0de0e2ef1fd00b725"},
+    {file = "asyncdagpi-3.3.2.tar.gz", hash = "sha256:7f9d9e436ecbf8b46638673194394d99cd416197401f5d293635f9974bb62626"},
 ]
 asyncpg = [
     {file = "asyncpg-0.21.0-cp35-cp35m-macosx_10_13_x86_64.whl", hash = "sha256:09badce47a4645cfe523cc8a182bd047d5d62af0caaea77935e6a3c9e77dc364"},
@@ -1545,8 +1545,8 @@ snowballstemmer = [
     {file = "snowballstemmer-2.1.0.tar.gz", hash = "sha256:e997baa4f2e9139951b6f4c631bad912dfd3c792467e2f03d7239464af90e914"},
 ]
 soupsieve = [
-    {file = "soupsieve-2.2-py3-none-any.whl", hash = "sha256:d3a5ea5b350423f47d07639f74475afedad48cf41c0ad7a82ca13a3928af34f6"},
-    {file = "soupsieve-2.2.tar.gz", hash = "sha256:407fa1e8eb3458d1b5614df51d9651a1180ea5fedf07feb46e45d7e25e6d6cdd"},
+    {file = "soupsieve-2.2.1-py3-none-any.whl", hash = "sha256:c2c1c2d44f158cdbddab7824a9af8c4f83c76b1e23e049479aa432feb6c4c23b"},
+    {file = "soupsieve-2.2.1.tar.gz", hash = "sha256:052774848f448cf19c7e959adf5566904d525f33a3f8b6ba6f6f8f26ec7de0cc"},
 ]
 sphinx = [
     {file = "Sphinx-3.5.2-py3-none-any.whl", hash = "sha256:ef64a814576f46ec7de06adf11b433a0d6049be007fefe7fd0d183d28b581fac"},

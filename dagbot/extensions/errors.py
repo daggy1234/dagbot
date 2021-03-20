@@ -122,7 +122,7 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
         print(repr(error))
         error = getattr(error, "original", error)
         if isinstance(error, NoMemberFound):
-            return await ctx.send((error))
+            return await ctx.send("Member found doesn't exist")
         elif isinstance(error, NoImageFound):
             return await ctx.send("No Valid Image was detected at your location\nPlease Specify a Valid Loaction Like\n```\n- Attachment (Add dummy text)\n- Member (ping or id)\n- Emoji (No standard emojis)\n- Url (Valid URL's only)\n```")
         elif isinstance(error, dagpibrok):

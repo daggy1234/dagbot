@@ -121,7 +121,7 @@ class fun(commands.Cog):
     async def get_advice(self):
         url = "https://api.adviceslip.com/advice"
         response = self.client.session.get(url)
-        file = await json.loads(response.text())
+        file = await json.loads(await response.text())
         return file["slip"]["advice"]
 
     async def chuck_norris(self):

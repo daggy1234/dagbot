@@ -1,6 +1,7 @@
 from dagbot.utils.exceptions import NoImageFound
 import random
 from datetime import datetime
+import re
 from io import BytesIO
 
 import aiohttp
@@ -69,7 +70,9 @@ class image(commands.Cog):
              ImageConverter),
             (ImageFeatures.triangle(),
              StaticImageConverter),
-            (ImageFeatures.stringify(), StaticImageConverter)
+            (ImageFeatures.stringify(), StaticImageConverter),
+            (ImageFeatures.neon(), StaticImageConverter),
+            (ImageFeatures.sketch(), StaticImageConverter)
 
         ]
         for command in self.dynamic:
@@ -85,8 +88,13 @@ class image(commands.Cog):
         async def _command(_self, ctx, *, source: converter = None):
             if converter is None:
                 raise NoImageFound('Please provide a valid image')
+            rgex = re.compile(
+                "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
+            if not (match := re.match(rgex, source)):
+                return await ctx.send("The url <{}> is badly framed", source)
             img = await self.client.dagpi.image_process(feature,
                                                         source)
+
             await self.to_embed(ctx, img, feature.value.replace("/", ""))
         _command.cog = self
         self.__cog_commands__ += (_command,)
