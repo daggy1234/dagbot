@@ -13,7 +13,7 @@ from discord.ext import commands
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
 from .utils.badwordcheck import bword
-from .utils.caching import caching
+from .utils.caching import Caching
 from .utils.logger import create_logger
 from .utils.context import MyContext
 
@@ -59,7 +59,7 @@ class Dagbot(commands.AutoShardedBot):
         self.pool = None
         self.dagpi = None
         self.repo = "https://github.com/Daggy1234/dagbot"
-        self.caching = caching(self)
+        self.caching = Caching(self)
         self.bwordchecker = bword()
         self.bwordchecker.loadbword()
         self.useage = {}
