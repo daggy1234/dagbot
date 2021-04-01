@@ -1,8 +1,6 @@
 import os
 import yaml
-dictionary = dict()
 env_vars = os.environ
-for var in env_vars:
-    dictionary[var] = os.getenv(var).replace('"', '')
+dictionary = {var: os.getenv(var).replace('"', '') for var in env_vars}
 file = open("configuration.yml", 'w')
 yaml.dump(dictionary, file)
