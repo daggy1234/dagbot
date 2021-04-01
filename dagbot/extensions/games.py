@@ -24,8 +24,7 @@ class TicTacToe:
         self.gamegrid = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
     async def duplicategird(self):
-        newgrid = self.gamegrid.copy()
-        return newgrid
+        return self.gamegrid.copy()
 
     @staticmethod
     async def gamecheck(gamegrid):
@@ -48,9 +47,6 @@ class TicTacToe:
         elif gamegrid[0][2] == gamegrid[1][2] == gamegrid[2][2] != 0:
             gl.append(True)
             gl.append(gamegrid[0][2])
-        elif gamegrid[0][0] == gamegrid[1][0] == gamegrid[2][0] != 0:
-            gl.append(True)
-            gl.append(gamegrid[0][0])
         elif gamegrid[0][0] == gamegrid[1][1] == gamegrid[2][2] != 0:
             gl.append(True)
             gl.append(gamegrid[0][0])
@@ -86,8 +82,8 @@ class TicTacToe:
         return False
 
     async def converter(self, play):
-        d = {'a': 0, 'b': 1, 'c': 2}
         if len(play) == 2:
+            d = {'a': 0, 'b': 1, 'c': 2}
             try:
                 nu = int(d[play[0]])
             except KeyError:
@@ -134,28 +130,26 @@ class TicTacToe:
                         self.oppmove += 1
                         return out
 
-        for i in range(0, 3):
-            for j in range(0, 3):
+        for i in range(3):
+            for j in range(3):
                 r = await self.checkempty(i, j)
                 if r:
                     dupgrid[i][j] = 2
                     re = await self.gamecheck(dupgrid)
                     if re[0] is True and re[1] == 2:
                         return i, j
-                        break
                     else:
                         dupgrid[i][j] = 0
                 j += 1
             i += 1
-        for k in range(0, 3):
-            for l_c in range(0, 3):
+        for k in range(3):
+            for l_c in range(3):
                 r = await self.checkempty(k, l_c)
                 if r:
                     dupgrid[k][l_c] = 1
                     re = await self.gamecheck(dupgrid)
                     if re[0] is True and re[1] == 1:
                         return k, l_c
-                        break
                     else:
                         dupgrid[k][l_c] = 0
                 l_c += 1
@@ -163,10 +157,7 @@ class TicTacToe:
         out = await self.checkcorners()
         if not out:
             out = await self.restchec()
-            return out
-        else:
-
-            return out
+        return out
 
     async def gamegridprinter(self):
         grid = await self.sharegamegrid()
@@ -178,22 +169,18 @@ class TicTacToe:
                 itm = formdic[el]
                 toapl.append(itm)
             nl.append(toapl)
-        st = f'''```
+        return f'''```
  {nl[0][0]} | {nl[0][1]} | {nl[0][2]}
 ──────────────
  {nl[1][0]} | {nl[1][1]} | {nl[1][2]}
 ──────────────
  {nl[2][0]} | {nl[2][1]} | {nl[2][2]} ```'''
-        return st
 
     async def makemove(self, nu, nut, token):
         self.gamegrid[nu][nut] = token
 
     async def checkempty(self, nu, nut):
-        if self.gamegrid[nu][nut] == 0:
-            return True
-        else:
-            return False
+        return self.gamegrid[nu][nut] == 0
 
 
 hangmanassest = [
@@ -296,12 +283,11 @@ class Mymenumcq(menus.Menu):
             color=ctx.guild.me.color
         )
         return await channel.send(embed=embed)
-        self.stop()
 
     @menus.button("\U0001f1e6")
     async def result_one(self, _payload):
         cal = self.file["mloc"] + 1
-        if 1 == cal:
+        if cal == 1:
             newembed = discord.Embed(
                 title="DAGBOT - Trivia Correct",
                 description="{} was the correct answer".format(
@@ -324,7 +310,7 @@ class Mymenumcq(menus.Menu):
     @menus.button("\U0001f1e7")
     async def result_2(self, _payload):
         cal = self.file["mloc"] + 1
-        if 2 == cal:
+        if cal == 2:
             newembed = discord.Embed(
                 title="DAGBOT - Trivia Correct",
                 description="{} was the correct answer".format(
@@ -347,7 +333,7 @@ class Mymenumcq(menus.Menu):
     @menus.button("\U0001f1e8")
     async def result_3(self, _payload):
         cal = self.file["mloc"] + 1
-        if 3 == cal:
+        if cal == 3:
             newembed = discord.Embed(
                 title="DAGBOT - Trivia Correct",
                 description="{} was the correct answer".format(
@@ -370,7 +356,7 @@ class Mymenumcq(menus.Menu):
     @menus.button("\U0001f1e9")
     async def result_4(self, payload):
         cal = self.file["mloc"] + 1
-        if 4 == cal:
+        if cal == 4:
             newembed = discord.Embed(
                 title="DAGBOT - Trivia Correct",
                 description="{} was the correct answer".format(
@@ -423,7 +409,6 @@ class Mymenuhead(menus.Menu):
         )
         embed.add_field(name="?", value="True or False")
         return await channel.send(embed=embed)
-        self.stop()
 
     @menus.button("<a:giftick:734746863340748892>")
     async def right(self, payload):
@@ -434,18 +419,16 @@ class Mymenuhead(menus.Menu):
                 description=str(self.headline),
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.result = True
-            self.stop()
         else:
             embed = discord.Embed(
                 title="HEADLINE WAS INCORRECTLY GUESSED AS TRUE\n It is FALSE",
                 description=str(self.headline),
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.result = True
-            self.stop()
+
+        await self.message.edit(embed=embed)
+        self.result = True
+        self.stop()
 
     @menus.button("<a:gifcross:734746864280404018>")
     async def wrong(self, payload):
@@ -456,18 +439,16 @@ class Mymenuhead(menus.Menu):
                 description=str(self.headline),
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.result = False
-            self.stop()
         else:
             embed = discord.Embed(
                 title="HEADLINE WAS INCORRECTLY GUESSED AS FALSE\n It is TRUE",
                 description=str(self.headline),
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.result = False
-            self.stop()
+
+        await self.message.edit(embed=embed)
+        self.result = False
+        self.stop()
 
     async def prompt(self, ctx):
         await self.start(ctx, wait=True)
@@ -596,10 +577,7 @@ class games(commands.Cog):
         g_id = str(ctx.guild.id)
         for e in self.bot.cogdata:
             if str(e["serverid"]) == str(g_id):
-                if e["games"]:
-                    return True
-                else:
-                    return False
+                return bool(e["games"])
 
     async def getcountry(self):
         url = "https://random.country/"
@@ -613,8 +591,7 @@ class games(commands.Cog):
         dic = soup.find_all("img")
         hr = dic[1]["src"]
         flg = f"https://random.country{hr}"
-        dictret = {"country": name, "info": info, "wiki": hr, "flag": flg}
-        return dictret
+        return {"country": name, "info": info, "wiki": hr, "flag": flg}
 
     async def question(self):
         url = "http://jservice.io/api/random"
@@ -635,14 +612,13 @@ class games(commands.Cog):
         v2 = numlist[1].span.text
         p1 = perlist[0].span.text
         p2 = perlist[1].span.text
-        toretdict = {
+        return {
             'choice1': op1,
             'votes1': v1,
             'percentage1': p1,
             'choice2': op2,
             'votes2': v2,
             'percentage2': p2}
-        return toretdict
 
     async def get_all_movies(self):
         url = "https://www.randomlists.com/data/movies.json"
@@ -689,15 +665,14 @@ class games(commands.Cog):
         )
         y = random.randint(0, 3)
         list_.insert(y, ca)
-        for c in range(0, len(list_)):
+        for c in range(len(list_)):
             des = des + "\n" + chr(ord("\U0001f1e6") + c) + ": " + list_[c]
             c += 1
         q = q.replace("&quot;", "`")
         q = q.replace("&#039;", "'")
         des = des.replace("&quot;", "`")
         des = des.replace("&#039;", "'")
-        fdict = {"embed": des, "correct_answer": ca, "mloc": y, "question": q}
-        return fdict
+        return {"embed": des, "correct_answer": ca, "mloc": y, "question": q}
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(3, commands.BucketType.channel)

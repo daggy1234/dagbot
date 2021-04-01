@@ -160,33 +160,32 @@ class text(commands.Cog):
     async def emojify(self, ctx, *, text: str):
         if len(text) > 1000:
             return await ctx.send("Too long to process")
-        else:
-            emos = []
-            capl = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            smalll = "abcdefghijklmnopqrstuvwxyz"
-            letst = "0123456789"
-            for let in text:
-                if let == " ":
-                    emos.append(2 * "\U00000020")
-                elif let == "?":
-                    emos.append("\U00002753")
-                elif let == "!":
-                    emos.append("\U00002757")
-                elif let == "":
-                    emos.append(2 * "\U00000020")
-                elif let in letst:
-                    emos.append("{}\N{combining enclosing keycap}".format(let))
-                    emos.append("\U00000020")
+        emos = []
+        capl = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        smalll = "abcdefghijklmnopqrstuvwxyz"
+        letst = "0123456789"
+        for let in text:
+            if let == " ":
+                emos.append(2 * "\U00000020")
+            elif let == "?":
+                emos.append("\U00002753")
+            elif let == "!":
+                emos.append("\U00002757")
+            elif let == "":
+                emos.append(2 * "\U00000020")
+            elif let in letst:
+                emos.append("{}\N{combining enclosing keycap}".format(let))
+                emos.append("\U00000020")
 
-                else:
-                    if let not in smalll:
-                        emos.append("🇥")
-                        emos.append("\U00000020")
-                    pos = capl.find(let.lower())
-                    emos.append(chr(ord("\U0001f1e5") + pos + 1))
+            else:
+                if let not in smalll:
+                    emos.append("🇥")
                     emos.append("\U00000020")
+                pos = capl.find(let.lower())
+                emos.append(chr(ord("\U0001f1e5") + pos + 1))
+                emos.append("\U00000020")
 
-            return await ctx.send("".join(emos))
+        return await ctx.send("".join(emos))
 
     @commands.command(cooldown_after_parsing=True, aliases=["encode"])
     async def encrypt(self, ctx, *, text):
