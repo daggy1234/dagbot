@@ -1,17 +1,17 @@
-from dagbot.utils.exceptions import NoImageFound
 import random
+import time
+import typing
 from datetime import datetime
 from io import BytesIO
 
-import aiohttp
-import time
-import typing
 import asyncdagpi
 import discord
 from asyncdagpi import ImageFeatures, Image
 from discord.ext import commands
 
-from ..utils.converters import BetterMemberConverter, ImageConverter, StaticImageConverter
+from dagbot.utils.exceptions import NoImageFound
+from ..utils.converters import BetterMemberConverter, ImageConverter, \
+    StaticImageConverter
 
 
 # atMoMn2Pg3EUmZ065QBvdJN4IcjNxCQRMv1oZTZWg98i7HelIdvJwHtZFKPgCtf
@@ -72,7 +72,9 @@ class image(commands.Cog):
             (ImageFeatures.stringify(), StaticImageConverter),
             (ImageFeatures.neon(), StaticImageConverter),
             (ImageFeatures.sketch(), StaticImageConverter),
-            (ImageFeatures.dissolve(), StaticImageConverter)
+            (ImageFeatures.dissolve(), StaticImageConverter),
+            (ImageFeatures.bonk(), StaticImageConverter),
+            (ImageFeatures.petpet(), StaticImageConverter)
 
         ]
         for command in self.dynamic:
@@ -92,22 +94,25 @@ class image(commands.Cog):
                                                         source)
 
             await self.to_embed(ctx, img, feature.value.replace("/", ""))
+
         _command.cog = self
         self.__cog_commands__ += (_command,)
 
     async def process_alex(self, url: str) -> BytesIO:
-        out = await self.client.session.get(url, headers={"Authorization": self.client.data["alex"]})
+        out = await self.client.session.get(url, headers={
+            "Authorization": self.client.data["alex"]})
         return BytesIO(await out.read())
 
     def make_fn_alex(self, feature: str, converter: typing.Union
-                     [ImageConverter, StaticImageConverter]):
+    [ImageConverter, StaticImageConverter]):
         @commands.command(name=feature)
         async def _command(_self, ctx, *, source: converter):
             start = time.perf_counter()
             url = f"https://api.alexflipnote.dev/{feature}?image={source}"
             img = await self.process_alex(url)
             end = time.perf_counter()
-            await self.to_embed_alex(ctx, img, end-start, feature)
+            await self.to_embed_alex(ctx, img, end - start, feature)
+
         _command.cog = self
         self.__cog_commands__ += (_command,)
 
@@ -131,14 +136,15 @@ class image(commands.Cog):
                              text=f"Called by {ctx.author.display_name}")
             await ctx.reply(embed=embed, file=file)
 
-    async def to_embed_alex(self, ctx, img: BytesIO, time: typing.Optional[float], feature: str):
+    async def to_embed_alex(self, ctx, img: BytesIO,
+                            time: typing.Optional[float], feature: str):
         async with ctx.typing():
             embed = discord.Embed(color=ctx.guild.me.color)
             filename = f"dagbot=process-image-{feature}.png"
             file = discord.File(fp=img, filename=filename)
             if time:
-                embed.description = f"Image Processed in {round(time,2)}s | " \
-                    f"Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
+                embed.description = f"Image Processed in {round(time, 2)}s | " \
+                                    f"Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
             else:
                 embed.description = "Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
             embed.timestamp = datetime.utcnow()
@@ -161,7 +167,8 @@ class image(commands.Cog):
         await self.to_embed(ctx, img, "tweet")
 
     @commands.command(cooldown_after_parsing=True)
-    async def captcha(self, ctx, user: BetterMemberConverter = None, *, text: str):
+    async def captcha(self, ctx, user: BetterMemberConverter = None, *,
+                      text: str):
         if user is None:
             user = ctx.author
         pfp = str(user.avatar_url_as(format="png", size=1024))
@@ -214,12 +221,14 @@ class image(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     async def achievement(self, ctx, *, text):
         url = f"https://api.alexflipnote.dev/achievement?text={text}&icon={random.randint(1, 44)}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None, "achievement")
+        await self.to_embed_alex(ctx, await self.process_alex(url), None,
+                                 "achievement")
 
     @commands.command(cooldown_after_parsing=True)
     async def challenge(self, ctx, *, text):
         url = f"https://api.alexflipnote.dev/challenge?text={text}&icon={random.randint(1, 44)}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None, "challenge")
+        await self.to_embed_alex(ctx, await self.process_alex(url), None,
+                                 "challenge")
 
     @commands.command(cooldown_after_parsing=True)
     async def didyoumean(
@@ -239,7 +248,8 @@ class image(commands.Cog):
 
         url = f"https://api.alexflipnote.dev/didyoumean?top={ttop}" \
               f"&bottom={tbot}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None, "didyoumean")
+        await self.to_embed_alex(ctx, await self.process_alex(url), None,
+                                 "didyoumean")
 
     @commands.command(cooldown_after_parsing=True)
     async def pornhub(
@@ -259,7 +269,8 @@ class image(commands.Cog):
 
         url = f"https://api.alexflipnote.dev/pornhub?top={ttop}" \
               f"&bottom={tbot}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None, "pornhub")
+        await self.to_embed_alex(ctx, await self.process_alex(url), None,
+                                 "pornhub")
 
     @commands.command(cooldown_after_parsing=True)
     async def ship(self, ctx, user: BetterMemberConverter,
@@ -272,4 +283,5 @@ class image(commands.Cog):
             return await ctx.send("Thats just loving yourself.")
         url = f"https://api.alexflipnote.dev//ship?user={urla}" \
               f"&user2={urlb}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None, "ship")
+        await self.to_embed_alex(ctx, await self.process_alex(url), None,
+                                 "ship")

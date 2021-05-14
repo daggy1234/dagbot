@@ -1,7 +1,6 @@
 import asyncio
-import aiohttp
 
-from discord import AsyncWebhookAdapter, Webhook
+import aiohttp
 from discord.ext import commands, tasks
 
 

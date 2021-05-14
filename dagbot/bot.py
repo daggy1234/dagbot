@@ -14,8 +14,8 @@ from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
 from .utils.badwordcheck import bword
 from .utils.caching import Caching
-from .utils.logger import create_logger
 from .utils.context import MyContext
+from .utils.logger import create_logger
 
 
 async def get_prefix(bot, message):
@@ -43,6 +43,7 @@ class Dagbot(commands.AutoShardedBot):
             description='The number 1 wanna be meme bot',
             case_insensitive=True,
             max_messages=100,
+            strip_after_prefix=True,
             allowed_mentions=discord.AllowedMentions(
                 roles=False,
                 everyone=False),
@@ -93,7 +94,7 @@ class Dagbot(commands.AutoShardedBot):
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
-            release="dagbot@2.8.0"
+            release="dagbot@2.9.0"
         )
         self.logger.info("Ready to roll")
 
@@ -123,7 +124,9 @@ class Dagbot(commands.AutoShardedBot):
         await self.caching.getkeydict()
         await self.caching.automemecache()
         await self.get_cog("reddit").memecache()
-        await self.session.post("https://dagbot-site.herokuapp.com/api/newstats", headers={"Token": self.data["stats"]})
+        await self.session.post(
+            "https://dagbot-site.herokuapp.com/api/newstats",
+            headers={"Token": self.data["stats"]})
 
     async def makesession(self):
         self.session = aiohttp.ClientSession(loop=self.loop)

@@ -21,7 +21,7 @@ def linecount():
             if name.endswith(".py"):
                 file_amount += 1
                 with codecs.open(
-                    "./" + str(pathlib.PurePath(path, name)), "r", "utf-8"
+                        "./" + str(pathlib.PurePath(path, name)), "r", "utf-8"
                 ) as f:
                     for i, l_c in enumerate(f):
                         stripped = l_c.strip()
@@ -516,7 +516,8 @@ class misc(commands.Cog):
         location = os.path.relpath(filename).replace('\\', '/')
         final_url = (f'{self.bot.repo}/blob/master/{location}'
                      f'#L{firstline}-L{firstline + len(lines) - 1}')
-        return await ctx.send(f"{final_url} is the source. Please follow the License used and don't forget to :star:")
+        return await ctx.send(
+            f"{final_url} is the source. Please follow the License used and don't forget to :star:")
 
 
 def setup(bot):

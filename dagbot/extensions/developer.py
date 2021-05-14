@@ -21,11 +21,9 @@ import traceback
 
 import discord
 from discord.ext import commands, menus
-from discord.ext.commands import bot
-from discord.ext.commands.core import command
-from tabulate import tabulate
-from jishaku.shell import ShellReader
 from jishaku.codeblocks import codeblock_converter
+from jishaku.shell import ShellReader
+from tabulate import tabulate
 
 
 class TabulateData(menus.ListPageSource):
@@ -62,7 +60,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
         def check(message):
             return (ctx.author.id == message.author.id) and (
-                message.channel == ctx.channel)
+                    message.channel == ctx.channel)
 
         e_tit = await self.bot.wait_for('message', check=check)
         await ctx.send('Send me the embed content')
@@ -280,7 +278,9 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def dev_stats(self, ctx):
-        res = await self.bot.session.get("https://dagbot-site.herokuapp.com/api/botstats", headers={"Token": self.bot.data["stats"]})
+        res = await self.bot.session.get(
+            "https://dagbot-site.herokuapp.com/api/botstats",
+            headers={"Token": self.bot.data["stats"]})
         our = await res.read()
         url = await self.bot.session.post("https://paste.rs/", data=our)
         t = await url.text()
@@ -290,7 +290,9 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def new_stats(self, ctx):
-        res = await self.bot.session.post("https://dagbot-site.herokuapp.com/api/newstats", headers={"Token": self.bot.data["stats"]})
+        res = await self.bot.session.post(
+            "https://dagbot-site.herokuapp.com/api/newstats",
+            headers={"Token": self.bot.data["stats"]})
         return await ctx.send(f"Code: {res.status}")
 
     @commands.command(hidden=True)

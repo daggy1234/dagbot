@@ -801,7 +801,7 @@ class games(commands.Cog):
 
         def check(answer):
             return (answer.author.id != self.bot.user.id) and (
-                answer.channel == channel
+                    answer.channel == channel
             )
 
         while not correct:
@@ -1028,7 +1028,7 @@ class games(commands.Cog):
 
                 def check(guess):
                     return (guess.author.id != self.bot.user.id) and (
-                        guess.channel == channel
+                            guess.channel == channel
                     )
 
                 if intis == 0:
@@ -1249,18 +1249,18 @@ class games(commands.Cog):
 
         def recheck(reaction, user):
             return (
-                user is not ctx.author
-                and reaction.message.channel == ctx.channel
-                and not user.bot
-                and reaction.message.id == msg.id
-                and user not in players
+                    user is not ctx.author
+                    and reaction.message.channel == ctx.channel
+                    and not user.bot
+                    and reaction.message.id == msg.id
+                    and user not in players
             )
 
         def gamecheck(message):
             return (
-                message.author in players
-                and message.channel == ctx.channel
-                and not message.author.bot
+                    message.author in players
+                    and message.channel == ctx.channel
+                    and not message.author.bot
             )
 
         try:
@@ -1330,7 +1330,7 @@ class games(commands.Cog):
 
         def check(guess):
             return (guess.author.id == ctx.author.id) and (
-                guess.channel == channel)
+                    guess.channel == channel)
 
         while not correct:
             try:
@@ -1411,8 +1411,8 @@ class games(commands.Cog):
     async def computer(self, ctx):
         def gamecheck(message_check):
             return message_check.author == ctx.author \
-                and message_check.channel == ctx.channel \
-                and len(message_check.content) == 2
+                   and message_check.channel == ctx.channel \
+                   and len(message_check.content) == 2
 
         game = TicTacToe()
         await game.makegamegrid()
@@ -1544,8 +1544,8 @@ class games(commands.Cog):
 
         def p1check(message):
             return message.author == ctx.author and \
-                message.channel == ctx.channel and \
-                len(message.content) == 2
+                   message.channel == ctx.channel and \
+                   len(message.content) == 2
 
         def p2check(message):
             return message.author == mlsit[
@@ -1656,7 +1656,7 @@ class games(commands.Cog):
 
             return reaction.message.id == msg.id and not user.bot and str(
                 reaction.emoji) == '<a:giftick:734746863340748892>' and \
-                user.id == challenged.id
+                   user.id == challenged.id
 
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
@@ -1706,13 +1706,13 @@ class games(commands.Cog):
 
         def p0check(message):
             return (
-                message.author.id == ctx.author.id) and \
-                message.guild is None
+                           message.author.id == ctx.author.id) and \
+                   message.guild is None
 
         def p1check(message):
             return (
-                message.author.id == challenged.id) and \
-                message.guild is None
+                           message.author.id == challenged.id) and \
+                   message.guild is None
 
         try:
             async with timeout(600):
@@ -1880,7 +1880,7 @@ class games(commands.Cog):
                         embed.set_image(url=a)
                         return await ctx.send(embed=embed)
                     elif (message.content.lower() == 'cancel') and \
-                         (message.author == ctx.author):
+                            (message.author == ctx.author):
                         embed = discord.Embed(
                             title='Game Cancelled',
                             description=f'The pokemon was **{name}**',
@@ -1950,14 +1950,14 @@ class games(commands.Cog):
                                 name='Description', value=rjs['clue'])
                         return await ctx.send(embed=embed)
                     elif (message.content.lower() == 'hint') and \
-                         (message.author == ctx.author):
+                            (message.author == ctx.author):
                         embed = discord.Embed(
                             title='Logo Game Hint',
                             description=f'`{hint}`',
                             color=ctx.guild.me.color)
                         await ctx.send(embed=embed)
                     elif (message.content.lower() == 'cancel') and \
-                         (message.author == ctx.author):
+                            (message.author == ctx.author):
                         embed = discord.Embed(
                             title='Game Cancelled',
                             description=f'The logo was **{name}**',

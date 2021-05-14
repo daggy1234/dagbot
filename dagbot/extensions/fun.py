@@ -1,12 +1,11 @@
 import asyncio
-import random
 import json
+import random
 import time
 from ipaddress import IPv4Address, IPv6Address
 from random import getrandbits
 
 import discord
-from discord.ext.commands.core import command
 import sr_api
 from PyDictionary import PyDictionary
 from bs4 import BeautifulSoup
@@ -153,7 +152,8 @@ class fun(commands.Cog):
         await message.edit(
             content="I'm Weak\n```diff\nPONG!\n- Websocket Latency:"
                     "{} ms\n+ Message {:.2f}\nDagpi: {}```".format(client_lat,
-                                                                   duration, dp))
+                                                                   duration,
+                                                                   dp))
 
     @commands.command(cooldown_after_parsing=True)
     async def dadjoke(self, ctx):
@@ -267,9 +267,9 @@ class fun(commands.Cog):
     @commands.command(cooldown_after_parsing=True, hidden=True)
     async def wrongopinion(self, ctx):
         msg = (
-            "DAGBOTS RESPONSE TO YOUR OPINION"
-            + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/"
-              "695401408429817916/Nice_opinion_just_one_tiny_problem.mp4"
+                "DAGBOTS RESPONSE TO YOUR OPINION"
+                + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/"
+                  "695401408429817916/Nice_opinion_just_one_tiny_problem.mp4"
         )
         return await ctx.send(msg)
 
@@ -576,7 +576,8 @@ class fun(commands.Cog):
 
     @commands.command(hidden=True)
     async def play(self, ctx, *, song="Despacito"):
-        await ctx.send(f"Go get a music bot. I cannot play {song} because it sucks anyway ")
+        await ctx.send(
+            f"Go get a music bot. I cannot play {song} because it sucks anyway ")
 
 
 def setup(bot):

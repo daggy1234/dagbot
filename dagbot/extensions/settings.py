@@ -196,8 +196,8 @@ class settings(commands.Cog):
         def check(reaction, user):
             # print('reaction')
             return reaction.message.id == msg.id and not user.bot and \
-                user.id == ctx.author.id and \
-                str(reaction.emoji) == '<a:giftick:734746863340748892>'
+                   user.id == ctx.author.id and \
+                   str(reaction.emoji) == '<a:giftick:734746863340748892>'
 
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
@@ -248,8 +248,8 @@ class settings(commands.Cog):
         def check(reaction, user):
             # print('reaction')
             return reaction.message.id == msg.id and not user.bot and \
-                user.id == ctx.author.id and \
-                str(reaction.emoji) == '<a:giftick:734746863340748892>'
+                   user.id == ctx.author.id and \
+                   str(reaction.emoji) == '<a:giftick:734746863340748892>'
 
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
@@ -298,8 +298,8 @@ class settings(commands.Cog):
         def check(reaction, user):
             # print('reaction')
             return reaction.message.id == msg.id and not user.bot and \
-                user.id == ctx.author.id and \
-                str(reaction.emoji) == '<a:giftick:734746863340748892>'
+                   user.id == ctx.author.id and \
+                   str(reaction.emoji) == '<a:giftick:734746863340748892>'
 
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
@@ -335,9 +335,9 @@ class settings(commands.Cog):
 
         def check(message):
             return (
-                message.author == ctx.author
-                and message.channel == ctx.channel
-                and not message.author.bot
+                    message.author == ctx.author
+                    and message.channel == ctx.channel
+                    and not message.author.bot
             )
 
         try:

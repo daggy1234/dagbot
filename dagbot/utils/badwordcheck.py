@@ -1,5 +1,3 @@
-
-
 class bword:
     def __init__(self):
         self.bord = set()

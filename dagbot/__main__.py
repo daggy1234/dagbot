@@ -1,9 +1,6 @@
 import os
 
 from .bot import Dagbot
-import logging
-import logging.handlers
-
 
 if __name__ == "__main__":
     os.environ["JISHAKU_NO_UNDERSCORE"] = "True"

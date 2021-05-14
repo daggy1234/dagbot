@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 import random
 import traceback
+
 import asyncdagpi.errors as dagpi_error
 import discord
 from discord import AsyncWebhookAdapter, Webhook
@@ -123,7 +124,8 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
         if isinstance(error, NoMemberFound):
             return await ctx.send("Member found doesn't exist")
         elif isinstance(error, NoImageFound):
-            return await ctx.send("No Valid Image was detected at your location\nPlease Specify a Valid Loaction Like\n```\n- Attachment (Add dummy text)\n- Member (ping or id)\n- Emoji (No standard emojis)\n- Url (Valid URL's only)\n```")
+            return await ctx.send(
+                "No Valid Image was detected at your location\nPlease Specify a Valid Loaction Like\n```\n- Attachment (Add dummy text)\n- Member (ping or id)\n- Emoji (No standard emojis)\n- Url (Valid URL's only)\n```")
         elif isinstance(error, dagpibrok):
             return await ctx.send('The API at https://dagpi.xyz broke')
         elif isinstance(error, dagpi_code_broke):

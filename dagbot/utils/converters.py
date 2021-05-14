@@ -39,6 +39,12 @@ class ImageConverter(commands.Converter):
                 return ctx.message.attachments[0].url.replace(".webp", ".png")
         if checkers.is_url(str(argument)):
             return str(argument)
+        if ctx.message.reference:
+            with suppress(Exception):
+                msg_ref = ctx.message.reference
+                chan = ctx.bot.get_channel(msg_ref.channel_id)
+                msg = await chan.fetch_message(msg_ref.message_id)
+                return msg.attachments[0].url.replace(".webp", ".png")
         raise NoImageFound('')
 
 
@@ -46,7 +52,8 @@ class StaticImageConverter(commands.Converter):
     async def convert(self, ctx, argument):
         with suppress(NoMemberFound):
             mem = await BetterMemberConverter().convert(ctx, argument)
-            return (str(mem.avatar_url_as(format="png", static_format='png', size=1024)))
+            return (str(mem.avatar_url_as(format="png", static_format='png',
+                                          size=1024)))
         with suppress(Exception):
             emoji = await emoji_converter.convert(ctx, str(argument))
             return (str(emoji.url_as(format="png")))
@@ -55,4 +62,10 @@ class StaticImageConverter(commands.Converter):
                 return ctx.message.attachments[0].url.replace(".webp", ".png")
         if checkers.is_url(str(argument)):
             return str(argument)
+        if ctx.message.reference:
+            with suppress(Exception):
+                msg_ref = ctx.message.reference
+                chan = ctx.bot.get_channel(msg_ref.channel_id)
+                msg = await chan.fetch_message(msg_ref.message_id)
+                return msg.attachments[0].url.replace(".webp", ".png")
         raise NoImageFound('')

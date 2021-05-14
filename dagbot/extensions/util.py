@@ -2,10 +2,10 @@ import random
 
 import async_cse
 import discord
-from jishaku import codeblocks
 from bs4 import BeautifulSoup
 from discord.ext import commands, menus
 from discord.ext.commands import BucketType
+from jishaku import codeblocks
 
 
 def setup(client):
@@ -403,12 +403,14 @@ pressure:              {}hPa```""".format(
                     f"Invalid file type: `{split_attachment[1]}` is invalid.")
             file = await attachments[0].read()
             text = file.decode('UTF-8')
-            url = await self.client.session.post("https://paste.daggy.tech/upload", data=text)
+            url = await self.client.session.post(
+                "https://paste.daggy.tech/upload", data=text)
             js = await url.json()
             return await ctx.send(js["file"])
         elif not ctx.message.attachments:
             paste = codeblocks.codeblock_converter(paste)
             lang = paste[0] or ""
-            url = await self.client.session.post("https://paste.daggy.tech/upload", data=paste[1])
+            url = await self.client.session.post(
+                "https://paste.daggy.tech/upload", data=paste[1])
             js = await url.json()
             return await ctx.send(f'{js["file"]}.{lang}')

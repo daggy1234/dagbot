@@ -44,15 +44,15 @@ class Source(menus.GroupByPageSource):
             f"{i}.{v.value}" for i, v in enumerate(entry.items, start=offset)
         )
         embed.description = (
-            "Dagbot's meme generation tool allows you to "
-            "access more than a 100+ meme templates.Browse through the "
-            "meme templates using the buttons below!\n "
-            "Once you select the template use the following template. "
-            "Use semicolons to seperate the number of text arguments "
-            "required! DO NOT NEED TO include all of them "
-            "`create template:text1:text2`\n **For example**\n`create "
-            "The scroll of truth:Dagbot is not the best:`\n"
-            + joined
+                "Dagbot's meme generation tool allows you to "
+                "access more than a 100+ meme templates.Browse through the "
+                "meme templates using the buttons below!\n "
+                "Once you select the template use the following template. "
+                "Use semicolons to seperate the number of text arguments "
+                "required! DO NOT NEED TO include all of them "
+                "`create template:text1:text2`\n **For example**\n`create "
+                "The scroll of truth:Dagbot is not the best:`\n"
+                + joined
         )
         return embed
 
@@ -94,7 +94,8 @@ class memes(commands.Cog):
             with open("./dagbot/data/imgfliptemplates.json") as file:
                 f = json.load(file)
                 li = f["data"]["memes"]
-                timplist = [e["id"] for e in li if tosearch in e["name"].lower()]
+                timplist = [e["id"] for e in li if
+                            tosearch in e["name"].lower()]
                 if not timplist:
                     return await ctx.send(
                         "No results\nUse the command `create` to view the "
@@ -147,9 +148,9 @@ class memes(commands.Cog):
 
         def check(message):
             return (
-                message.author == ctx.author
-                and message.channel == ctx.channel
-                and not message.author.bot
+                    message.author == ctx.author
+                    and message.channel == ctx.channel
+                    and not message.author.bot
             )
 
         try:
@@ -220,7 +221,8 @@ class memes(commands.Cog):
                 bottomtext = bm.content
             await ctx.trigger_typing()
             img = await self.client.dagpi.image_process(
-                ImageFeatures.motiv(), url=image_url, top_text=toptext, bottom_text=bottomtext)
+                ImageFeatures.motiv(), url=image_url, top_text=toptext,
+                bottom_text=bottomtext)
             await self.client.get_cog("image").to_embed(ctx, img, "Retromeme")
 
     @commands.command(cooldown_after_parsing=True)
@@ -234,9 +236,9 @@ class memes(commands.Cog):
 
         def check(message):
             return (
-                message.author == ctx.author
-                and message.channel == ctx.channel
-                and not message.author.bot
+                    message.author == ctx.author
+                    and message.channel == ctx.channel
+                    and not message.author.bot
             )
 
         try:
@@ -307,7 +309,8 @@ class memes(commands.Cog):
                 bottomtext = bm.content
             await ctx.trigger_typing()
             img = await self.client.dagpi.image_process(
-                ImageFeatures.retro_meme(), url=image_url, top_text=toptext, bottom_text=bottomtext)
+                ImageFeatures.retro_meme(), url=image_url, top_text=toptext,
+                bottom_text=bottomtext)
             await self.client.get_cog("image").to_embed(ctx, img, "Retromeme")
 
     @commands.command(cooldown_after_parsing=True)
@@ -346,9 +349,9 @@ class memes(commands.Cog):
 
         def check(message):
             return (
-                message.author == ctx.author
-                and message.channel == ctx.channel
-                and not message.author.bot
+                    message.author == ctx.author
+                    and message.channel == ctx.channel
+                    and not message.author.bot
             )
 
         try:
