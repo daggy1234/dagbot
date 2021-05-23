@@ -93,7 +93,7 @@ Thats it you now have a dagbot kubernetes pod deployed!
 
 ### Server
 
-Join the discord for help.
+Join the [discord](https://discord.com/invite/grGkdeS) for help.
 
 I recommend usingmy hosted version, but feel free to self host. Drop a star and read the license!
 
