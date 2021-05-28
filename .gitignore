@@ -11,3 +11,4 @@ pythonenv3.8/
 sample.env
 .venv
 .env
+pyrightconfig.json
