@@ -79,7 +79,7 @@ python-versions = ">=3.5.3"
 
 [[package]]
 name = "asyncdagpi"
-version = "3.3.3"
+version = "3.3.4"
 description = "An Asynchronos API wrapper for https://dagpi.xyz"
 category = "main"
 optional = false
@@ -174,7 +174,7 @@ beautifulsoup4 = "*"
 
 [[package]]
 name = "certifi"
-version = "2020.12.5"
+version = "2021.5.30"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
@@ -323,7 +323,7 @@ futures = "*"
 
 [[package]]
 name = "humanize"
-version = "3.5.0"
+version = "3.7.1"
 description = "Python humanize utilities"
 category = "main"
 optional = false
@@ -378,7 +378,7 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "jishaku"
-version = "2.0.0"
+version = "2.0.0a315+g010991f.master"
 description = "A discord.py extension including useful tools for bot development and debugging."
 category = "main"
 optional = false
@@ -386,22 +386,23 @@ python-versions = ">=3.8.0"
 develop = false
 
 [package.dependencies]
-braceexpand = ">=0.1.5"
-"discord.py" = ">=1.5.0"
-humanize = "*"
+braceexpand = ">=0.1.7"
+"discord.py" = ">=1.7.2"
+humanize = ">=3.7.0"
 import-expression = ">=1.0.0,<2.0.0"
 
 [package.extras]
-docs = ["sphinx (>=3.1.2)", "sphinxcontrib-asyncio"]
+docs = ["sphinx (>=3.5.4)", "sphinxcontrib-asyncio"]
 procinfo = ["psutil"]
-test = ["coverage", "flake8", "isort", "pylint", "pytest", "pytest-cov", "pytest-mock"]
-voice = ["discord.py[voice] (>=1.5.0)", "youtube-dl"]
+publish = ["jinja2"]
+test = ["click", "coverage", "flake8", "isort", "pylint", "pytest", "pytest-cov", "pytest-mock"]
+voice = ["discord.py[voice] (>=1.7.2)", "youtube-dl"]
 
 [package.source]
 type = "git"
 url = "https://github.com/Gorialis/jishaku/"
 reference = "master"
-resolved_reference = "873f863052a663efab3b6184d2516e03bf16bcf9"
+resolved_reference = "010991f2a3fb9c32c9801501b9d57caf6fb5e9f4"
 
 [[package]]
 name = "jsonschema"
@@ -959,8 +960,8 @@ async-timeout = [
     {file = "async_timeout-3.0.1-py3-none-any.whl", hash = "sha256:4291ca197d287d274d0b6cb5d6f8f8f82d434ed288f962539ff18cc9012f9ea3"},
 ]
 asyncdagpi = [
-    {file = "asyncdagpi-3.3.3-py3-none-any.whl", hash = "sha256:15bcea8c79edf35c999ec43b62813468684bfd62604a11016d46391d082db3ff"},
-    {file = "asyncdagpi-3.3.3.tar.gz", hash = "sha256:dab2d21d0273ddb502a0b237ab49d29d903fea9824f542b7384074e78f2c20c7"},
+    {file = "asyncdagpi-3.3.4-py3-none-any.whl", hash = "sha256:bcd50d4c5f9074bff7dd276d59ae1f8ca45b5d41c29c9d28b13ebcdc04bfcb90"},
+    {file = "asyncdagpi-3.3.4.tar.gz", hash = "sha256:6d9dfad8b9e5472408984e43ba4776958822d530566dbd7ab4f3b5a04bbf01dd"},
 ]
 asyncpg = [
     {file = "asyncpg-0.21.0-cp35-cp35m-macosx_10_13_x86_64.whl", hash = "sha256:09badce47a4645cfe523cc8a182bd047d5d62af0caaea77935e6a3c9e77dc364"},
@@ -1014,8 +1015,8 @@ bs4 = [
     {file = "bs4-0.0.1.tar.gz", hash = "sha256:36ecea1fd7cc5c0c6e4a1ff075df26d50da647b75376626cc186e2212886dd3a"},
 ]
 certifi = [
-    {file = "certifi-2020.12.5-py2.py3-none-any.whl", hash = "sha256:719a74fb9e33b9bd44cc7f3a8d94bc35e4049deebe19ba7d8e108280cfd59830"},
-    {file = "certifi-2020.12.5.tar.gz", hash = "sha256:1a4995114262bffbc2413b159f2a1a480c969de6e6eb13ee966d470af86af59c"},
+    {file = "certifi-2021.5.30-py2.py3-none-any.whl", hash = "sha256:50b1e4f8446b06f41be7dd6338db18e0990601dce795c2b1686458aa7e8fa7d8"},
+    {file = "certifi-2021.5.30.tar.gz", hash = "sha256:2bbf76fd432960138b3ef6dda3dde0544f27cbf8546c458e60baf371917ba9ee"},
 ]
 cffi = [
     {file = "cffi-1.14.5-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:bb89f306e5da99f4d922728ddcd6f7fcebb3241fc40edebcb7284d7514741991"},
@@ -1119,8 +1120,8 @@ goslate = [
     {file = "goslate-1.5.1.tar.gz", hash = "sha256:dee7cf08fd7d744fbb3477d28ea6a98a11b363c138d7577b4b097f517581f864"},
 ]
 humanize = [
-    {file = "humanize-3.5.0-py3-none-any.whl", hash = "sha256:f584919f691ecfb67036a8639f2ac3d578f5f9073fb4cfd370a4cdf9f66aed78"},
-    {file = "humanize-3.5.0.tar.gz", hash = "sha256:a0474226e1494923f9106758e11f0c3bb4dbe5e7d84388fa78f90eb7713b5d65"},
+    {file = "humanize-3.7.1-py3-none-any.whl", hash = "sha256:a0dca9eb010dd1fab61819acaea54be344a4c22c77261f72ac4dbee183dd9a59"},
+    {file = "humanize-3.7.1.tar.gz", hash = "sha256:b8e7878f3063174b212bb82b9e5bee3b24bc47931e44df0bd34bcb1d8e0acf2f"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},

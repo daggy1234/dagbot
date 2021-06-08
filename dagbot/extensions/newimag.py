@@ -28,66 +28,67 @@ class image(commands.Cog):
         self.client = client
         self.dynamic = [
             (ImageFeatures.night(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.gay(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.wanted(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.ascii(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.sobel(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.hog(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.colors(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.rgb(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.sith(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.triggered(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.deepfry(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.invert(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.wasted(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.communism(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.america(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.pixel(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.fedora(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.jail(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.magik(),
-             StaticImageConverter),
+             StaticImageConverter()),
             (ImageFeatures.rainbow(),
-             ImageConverter),
+             ImageConverter()),
             (ImageFeatures.triangle(),
-             StaticImageConverter),
-            (ImageFeatures.stringify(), StaticImageConverter),
-            (ImageFeatures.neon(), StaticImageConverter),
-            (ImageFeatures.sketch(), StaticImageConverter),
-            (ImageFeatures.dissolve(), StaticImageConverter),
-            (ImageFeatures.bonk(), StaticImageConverter),
-            (ImageFeatures.petpet(), StaticImageConverter)
+             StaticImageConverter()),
+            (ImageFeatures.stringify(), StaticImageConverter()),
+            (ImageFeatures.neon(), StaticImageConverter()),
+            (ImageFeatures.sketch(), StaticImageConverter()),
+            (ImageFeatures.dissolve(), StaticImageConverter()),
+            (ImageFeatures.bonk(), StaticImageConverter()),
+            (ImageFeatures.petpet(), StaticImageConverter()),
 
         ]
         for command in self.dynamic:
             self.make_fn(command[0], command[1])
-        self.make_fn_alex("salty", StaticImageConverter)
-        self.make_fn_alex("jokeoverhead", StaticImageConverter)
+        self.make_fn_alex("salty", StaticImageConverter())
+        self.make_fn_alex("jokeoverhead", StaticImageConverter())
 
     def make_fn(self, feature: asyncdagpi.ImageFeatures,
                 converter: typing.Union
                 [ImageConverter, StaticImageConverter]):
         @commands.command(name=feature.value.replace("/", ""),
                           help=feature.description)
-        async def _command(_self, ctx, *, source: converter = None):
+        async def _command(_self, ctx, *, to_convert: str = ""):
+            source = await converter.convert(ctx, to_convert)
             if source is None:
                 raise NoImageFound('Please provide a valid image')
             img = await self.client.dagpi.image_process(feature,
@@ -106,7 +107,8 @@ class image(commands.Cog):
     def make_fn_alex(self, feature: str, converter: typing.Union
     [ImageConverter, StaticImageConverter]):
         @commands.command(name=feature)
-        async def _command(_self, ctx, *, source: converter):
+        async def _command(_self, ctx, *, to_convert: str = ""):
+            source = await converter.convert(ctx, to_convert)
             start = time.perf_counter()
             url = f"https://api.alexflipnote.dev/{feature}?image={source}"
             img = await self.process_alex(url)
@@ -152,6 +154,15 @@ class image(commands.Cog):
             embed.set_footer(icon_url=str(ctx.author.avatar_url),
                              text=f"Called by {ctx.author.display_name}")
             await ctx.reply(embed=embed, file=file)
+
+    @commands.command(cooldown_after_parsing=True)
+    async def special(self, ctx, *, to_convert: str = ""):
+        image = await ImageConverter().convert(ctx, to_convert)
+        if image is None:
+            raise NoImageFound('Please provide a valid image')
+        img = await self.client.dagpi.special_image_process(image)
+        await self.to_embed(ctx, img,
+                            "Dagpi Special Endpoint. Can change randomly")
 
     @commands.command(cooldown_after_parsing=True)
     async def tweet(self, ctx, user: BetterMemberConverter = None, *, text):
