@@ -48,7 +48,7 @@ class misc(commands.Cog):
         embed = discord.Embed(
             title="DAGBOT SUGGESTION ADDED",
             description=f"```yaml\n{suggest}\n```\n**"
-                        f"FROM:***{auth}\n**SERVER:**{fro}",
+                        f"FROM:**{auth}\n**SERVER:**{fro}",
             color=ctx.guild.me.color,
         )
         embed.add_field(
@@ -75,7 +75,7 @@ class misc(commands.Cog):
         embed = discord.Embed(
             title="DAGBOT BUG REPORTED",
             description=f"```http\n{bug}\n```\n**\
-            FROM:***{auth}\n**SERVER:**{fro}",
+            FROM:**{auth}\n**SERVER:**{fro}",
             color=ctx.guild.me.color,
         )
         embed.add_field(
