@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dagbot"
-version = "2.9.0"
+version = "2.9.1"
 description = "Fun Meme Discord bot"
 authors = ["Daggy1234"]
 license = "AGPLv3"
