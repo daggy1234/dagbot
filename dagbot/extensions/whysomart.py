@@ -359,7 +359,7 @@ hp spell <spell> : gets information about spell    `"""
             title=js['title'],
             description=js['explanation'],
             color=ctx.guild.me.color)
-        embed.set_image(url=js['hdurl'])
+        embed.set_image(url=js.get("url"))
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
