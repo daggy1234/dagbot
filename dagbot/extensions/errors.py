@@ -20,7 +20,7 @@ import traceback
 
 import asyncdagpi.errors as dagpi_error
 import discord
-from discord import AsyncWebhookAdapter, Webhook
+from discord import Webhook
 from discord.ext import commands
 from sentry_sdk import capture_exception, configure_scope
 
@@ -78,7 +78,7 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             return await ctx.send(fst)
         elif isinstance(error, commands.BotMissingPermissions):
             perms = ""
-            for e in error.missing_perms:
+            for e in error.missing_permissions:
                 perms += f"{e}\n"
             embed = discord.Embed(
                 title="Missing Perms",
@@ -167,24 +167,25 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
             try:
                 webhook = Webhook.from_url(
                     self.bot.data['errorwebhook'],
-                    adapter=AsyncWebhookAdapter(
-                        self.bot.session))
+                    session=self.bot.session)
                 await webhook.send('New Error', embed=nemb)
             except RuntimeError:
                 channel = self.bot.get_channel(682199468375932928)
                 await channel.send(embed=nemb)
-            with configure_scope() as scope:
-                scope.user = {
-                    "id": ctx.author.id,
-                    "username": ctx.author.name}
-                scope.set_tag("message_id", ctx.message.id)
-                scope.set_tag("guild_id", ctx.guild.id)
-                scope.set_tag('guild_name', ctx.guild.name)
-                scope.set_tag("channel_id", ctx.channel.id)
-                scope.set_tag('channel_name', ctx.channel.name)
-                scope.set_tag('command', ctx.invoked_with)
-            capture_exception(error)
-            await ctx.send(embed=embed)
+            cscope = configure_scope()
+            if cscope:
+                with cscope as scope:
+                    scope.user = {
+                        "id": ctx.author.id,
+                        "username": ctx.author.name}
+                    scope.set_tag("message_id", ctx.message.id)
+                    scope.set_tag("guild_id", ctx.guild.id)
+                    scope.set_tag('guild_name', ctx.guild.name)
+                    scope.set_tag("channel_id", ctx.channel.id)
+                    scope.set_tag('channel_name', ctx.channel.name)
+                    scope.set_tag('command', ctx.invoked_with)
+                capture_exception(error)
+                await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_error(self, error, *args, **kwargs):

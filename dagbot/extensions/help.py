@@ -1,31 +1,67 @@
 import asyncio
 from contextlib import suppress
+from dagbot.bot import Dagbot
+import re
 
 import discord
 import difflib
 from async_timeout import timeout
+from discord.components import SelectOption
 from discord.ext import commands
 from discord.ext.commands import bot
-from typing import List
+from typing import List, Optional
+
+from discord.types.interactions import ApplicationCommandInteractionData
 from dagbot.utils.context import MyContext
-import dagbot.data.textdata as data
+from dagbot.data import textdata
 
 
 class DagbotHelpView(discord.ui.View):
 
-    def __init__(self, ctx: MyContext):
+    def __init__(self, ctx: MyContext, cog_list: List[str], help_embed: discord.Embed):
         super().__init__(timeout=400)
+        self.ctx = ctx
+        self.cog_list = cog_list
+        self.help_embed = help_embed
+        self.select_list = [SelectOption(label=cog, value=cog, emoji=textdata.emojilist.get(cog)) for cog in cog_list]
+        self.add_item(HelpSelect(self.select_list))
 
-    async def process_callback(select: discord.ui.Select, interaction: discord.Interaction):
-        DagbotHelp.cog_help_maker()
-        print("")
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        check = self.ctx.author.id == interaction.user.id
+        if check:
+            return True
+        else:
+            await interaction.response.send_message("Not your help menu :(", ephemeral=True)
+            return False
+
+    async def process_callback(self, select: discord.ui.Select, interaction: discord.Interaction):
+        data = interaction.data
+        if not data:
+            raise Exception("No Data")
+        try:
+            opt: str = data["values"][0]
+            if opt == "help":
+                return await interaction.response.edit_message(embed=self.help_embed)
+            else:
+                bot: Optional[Dagbot] = self.ctx.bot
+                if not bot:
+                    return
+                cog: Optional[commands.Cog] = bot.get_cog(opt)
+                if not cog:
+                    return
+                embed = await DagbotHelp.cog_help_maker(cog, self.ctx)
+                return await interaction.response.edit_message(embed=embed)
+        except:
+            pass
+
 
 
 class HelpSelect(discord.ui.Select):
 
     view: DagbotHelpView
 
-    def __init__(self, *, options: List[discord.SelectOption]) -> None:
+    def __init__(self, options: List[discord.SelectOption]) -> None:
         super().__init__(placeholder="Dagbot Help Command",
                          min_values=1, max_values=1, options=options)
 
@@ -36,28 +72,31 @@ class HelpSelect(discord.ui.Select):
 class DagbotHelp(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         ctx = self.context
+        if not ctx:
+            raise Exception("NO ctx")
         guild = ctx.guild
         g_id = guild.id
+        prefix = None
         for e in ctx.bot.prefdict:
             if e["server_id"] == str(g_id):
-                prefix = e["command_prefix"]
+                prefix = str(e["command_prefix"])
                 break
         embed = discord.Embed(color=guild.me.color)
         embed.set_author(
-            icon_url=ctx.author.avatar_url,
+            icon_url=ctx.author.avatar.url,
             name="Dagot Help Command")
         embed.description = '''`[]` means that a parameter is optional\n`<>`
         means that a parameter is required\nYou can use do `help <command> \
 help <category>` for help with specific commands or react with the
 reactions below.'''
         cog_moji = []
-        cog_list = []
+        cog_list: List[str] = []
         for record in ctx.bot.cogdata:
             if str(record["serverid"]) == str(g_id):
                 for cog, state in zip(record.keys(), record.values()):
                     if cog != 'serverid' and state is True:
                         cog_list.append(cog)
-                        em = data.emojilist[cog]
+                        em = textdata.emojilist[cog]
                         cog_moji.append(em)
                         embed.add_field(name=f"{cog} {em}", value='_')
         embed.add_field(name='help', value='-')
@@ -65,48 +104,14 @@ reactions below.'''
         embed.add_field(name='settings', value='-')
         cog_list.append('settings')
         embed.add_field(name='prefix', value=f'`{prefix}`')
-        emoji_list = [data.emojilist[cog] for cog in cog_list]
-        msg = await ctx.send(embed=embed)
-        for emoji in emoji_list:
-            await msg.add_reaction(emoji)
-
-        def check(reaction, user) -> bool:
-            return str(reaction) in emoji_list \
-                and reaction.message.channel == ctx.channel \
-                and not user.bot and user == ctx.author
-        try:
-            async with timeout(300):
-                while True:
-                    try:
-                        reaction, user = await ctx.bot.wait_for('reaction_add',
-                                                                check=check,
-                                                                timeout=20)
-                    except asyncio.TimeoutError:
-                        continue
-                    else:
-
-                        ind = emoji_list.index(str(reaction))
-
-                        cog = cog_list[ind]
-                        if cog == 'help':
-                            await msg.edit(embed=embed)
-                        else:
-
-                            coginst = ctx.bot.get_cog(cog.lower())
-                            if coginst is None:
-                                continue
-                            embd = await self.cog_help_maker(coginst, ctx)
-                            embd.set_author(
-                                icon_url=ctx.author.avatar_url,
-                                name="Dagot Help Command")
-                            await msg.edit(embed=embd)
-        except BaseException:
-            return
+        view = DagbotHelpView(ctx, cog_list, embed)
+        msg = await ctx.send(embed=embed, view=view)
 
     @staticmethod
     async def cog_help_maker(cog: commands.Cog, ctx: MyContext) -> discord.Embed:
         sp = 15
         guild = ctx.guild
+        prefix = None
         g_id = guild.id
         for e in ctx.bot.prefdict:
             if e["server_id"] == str(g_id):
@@ -116,8 +121,9 @@ reactions below.'''
         cog_commands = cog.get_commands()
         cmlist = ""
         if len(cog_commands) == 0:
-            return await ctx.send(
+            await ctx.send(
                 "This cog doesn't have any commands for some reason.")
+            raise Exception("No commands")
         # command.clean_params
 
         if cog.qualified_name == "animals":
@@ -149,7 +155,7 @@ reactions below.'''
             sig = command.signature
             sig = sig.replace('[source]', '<source>')
             try:
-                file = data.cmdhelp[f"{command}"]
+                file = textdata.cmdhelp[f"{command}"]
             except BaseException:
                 if cog.qualified_name in ["image", "animals"]:
                     des = ""
@@ -220,6 +226,8 @@ reactions below.'''
 
     async def send_command_help(self, command):
         ctx = self.context
+        if not ctx:
+            return
         guild = ctx.guild
         embed = discord.Embed(color=guild.me.color, )
         sig = command.signature
@@ -227,7 +235,7 @@ reactions below.'''
         embed.title = f"{command.name} {sig}"
         try:
 
-            embed.description = data.cmdhelp[f"{command}"]
+            embed.description = textdata.cmdhelp[f"{command}"]
         except BaseException:
             embed.description = command.help or "No help just yet!"
         alis = command.aliases

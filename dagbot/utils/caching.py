@@ -1,5 +1,13 @@
+from __future__ import annotations
+from typing import Dict, List, Mapping, Optional, TYPE_CHECKING
+
+from discord.ext import commands
+if TYPE_CHECKING:
+    from dagbot.bot import Dagbot
+
+
 class Caching:
-    def __init__(self, bot):
+    def __init__(self, bot: Dagbot):
         bot.logger.debug("WILL CACHE")
         self.bot = bot
 
@@ -31,10 +39,12 @@ class Caching:
                 )
 
     async def getkeydict(self):
-        wedit = self.bot.cogs
-        keylist = []
+        wedit: Mapping[str, commands.Cog] = self.bot.cogs
+        keylist: List[str] = []
         for key in wedit.keys():
-            cog = self.bot.get_cog(key)
+            cog: Optional[commands.Cog] = self.bot.get_cog(key)
+            if not cog:
+                continue
             if len(cog.get_commands()) > 1 \
                     and cog.qualified_name != 'Jishaku' \
                     and cog.qualified_name.lower() != 'help' \

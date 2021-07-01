@@ -1,11 +1,30 @@
+from __future__ import annotations
+from typing import Union, Optional, TYPE_CHECKING
 import discord
 from discord.ext import commands
+if TYPE_CHECKING:
+    from dagbot.bot import Dagbot
 
 
 class MyContext(commands.Context):
-    async def send(self, content=None, *, tts=False,
-                   embed: discord.Embed = None, file=None, files=None,
-                   delete_after=None, nonce=None, allowed_mentions=None):
+
+    bot: Dagbot
+    guild: discord.Guild
+    authot: discord.Member
+
+    async def send(self,         
+        content: Optional[str] = None,
+        *,
+        tts: bool = None,
+        embed: discord.Embed = None,
+        file: discord.File = None,
+        delete_after: float = None,
+        nonce: Union[str, int] = None,
+        allowed_mentions: discord.AllowedMentions = None,
+        reference: Union[discord.Message, discord.MessageReference] = None,
+        mention_author: bool = None,
+        view: discord.ui.View = None,
+):
         bot = self.bot
 
         if content:
@@ -29,9 +48,10 @@ class MyContext(commands.Context):
             return await super().send("Little long there woul you like me to "
                                       "upload this?")
 
-        return await super().send(content, file=file, embed=embed, files=files,
+        #typeignore
+        return await super().send(content, file=file, embed=embed, 
                                   delete_after=delete_after, nonce=nonce,
-                                  allowed_mentions=allowed_mentions, tts=tts)
+                                  allowed_mentions=allowed_mentions, tts=tts, view=view)
 
     async def safe_send(self, yes):
         await super().send("Yes this method is cool")

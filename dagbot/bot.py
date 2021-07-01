@@ -9,7 +9,7 @@ import discord
 import sentry_sdk
 import yaml
 from asyncdagpi import Client
-from discord import AsyncWebhookAdapter, Webhook
+from discord import Webhook
 from discord.ext import commands
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
@@ -20,11 +20,15 @@ from .utils.logger import create_logger
 
 
 async def get_prefix(bot, message: discord.Message) -> List[str]:
-    g_id = message.guild.id
-    for e in bot.prefdict:
-        if e["server_id"] == str(g_id):
-            prefix = e["command_prefix"]
-            break
+    guild = message.guild
+    if not guild:
+        prefix = "do "
+    else:
+        g_id = guild.id
+        for e in bot.prefdict:
+            if e["server_id"] == str(g_id):
+                prefix = e["command_prefix"]
+                break
     return commands.when_mentioned_or("dev")(bot, message)
 
 
@@ -60,13 +64,17 @@ class Dagbot(commands.AutoShardedBot):
             'discord', logging.INFO)
         with open('./configuration.yml', 'r') as file:
             self.data: Dict[str, str] = yaml.load(file, Loader=yaml.FullLoader)
-        self.data.pop("PWD")
+            self.logger.info(self.data)
+        try:
+            self.data.pop("PWD")
+        except:
+            pass
         self.logger.info("Loaded Config File")
         self.launch_time: datetime = datetime.utcnow()
-        self.session = None
-        self.pool = None
-        self.dagpi = None
         self.repo: str = "https://github.com/Daggy1234/dagbot"
+        self.prefdict: List[Dict[str, str]] = [{}]
+        self.cogdata: List[Dict[str, str]] = [{}]
+        self.automeme_data: List[Dict[str, str]] = [{}]
         self.caching: Caching = Caching(self)
         self.bwordchecker: bword = bword()
         self.bwordchecker.loadbword()
@@ -145,8 +153,7 @@ class Dagbot(commands.AutoShardedBot):
     async def postready(self):
         webhook = Webhook.from_url(
             self.data['onreadyurl'],
-            adapter=AsyncWebhookAdapter(
-                self.session))
+            session=self.session)
         await webhook.send('Dagbot is Online')
 
     async def dbconnect(self):

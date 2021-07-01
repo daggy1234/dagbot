@@ -1,4 +1,7 @@
 import asyncio
+from operator import ne
+from dagbot.data.hangman import hangmanassest
+from dagbot.utils.context import MyContext
 import json
 import random
 from datetime import datetime
@@ -183,111 +186,55 @@ class TicTacToe:
         return self.gamegrid[nu][nut] == 0
 
 
-hangmanassest = [
-    """--------------------------""",
-    """
-|
-|
-|
-|
-|
---------------------------""",
-    """
--------------
-|
-|
-|
-|
-|
---------------------------
-""",
-    """
--------------
-|           |
-|
-|
-|
-|
---------------------------
-""",
-    """
--------------
-|           |
-|           O
-|
-|
-|
---------------------------
-""",
-    """
--------------
-|           |
-|           O
-|           |
-|
-|
---------------------------
-""",
-    """
--------------
-|           |
-|           O
-|          /|
-|
-|
---------------------------
-""",
-    """
--------------
-|           |
-|           O
-|          /|\\
-|
-|
---------------------------
-""",
-    """
--------------
-|           |
-|           O
-|          /|\\
-|           /
-|
---------------------------
-""",
-    """
--------------
-|           |
-|           O
-|          /|\\
-|           /\\
-|
---------------------------
-""",
-]
-
 
 def setup(bot):
     bot.add_cog(games(bot))
 
 
-class Mymenumcq(menus.Menu):
-    def __init__(self, file):
-        super().__init__(timeout=30.0)
-        self.result = False
+class BaseDagbotGameView(discord.ui.View):
+
+    def __init__(self, ctx: MyContext, timeout_embed: discord.Embed):
+         super().__init__(timeout=60.0)
+         self.ctx = ctx
+         self.timeout_embed = timeout_embed
+
+
+    def disable_all(self):
+        for button in self.children:
+            button.disabled = True
+
+    async def on_timeout(self) -> None:
+        await self.ctx.send(embed=self.timeout_embed)
+        return await super().on_timeout()
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        check = self.ctx.author.id == interaction.user.id
+        if check:
+            return True
+        else:
+            await interaction.response.send_message("Not your help menu :(", ephemeral=True)
+            return False
+
+
+class MCQView(BaseDagbotGameView):
+
+    def __init__(self, ctx: MyContext, file):
+
+        newembed = discord.Embed(
+                title="DAGBOT - Trivia Timeout",
+                description="Q:**{}**\n{} is the correct answer".format(
+                    file["question"], file["correct_answer"]
+                ),
+                color=ctx.guild.me.color,
+        )
+        super().__init__(ctx, newembed)
         self.file = file
 
-    async def send_initial_message(self, ctx, channel):
-        embed = discord.Embed(
-            title="DAGBOT - Triva", description=str(self.file["embed"]),
-            color=ctx.guild.me.color
-        )
-        return await channel.send(embed=embed)
+    
 
-    @menus.button("\U0001f1e6")
-    async def result_one(self, _payload):
+    async def process_answer(self, opt: int, interaction: discord.Interaction):
         cal = self.file["mloc"] + 1
-        if cal == 1:
+        if cal == opt:
             newembed = discord.Embed(
                 title="DAGBOT - Trivia Correct",
                 description="{} was the correct answer".format(
@@ -303,94 +250,26 @@ class Mymenumcq(menus.Menu):
                 ),
                 color=self.ctx.guild.me.color,
             )
-        await self.message.edit(embed=newembed)
-        self.result = True
+        self.disable_all()
+        await interaction.response.edit_message(embed=newembed, view=self)
         self.stop()
 
-    @menus.button("\U0001f1e7")
-    async def result_2(self, _payload):
-        cal = self.file["mloc"] + 1
-        if cal == 2:
-            newembed = discord.Embed(
-                title="DAGBOT - Trivia Correct",
-                description="{} was the correct answer".format(
-                    self.file["correct_answer"]
-                ),
-                color=self.ctx.guild.me.color,
-            )
-        else:
-            newembed = discord.Embed(
-                title="DAGBOT - Trivia Incorrect",
-                description="{} was the correct answer".format(
-                    self.file["correct_answer"]
-                ),
-                color=self.ctx.guild.me.color,
-            )
-        await self.message.edit(embed=newembed)
-        self.result = True
-        self.stop()
+    @discord.ui.button(label="A", style=discord.ButtonStyle.blurple)
+    async def option_a(self,button: discord.ui.Button, interaction: discord.Interaction):
+        await self.process_answer(1, interaction)
 
-    @menus.button("\U0001f1e8")
-    async def result_3(self, _payload):
-        cal = self.file["mloc"] + 1
-        if cal == 3:
-            newembed = discord.Embed(
-                title="DAGBOT - Trivia Correct",
-                description="{} was the correct answer".format(
-                    self.file["correct_answer"]
-                ),
-                color=self.ctx.guild.me.color,
-            )
-        else:
-            newembed = discord.Embed(
-                title="DAGBOT - Trivia Incorrect",
-                description="{} was the correct answer".format(
-                    self.file["correct_answer"]
-                ),
-                color=self.ctx.guild.me.color,
-            )
-        await self.message.edit(embed=newembed)
-        self.result = True
-        self.stop()
+    @discord.ui.button(label="B", style=discord.ButtonStyle.blurple)
+    async def option_b(self,button: discord.ui.Button, interaction: discord.Interaction):
+        await self.process_answer(2, interaction)
 
-    @menus.button("\U0001f1e9")
-    async def result_4(self, payload):
-        cal = self.file["mloc"] + 1
-        if cal == 4:
-            newembed = discord.Embed(
-                title="DAGBOT - Trivia Correct",
-                description="{} was the correct answer".format(
-                    self.file["correct_answer"]
-                ),
-                color=self.ctx.guild.me.color,
-            )
-        else:
-            newembed = discord.Embed(
-                title="DAGBOT - Trivia Incorrect",
-                description="{} was the correct answer".format(
-                    self.file["correct_answer"]
-                ),
-                color=self.ctx.guild.me.color,
-            )
-        await self.message.edit(embed=newembed)
-        self.result = True
-        self.stop()
+    @discord.ui.button(label="C", style=discord.ButtonStyle.blurple)
+    async def option_c(self,button: discord.ui.Button, interaction: discord.Interaction):
+        await self.process_answer(3, interaction)
 
-    @menus.button("\N{BLACK SQUARE FOR STOP}\ufe0f")
-    async def on_stop(self, payload):
-        newembed = discord.Embed(
-            title="DAGBOT - Trivia Surrender",
-            description="{} is the correct answer".format(
-                self.file["correct_answer"]),
-            color=self.ctx.guild.me.color,
-        )
-        await self.message.edit(embed=newembed)
-        self.result = True
-        self.stop()
-
-    async def prompt(self, ctx):
-        await self.start(ctx, wait=True)
-        return self.result
+    @discord.ui.button(label="D", style=discord.ButtonStyle.blurple)
+    async def option_d(self,button: discord.ui.Button, interaction: discord.Interaction):
+        await self.process_answer(4, interaction)
+   
 
 
 class Mymenuhead(menus.Menu):
@@ -454,69 +333,65 @@ class Mymenuhead(menus.Menu):
         await self.start(ctx, wait=True)
         return self.result
 
+class RPSView(BaseDagbotGameView):
 
-class MenuRPS(menus.Menu):
-    def __init__(self, ai):
-        super().__init__()
-        self.ai = ai
-
-    @staticmethod
-    async def send_initial_message(ctx, channel):
-        guild = ctx.guild
+    def __init__(self, ctx: MyContext):
         embed = discord.Embed(
-            title="DAGBOT - Rock/Paper/Scissors",
-            description="Choose option from the menu below",
-            color=guild.me.color,
+            title="RPS game ended with no outcome",
+            description="You didn't chose an option"
         )
-        return await channel.send(embed=embed)
+        super().__init__(ctx, embed)
+        self.ai = random.randint(1, 3)
 
-    @menus.button("\U0001f94c")
-    async def rock(self, _payload):
-        guild = self.message.guild
+
+    async def stop_all(self, embed: discord.Embed, interaction: discord.Interaction):
+        self.disable_all()
+        await interaction.response.edit_message(embed=embed, view=self)
+        self.stop()
+
+
+    @discord.ui.button(emoji="\U0001f94c")
+    async def rock(self,button, interaction: discord.Interaction):
+        guild = self.ctx.guild
+        embed = None
         if self.ai == 1:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: TIE",
                 description="Rock and rock is a tie",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
         if self.ai == 2:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Defeat",
                 description=" Paper beats rock\n Get wrecked",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
         if self.ai == 3:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: VICTORY",
                 description="Rock beats Scissors\n How dare you beat me",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
+        if not embed:
+            return
+        await self.stop_all(embed, interaction)
 
-    @menus.button("\U0001f4f0")
-    async def paper(self, _payload):
-        guild = self.message.guild
+    @discord.ui.button(emoji="\U0001f4f0")
+    async def paper(self, button, interaction):
+        guild = self.ctx.guild
+        embed = None
         if self.ai == 1:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: VICTORY",
                 description="Paper beats rock\nhacks",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
         if self.ai == 2:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Tie",
                 description="Paper = Paper",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
         if self.ai == 3:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Defeat",
@@ -524,12 +399,14 @@ class MenuRPS(menus.Menu):
                             "Dagbot is the best",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
+        if not embed:
+            return
+        await self.stop_all(embed, interaction)
 
-    @menus.button("\U00002702")
-    async def scissors(self, _payload):
-        guild = self.message.guild
+    @discord.ui.button(emoji="\U00002702")
+    async def scissors(self,button, interaction):
+        guild = self.ctx.guild
+        embed = None
         if self.ai == 1:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Defeat",
@@ -537,8 +414,6 @@ class MenuRPS(menus.Menu):
                             "I am on top and not you",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
         if self.ai == 2:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: VICTORY",
@@ -546,26 +421,20 @@ class MenuRPS(menus.Menu):
                             "be your demise! I shall have my revenge",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
         if self.ai == 3:
             embed = discord.Embed(
                 title="DAGBOT - Rock/Paper/Scissors Result: Tie",
                 description="Scissors and Scissors are samesies",
                 color=guild.me.color,
             )
-            await self.message.edit(embed=embed)
-            self.stop()
+        if not embed:
+            return
+        await self.stop_all(embed, interaction)
 
-
-# \U00002702 = Scissors = 3
-# \U0001f590 = Paper = 2
-# \U0000270a = rock    = 1
 
 
 class games(commands.Cog):
-    """Lets all play a game (everyone can)"""
-
+    """lets all play a game (everyone can)"""
     def __init__(self, bot):
         self.bot = bot
         with open("./dagbot/data/notonion.txt", "r", encoding="utf8") as f:
@@ -676,10 +545,11 @@ class games(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(3, commands.BucketType.channel)
-    async def rps(self, ctx):
-        ai = random.randint(1, 3)
-        game = MenuRPS(ai)
-        await game.start(ctx)
+    async def rps(self, ctx: MyContext):
+        await ctx.send(embed=discord.Embed(
+            title="DAGBOT - Rock/Paper/Scissors",
+            description="Choose option from the menu below"
+        ),view=RPSView(ctx))
 
     @commands.command(cooldown_after_parsing=True, aliases=["RR"])
     async def russianroulette(self, ctx, amount=6):
@@ -714,18 +584,14 @@ class games(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(3, commands.BucketType.channel)
-    async def trivia(self, ctx):
+    async def trivia(self, ctx: MyContext):
         file = await self.mcq()
-        c = await Mymenumcq(file).prompt(ctx)
-        if not c:
-            newembed = discord.Embed(
-                title="DAGBOT - Trivia Timeout",
-                description="Q:**{}**\n{} is the correct answer".format(
-                    file["question"], file["correct_answer"]
-                ),
-                color=ctx.guild.me.color,
-            )
-            await ctx.send(embed=newembed)
+        view = MCQView(ctx, file)
+        embed = discord.Embed(
+            title="DAGBOT - Triva", description=str(file["embed"]),
+            color=ctx.guild.me.color
+        )
+        await ctx.send(embed=embed, view=view)
 
     @commands.command(cooldown_after_parsing=True,
                       aliases=["reactiontime", "retime"])
