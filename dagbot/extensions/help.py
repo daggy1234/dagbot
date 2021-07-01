@@ -6,8 +6,31 @@ import difflib
 from async_timeout import timeout
 from discord.ext import commands
 from discord.ext.commands import bot
-
+from typing import List
+from dagbot.utils.context import MyContext
 import dagbot.data.textdata as data
+
+
+class DagbotHelpView(discord.ui.View):
+
+    def __init__(self, ctx: MyContext):
+        super().__init__(timeout=400)
+
+    async def process_callback(select: discord.ui.Select, interaction: discord.Interaction):
+        DagbotHelp.cog_help_maker()
+        print("")
+
+
+class HelpSelect(discord.ui.Select):
+
+    view: DagbotHelpView
+
+    def __init__(self, *, options: List[discord.SelectOption]) -> None:
+        super().__init__(placeholder="Dagbot Help Command",
+                         min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        await self.view.process_callback(self, interaction)
 
 
 class DagbotHelp(commands.HelpCommand):
@@ -80,7 +103,8 @@ reactions below.'''
         except BaseException:
             return
 
-    async def cog_help_maker(self, cog, ctx):
+    @staticmethod
+    async def cog_help_maker(cog: commands.Cog, ctx: MyContext) -> discord.Embed:
         sp = 15
         guild = ctx.guild
         g_id = guild.id

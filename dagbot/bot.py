@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from datetime import datetime
+from typing import List, Dict, Optional
 
 import aiohttp
 import asyncpg
@@ -18,13 +19,13 @@ from .utils.context import MyContext
 from .utils.logger import create_logger
 
 
-async def get_prefix(bot, message):
+async def get_prefix(bot, message: discord.Message) -> List[str]:
     g_id = message.guild.id
     for e in bot.prefdict:
         if e["server_id"] == str(g_id):
             prefix = e["command_prefix"]
             break
-    return commands.when_mentioned_or(prefix)(bot, message)
+    return commands.when_mentioned_or("dev")(bot, message)
 
 
 def make_intents() -> discord.Intents:
@@ -36,6 +37,10 @@ def make_intents() -> discord.Intents:
 
 
 class Dagbot(commands.AutoShardedBot):
+
+    session: aiohttp.ClientSession
+    pool: asyncpg.pool.Pool
+    dagpi: Client
 
     def __init__(self):
         super().__init__(
@@ -50,22 +55,23 @@ class Dagbot(commands.AutoShardedBot):
             intents=make_intents()
         )
 
-        self.logger = create_logger("Dagbot", logging.DEBUG)
-        self.discprd_logger = create_logger('discord', logging.INFO)
+        self.logger: logging.Logger = create_logger("Dagbot", logging.DEBUG)
+        self.discprd_logger: logging.Logger = create_logger(
+            'discord', logging.INFO)
         with open('./configuration.yml', 'r') as file:
-            self.data = yaml.load(file, Loader=yaml.FullLoader)
+            self.data: Dict[str, str] = yaml.load(file, Loader=yaml.FullLoader)
         self.data.pop("PWD")
         self.logger.info("Loaded Config File")
-        self.launch_time = None
+        self.launch_time: datetime = datetime.utcnow()
         self.session = None
         self.pool = None
         self.dagpi = None
-        self.repo = "https://github.com/Daggy1234/dagbot"
-        self.caching = Caching(self)
-        self.bwordchecker = bword()
+        self.repo: str = "https://github.com/Daggy1234/dagbot"
+        self.caching: Caching = Caching(self)
+        self.bwordchecker: bword = bword()
         self.bwordchecker.loadbword()
-        self.useage = {}
-        self.commands_called = 0
+        self.useage: Dict[str, int] = {}
+        self.commands_called: int = 0
 
         # self.add_cog(Help(bot))
 
@@ -90,7 +96,7 @@ class Dagbot(commands.AutoShardedBot):
         self.before_invoke(self.starttyping)
         self.logger.info("Initialising Stuff")
         self.loop.create_task(self.startdagbot())
-        self.socket_stats = {}
+        self.socket_stats: Dict[str, int] = {}
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
