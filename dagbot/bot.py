@@ -10,6 +10,7 @@ import sentry_sdk
 import yaml
 from asyncdagpi import Client
 from discord import Webhook
+from dagbot.extensions.reddit import reddit
 from discord.ext import commands
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
@@ -45,6 +46,7 @@ class Dagbot(commands.AutoShardedBot):
     session: aiohttp.ClientSession
     pool: asyncpg.pool.Pool
     dagpi: Client
+    user: discord.User
 
     def __init__(self):
         super().__init__(
@@ -75,6 +77,7 @@ class Dagbot(commands.AutoShardedBot):
         self.prefdict: List[Dict[str, str]] = [{}]
         self.cogdata: List[Dict[str, str]] = [{}]
         self.automeme_data: List[Dict[str, str]] = [{}]
+        self.coglist: List[str] = []
         self.caching: Caching = Caching(self)
         self.bwordchecker: bword = bword()
         self.bwordchecker.loadbword()
@@ -137,7 +140,11 @@ class Dagbot(commands.AutoShardedBot):
         await asyncio.sleep(1)
         await self.caching.getkeydict()
         await self.caching.automemecache()
-        await self.get_cog("reddit").memecache()
+        reddit_cog = self.get_cog("reddit")
+        if not reddit_cog:
+            raise Exception("Reddit Cog not loaded")
+        self.reddit_cog: reddit = reddit_cog
+        await self.reddit_cog.memcache()
         await self.session.post(
             "https://dagbot-site.herokuapp.com/api/newstats",
             headers={"Token": self.data["stats"]})

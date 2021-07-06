@@ -1,127 +1,29 @@
+from dagbot.bot import Dagbot
+from dagbot.utils.context import MyContext
 import random
+from typing import Dict, TypedDict, List, Union
 
 import async_cse
 import discord
 from bs4 import BeautifulSoup
 from discord.ext import commands, menus
 from discord.ext.commands import BucketType
-from jishaku import codeblocks
+from jishaku.codeblocks import codeblock_converter, Codeblock
+from dagbot.utils.daggypag import DaggyPaginator
 
 
 def setup(client):
     client.add_cog(util(client))
 
 
-class MyMenuyt(menus.Menu):
-    def __init__(self, y):
-        super().__init__()
-        self.y = y
-
-    async def send_initial_message(self, ctx, channel):
-        embed = discord.Embed(
-            title=self.y["title"][0],
-            url=self.y["urls"][0],
-            description=f"""
-    {self.y['channel'][0]} on {self.y['time'][0]}""",
-            color=self.ctx.guild.me.color,
-        )
-        embed.add_field(
-            name="------------------------",
-            value=self.y["description"][0],
-            inline=False,
-        )
-        embed.set_thumbnail(url=self.y["thumbnails"][0])
-        return await channel.send(embed=embed)
-
-    @menus.button("1\N{combining enclosing keycap}")
-    async def result_1(self, payload):
-        embed = discord.Embed(
-            title=self.y["title"][0],
-            url=self.y["urls"][0],
-            description=f"""
-    {self.y['channel'][0]} on {self.y['time'][0]}""",
-            color=self.ctx.guild.me.color,
-        )
-        embed.add_field(
-            name="------------------------",
-            value=self.y["description"][0],
-            inline=False,
-        )
-        embed.set_thumbnail(url=self.y["thumbnails"][0])
-        await self.message.edit(embed=embed)
-
-    @menus.button("2\N{combining enclosing keycap}")
-    async def result_2(self, payload):
-        embed = discord.Embed(
-            title=self.y["title"][1],
-            url=self.y["urls"][1],
-            description=f"""
-    {self.y['channel'][1]} on {self.y['time'][1]}""",
-            color=self.ctx.guild.me.color,
-        )
-        embed.add_field(
-            name="------------------------",
-            value=self.y["description"][1],
-            inline=False,
-        )
-        embed.set_thumbnail(url=self.y["thumbnails"][1])
-        await self.message.edit(embed=embed)
-
-    @menus.button("3\N{combining enclosing keycap}")
-    async def result_3(self, payload):
-        embed = discord.Embed(
-            title=self.y["title"][2],
-            url=self.y["urls"][2],
-            description=f"""
-    {self.y['channel'][2]} on {self.y['time'][2]}""",
-            color=self.ctx.guild.me.color,
-        )
-        embed.add_field(
-            name="------------------------",
-            value=self.y["description"][2],
-            inline=False,
-        )
-        embed.set_thumbnail(url=self.y["thumbnails"][2])
-        await self.message.edit(embed=embed)
-
-    @menus.button("4\N{combining enclosing keycap}")
-    async def result_4(self, payload):
-        embed = discord.Embed(
-            title=self.y["title"][3],
-            url=self.y["urls"][3],
-            description=f"""
-    {self.y['channel'][3]} on {self.y['time'][3]}""",
-            color=self.ctx.guild.me.color,
-        )
-        embed.add_field(
-            name="------------------------",
-            value=self.y["description"][3],
-            inline=False,
-        )
-        embed.set_thumbnail(url=self.y["thumbnails"][3])
-        await self.message.edit(embed=embed)
-
-    @menus.button("5\N{combining enclosing keycap}")
-    async def result_5(self, payload):
-        embed = discord.Embed(
-            title=self.y["title"][4],
-            url=self.y["urls"][4],
-            description=f"""
-    {self.y['channel'][4]} on {self.y['time'][4]}""",
-            color=self.ctx.guild.me.color,
-        )
-        embed.add_field(
-            name="------------------------",
-            value=self.y["description"][4],
-            inline=False,
-        )
-        embed.set_thumbnail(url=self.y["thumbnails"][4])
-        await self.message.edit(embed=embed)
-
-    @menus.button("\N{BLACK SQUARE FOR STOP}\ufe0f")
-    async def on_stop(self, payload):
-        self.stop()
-
+class YtResponse(TypedDict):
+    title: List[str]
+    description: List[str]
+    thumbnails: List[str]
+    urls: List[str]
+    channel: List[str]
+    time: List[str]
+    kind: List[str]
 
 class MyMenugoogle(menus.Menu):
     def __init__(self, reslist):
@@ -159,7 +61,7 @@ class MyMenugoogle(menus.Menu):
 class util(commands.Cog):
     """useful features (might actually help)"""
 
-    def __init__(self, client):
+    def __init__(self, client: Dagbot):
         self.client = client
         self.googlethingy = async_cse.Search(self.client.data["gapikey"])
 
@@ -180,17 +82,19 @@ class util(commands.Cog):
         furl = "https://en.wikipedia.org/wiki/" + tit
         return {"title": tit, "content": conten, "url": furl}
 
-    async def gettaco(self):
+    async def gettaco(self) -> Union[bool, Dict[str, str]]:
         response = await self.client.session.get(
             "http://taco-randomizer.herokuapp.com")
         file = await response.read()
         soup = BeautifulSoup(file, "html.parser")
-        head = str(soup.body.find("h1", attrs={"class": "light"}).Text)
+        if not soup.body:
+            return False
+        head = str(soup.body.find("h1", attrs={"class": "light"}).text)
         ll = [link.get("href") for link in soup.find_all("a")]
         perma = f"http://taco-randomizer.herokuapp.com{str(ll[1])}"
         return {"text": head, "link": perma}
 
-    async def ytget(self, query):
+    async def ytget(self, query: str) -> Union[bool, YtResponse]:
         url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q=" \
               f"{query}&key={self.client.data['gapikey']}"
         response = await self.client.session.get(url)
@@ -203,7 +107,7 @@ class util(commands.Cog):
         timlist = []
         kindlist = []
         if len(resp["items"]) == 0:
-            return {"title": False}
+            return False
         for r in resp["items"]:
             kind = r["id"]["kind"]
             if kind == "youtube#channel":
@@ -299,10 +203,19 @@ pressure:              {}hPa```""".format(
             reslist = await self.googlethingy.search(query)
         else:
             reslist = await self.googlethingy.search(query, safesearch=True)
+
+        embed_list : List[discord.Embed] = []
+
+        for data in reslist:
+            embed = discord.Embed(title=data.title, description=f"{data.description}\n\n**Search Result**: [Result]({data.url})", url=data.url)
+            if data.url != data.image_url:
+                embed.set_image(url=data.image_url)
+            embed_list.append(embed)
+
         if len(reslist) == 0:
             return await ctx.send("NO RESULTS")
-        m = MyMenugoogle(reslist)
-        await m.start(ctx)
+        view = DaggyPaginator(ctx, embed_list)
+        await ctx.send(embed=embed_list[0],view=view)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 120, type=commands.BucketType.user)
@@ -369,7 +282,8 @@ pressure:              {}hPa```""".format(
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True, aliases=["yt"])
-    async def youtube(self, ctx, *, query):
+    async def youtube(self, ctx: MyContext, *, query: str):
+        assert isinstance(ctx.channel, discord.TextChannel)
         channel = ctx.channel
         qu, st = await self.client.bwordchecker.bwordcheck(query)
         if (not qu or not channel.is_nsfw()) and qu:
@@ -380,10 +294,26 @@ pressure:              {}hPa```""".format(
 
         await ctx.trigger_typing()
         y = await self.ytget(query)
-        if not y["title"]:
+        if isinstance(y, bool):
             return await ctx.send("No results")
-        m = MyMenuyt(y)
-        await m.start(ctx)
+        embed_list: List[discord.Embed] = []
+        for i in range(len(y["title"])):
+            embed = discord.Embed(
+                title=y["title"][i],
+                url=y["urls"][i],
+                description=f"""
+        {y['channel'][3]} on {y['time'][i]}""",
+                color=ctx.guild.me.color,
+            )
+            embed.add_field(
+                name="------------------------",
+                value=y["description"][i],
+                inline=False,
+            )
+            embed.set_thumbnail(url=y["thumbnails"][i])
+            embed_list.append(embed)
+        view = DaggyPaginator(ctx, embed_list)
+        await ctx.send(embed=embed_list[0],view=view)
 
     @commands.command(aliases=["dagpaste"])
     @commands.cooldown(1, 30, BucketType.user)
@@ -402,15 +332,15 @@ pressure:              {}hPa```""".format(
                 return await ctx.send(
                     f"Invalid file type: `{split_attachment[1]}` is invalid.")
             file = await attachments[0].read()
-            text = file.decode('UTF-8')
             url = await self.client.session.post(
-                "https://paste.daggy.tech/upload", data=text)
-            js = await url.json()
-            return await ctx.send(js["file"])
+                "https://paste.rs/", data=file)
+            js = await url.text()
+            atchment = split_attachment[1].replace('\n', '').replace('py', 'py3')
+            return await ctx.send(f"{js}.{atchment}")
         elif not ctx.message.attachments:
-            paste = codeblocks.codeblock_converter(paste)
-            lang = paste[0] or ""
+            paste_c: Codeblock = codeblock_converter(paste)
+            lang = paste_c[0] or ""
             url = await self.client.session.post(
-                "https://paste.daggy.tech/upload", data=paste[1])
-            js = await url.json()
-            return await ctx.send(f'{js["file"]}.{lang}')
+                "https://paste.rs/", data=paste_c[1])
+            js = await url.text()
+            return await ctx.send(f'{js}.{lang}'.replace('\n', '').replace('py', 'py3'))

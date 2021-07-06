@@ -1,11 +1,15 @@
 import asyncio
+from dagbot.bot import Dagbot
 from operator import ne
+from typing import List, Optional, Tuple, Union
+
+from discord.ui import view
 from dagbot.data.hangman import hangmanassest
 from dagbot.utils.context import MyContext
 import json
 import random
-from datetime import datetime
-
+from datetime import datetime, timedelta
+import fractions
 import discord
 from async_timeout import timeout
 from bs4 import BeautifulSoup
@@ -13,49 +17,48 @@ from discord.ext import commands, menus
 from random_words import RandomWords
 
 
+
+def fraction_to_percent(fraction: fractions.Fraction) -> int:
+    times_er = 100 // fraction.denominator
+    return fraction.numerator * times_er
+
+
 class TicTacToe:
 
     def __init__(self):
-        self.gamegrid = None
+        self.gamegrid = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.consideredmoves = []
         self.oppmove = 0
 
-    async def sharegamegrid(self):
+    async def sharegamegrid(self) -> List[List[int]]:
         return self.gamegrid
 
-    async def makegamegrid(self):
-        self.gamegrid = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-
-    async def duplicategird(self):
+    async def duplicategird(self) -> List[List[int]]:
         return self.gamegrid.copy()
 
+    async def check_win(self) -> Tuple[bool, int]:
+        return await self.gamecheck(self.gamegrid)
+
     @staticmethod
-    async def gamecheck(gamegrid):
-        gl = []
+    async def gamecheck(gamegrid: List[List[int]]) -> Tuple[bool, int]:
+        bool_stat: bool = True
+        gl: int = 100109120
         if gamegrid[0][0] == gamegrid[0][1] == gamegrid[0][2] != 0:
-            gl.append(True)
-            gl.append(gamegrid[0][0])
+            gl = gamegrid[0][0]
         elif gamegrid[1][0] == gamegrid[1][1] == gamegrid[1][2] != 0:
-            gl.append(True)
-            gl.append(gamegrid[1][0])
+            gl = gamegrid[1][0]
         elif gamegrid[2][0] == gamegrid[2][1] == gamegrid[2][2] != 0:
-            gl.append(True)
-            gl.append(gamegrid[2][0])
+            gl = gamegrid[2][0]
         elif gamegrid[0][0] == gamegrid[1][0] == gamegrid[2][0] != 0:
-            gl.append(True)
-            gl.append(gamegrid[0][0])
+            gl = gamegrid[0][0]
         elif gamegrid[0][1] == gamegrid[1][1] == gamegrid[2][1] != 0:
-            gl.append(True)
-            gl.append(gamegrid[0][1])
+            gl = gamegrid[0][1]
         elif gamegrid[0][2] == gamegrid[1][2] == gamegrid[2][2] != 0:
-            gl.append(True)
-            gl.append(gamegrid[0][2])
+            gl = gamegrid[0][2]
         elif gamegrid[0][0] == gamegrid[1][1] == gamegrid[2][2] != 0:
-            gl.append(True)
-            gl.append(gamegrid[0][0])
+            gl = gamegrid[0][0]
         elif gamegrid[0][2] == gamegrid[1][1] == gamegrid[2][0] != 0:
-            gl.append(True)
-            gl.append(gamegrid[0][2])
+            gl = gamegrid[0][2]
         else:
             emg = 0
             for e in gamegrid:
@@ -63,13 +66,12 @@ class TicTacToe:
                     if l_c != 0:
                         emg += 1
             if emg == 9:
-                gl.append(True)
-                gl.append(0)
+                gl = 0
             else:
-                gl.append(False)
-        return gl
+                bool_stat = False
+        return bool_stat, gl
 
-    async def checkcorners(self):
+    async def checkcorners(self) -> Union[bool, Tuple[int, int]]:
         r = await self.checkempty(0, 0)
         if r:
             return 0, 0
@@ -84,7 +86,7 @@ class TicTacToe:
             return 2, 2
         return False
 
-    async def converter(self, play):
+    async def converter(self, play: str) -> Union[bool, Tuple[int, int]]:
         if len(play) == 2:
             d = {'a': 0, 'b': 1, 'c': 2}
             try:
@@ -98,8 +100,9 @@ class TicTacToe:
                     return False
                 else:
                     return nu, nut
+        return False
 
-    async def restchec(self):
+    async def restchec(self) -> Optional[Tuple[int, int]]:
         r = await self.checkempty(1, 1)
         if r:
             return 1, 1
@@ -116,9 +119,9 @@ class TicTacToe:
         if r:
             return 2, 1
 
-    async def aigamemove(self, turns, playermoves):
-        cornermovesa = [(0, 0), (0, 2), (2, 2), (2, 0)]
-        opposingmoves = [(2, 2), (2, 0), (0, 0), (0, 2)]
+    async def aigamemove(self, turns, playermoves) -> Union[bool, Tuple[int, int]]:
+        cornermovesa: List[Tuple[int, int]] = [(0, 0), (0, 2), (2, 2), (2, 0)]
+        opposingmoves: List[Tuple[int, int]] = [(2, 2), (2, 0), (0, 0), (0, 2)]
         dupgrid = await self.duplicategird()
         if self.oppmove == 0:
             for e in playermoves:
@@ -160,9 +163,11 @@ class TicTacToe:
         out = await self.checkcorners()
         if not out:
             out = await self.restchec()
+        if not out:
+            return False
         return out
 
-    async def gamegridprinter(self):
+    async def gamegridprinter(self) -> str:
         grid = await self.sharegamegrid()
         nl = []
         formdic = ['⬛', '❌', '⭕']
@@ -201,13 +206,14 @@ class BaseDagbotGameView(discord.ui.View):
 
     def disable_all(self):
         for button in self.children:
-            button.disabled = True
+            button.disabled = True # type: ignore
 
     async def on_timeout(self) -> None:
         await self.ctx.send(embed=self.timeout_embed)
         return await super().on_timeout()
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        assert interaction.user is not None
         check = self.ctx.author.id == interaction.user.id
         if check:
             return True
@@ -216,7 +222,142 @@ class BaseDagbotGameView(discord.ui.View):
             return False
 
 
+
+class RussianRouletteButton(discord.ui.Button['RussianRoulette']):
+
+    def __init__(self,placeholder: bool, x: int, y: int, has_bullet: bool ,*, style: discord.ButtonStyle = discord.ButtonStyle.secondary):
+        if not placeholder:
+            super().__init__(style=discord.ButtonStyle.gray,label='\u200b',disabled=True, row=x)
+        else:
+            super().__init__(style=style, emoji="\U000026ab", row=x)
+        self.x = x
+        self.y = y
+        self.placeholder = placeholder
+        self.has_bullet = has_bullet
+
+    async def callback(self, interaction: discord.Interaction):
+        assert self.view is not None
+        assert interaction.user is not None
+        self.view.make_green(self.has_bullet)
+
+        if not self.has_bullet:
+           await interaction.response.edit_message(content=f"Congratulations {interaction.user.mention}! You survived this round", view=self.view)
+        else:
+            await interaction.response.edit_message(content=f"\U00002620 You have died. RIP {interaction.user.mention}", view=self.view)
+        self.view.stop()
+
+
+class RussianRoulette(BaseDagbotGameView):
+
+
+    children: List[RussianRouletteButton]
+
+
+    def __init__(self, ctx: MyContext, timeout_embed: discord.Embed):
+        super().__init__(ctx, timeout_embed)
+
+
+        self.valid_spot: List[Tuple[int, int]] = [
+            (0,1), (1, 0), (1,2), (2, 0), (2, 2), (3, 1)
+        ]
+        self.bullet_spot = random.choice(self.valid_spot)
+        print(self.bullet_spot)
+        for i in range(4):
+            for j in range(3):
+                b = (i,j)  in self.valid_spot
+                has_bullet =  (i, j) == self.bullet_spot
+                self.add_item(RussianRouletteButton(b,i,j, has_bullet))
+
+        
+
+
+    def make_green(self, loss: bool):
+        for item in self.children:
+            if item.placeholder:
+                item.disabled = True
+                if item.has_bullet and loss:
+                    item.style = discord.ButtonStyle.red
+                    item.emoji = "<:bullet:860793990487998517>"
+                else:
+                    item.style = discord.ButtonStyle.green
+                    item.emoji = "<:bullet:860793990487998517>" if item.has_bullet else "\U000026ab"
+
+
+class TicTacToeButton(discord.ui.Button['TicTacToeAi']):
+
+    def __init__(self, x: int, y: int, tt: TicTacToe):
+           super().__init__(style=discord.ButtonStyle.secondary, label='\u200b', row=y)
+           self.x = x
+           self.y = y
+           self.tt = tt
+
+    async def callback(self, interaction: discord.Interaction):
+        assert self.view is not None
+        view : TicTacToeAi = self.view
+        await self.tt.makemove(self.y, self.x, 1)
+        self.disabled = True
+        self.style = discord.ButtonStyle.danger
+        self.label =  'X'
+        view.moves.append((self.y, self.x))
+        view.turns += 1
+        win, t = await self.tt.check_win()
+
+        if win:
+            winner = "Na"
+            message = "It's a draw."
+            if t == 1:
+                winner = "X"
+                message = "Beat me this time."
+            elif t == 2:
+                winner = "O"
+                message = "Get rekt"
+            else:
+                pass
+            view.disable_all()
+            await interaction.response.edit_message(content=f"Result\nThe winner is `{winner}`\n{message}",view=view)
+            return
+
+        await view.make_parent_ai()
+        await interaction.response.edit_message(view=view)
+
+
+
+
+
+class TicTacToeAi(BaseDagbotGameView):
+
+    children: List[TicTacToeButton]
+
+    def __init__(self, ctx: MyContext, timeout_embed: discord.Embed, tt: TicTacToe):
+        super().__init__(ctx, timeout_embed)
+        self.tt = tt
+        self.moves: List[Tuple[int, int]] = []
+        self.turns = 0
+        for x in range(3):
+            for y in range(3):
+                self.add_item(TicTacToeButton(x, y, tt))
+
+
+    async def make_parent_ai(self):
+        a = await self.tt.aigamemove(self.turns, self.moves)
+        if isinstance(a, bool):
+            raise Exception("Error computing Ai move")
+        nu, nut = a
+        if str(nu) == 'error':
+            raise Exception("Error computing Ai move")
+        await self.tt.makemove(nu, nut, 2)
+        self.turns += 1
+        for button in self.children:
+            if button.x == nut and button.y == nu:
+                button.disabled = True
+                button.label = 'O'
+                button.style = discord.ButtonStyle.green
+
+
 class MCQView(BaseDagbotGameView):
+
+
+    children: List[discord.ui.Button]
 
     def __init__(self, ctx: MyContext, file):
 
@@ -232,20 +373,25 @@ class MCQView(BaseDagbotGameView):
 
     
 
-    async def process_answer(self, opt: int, interaction: discord.Interaction):
+    async def process_answer(self, opt: int,button: discord.ui.Button, interaction: discord.Interaction):
         cal = self.file["mloc"] + 1
         if cal == opt:
+            button.style = discord.ButtonStyle.green
             newembed = discord.Embed(
                 title="DAGBOT - Trivia Correct",
-                description="{} was the correct answer".format(
+                description="Q: {}\n{} was the correct answer".format(
+                    self.file["question"],
                     self.file["correct_answer"]
                 ),
                 color=self.ctx.guild.me.color,
             )
         else:
+            button.style = discord.ButtonStyle.red
+            self.children[self.file["mloc"]].style = discord.ButtonStyle.green
             newembed = discord.Embed(
                 title="DAGBOT - Trivia Incorrect",
-                description="{} was the correct answer".format(
+                description="Q: {}\n{} was the correct answer.".format(
+                    self.file["question"],
                     self.file["correct_answer"]
                 ),
                 color=self.ctx.guild.me.color,
@@ -256,19 +402,19 @@ class MCQView(BaseDagbotGameView):
 
     @discord.ui.button(label="A", style=discord.ButtonStyle.blurple)
     async def option_a(self,button: discord.ui.Button, interaction: discord.Interaction):
-        await self.process_answer(1, interaction)
+        await self.process_answer(1,button, interaction)
 
     @discord.ui.button(label="B", style=discord.ButtonStyle.blurple)
     async def option_b(self,button: discord.ui.Button, interaction: discord.Interaction):
-        await self.process_answer(2, interaction)
+        await self.process_answer(2,button, interaction)
 
     @discord.ui.button(label="C", style=discord.ButtonStyle.blurple)
     async def option_c(self,button: discord.ui.Button, interaction: discord.Interaction):
-        await self.process_answer(3, interaction)
+        await self.process_answer(3,button, interaction)
 
     @discord.ui.button(label="D", style=discord.ButtonStyle.blurple)
     async def option_d(self,button: discord.ui.Button, interaction: discord.Interaction):
-        await self.process_answer(4, interaction)
+        await self.process_answer(4,button, interaction)
    
 
 
@@ -333,13 +479,44 @@ class Mymenuhead(menus.Menu):
         await self.start(ctx, wait=True)
         return self.result
 
+
+class WouldYouRather(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=60.0)
+        self.a_n = 0
+        self.b_n = 0
+        self.done_list: List[int] = []
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        assert interaction.user is not None
+        if interaction.user.id in self.done_list:
+            await interaction.response.send_message("Only a single vote",ephemeral=True)
+            return False
+        else:
+            self.done_list.append(interaction.user.id)
+        return True
+
+    @discord.ui.button(label="A", style=discord.ButtonStyle.red)
+    async def button_a(self, button, interaction: discord.Interaction):
+        self.a_n += 1
+        await interaction.response.send_message("Recived your vote for A", ephemeral=True)
+
+    @discord.ui.button(label="B", style=discord.ButtonStyle.blurple)
+    async def button_b(self, button, interaction):
+        self.b_n += 1
+        await interaction.response.send_message("Recived your vote for B", ephemeral=True)
+
+
+
+
 class RPSView(BaseDagbotGameView):
 
     def __init__(self, ctx: MyContext):
         embed = discord.Embed(
             title="RPS game ended with no outcome",
             description="You didn't chose an option"
-        )
+        )   
         super().__init__(ctx, embed)
         self.ai = random.randint(1, 3)
 
@@ -372,6 +549,7 @@ class RPSView(BaseDagbotGameView):
                 description="Rock beats Scissors\n How dare you beat me",
                 color=guild.me.color,
             )
+            
         if not embed:
             return
         await self.stop_all(embed, interaction)
@@ -435,7 +613,7 @@ class RPSView(BaseDagbotGameView):
 
 class games(commands.Cog):
     """lets all play a game (everyone can)"""
-    def __init__(self, bot):
+    def __init__(self, bot: Dagbot):
         self.bot = bot
         with open("./dagbot/data/notonion.txt", "r", encoding="utf8") as f:
             self.onion_headlines = f.read().splitlines()
@@ -475,18 +653,28 @@ class games(commands.Cog):
         l_data = (soup.findAll('span', attrs={'class': 'option-text'}))
         op1 = l_data[0].text
         op2 = l_data[1].text
-        perlist = (soup.findAll('div', attrs={'class': 'percentage'}))
         numlist = (soup.findAll('div', attrs={'class': 'total-votes'}))
         v1 = numlist[0].span.text
         v2 = numlist[1].span.text
-        p1 = perlist[0].span.text
-        p2 = perlist[1].span.text
+        v1_n = int(v1.replace(",", ""))
+        v2_n = int(v2.replace(",", ""))
+        p1 =  fraction_to_percent(round(fractions.Fraction(v1_n ,v1_n + v2_n), 2))
+        p2 =  fraction_to_percent(round(fractions.Fraction(v2_n ,v1_n + v2_n), 2))
+
+        url = "None"
+        try:
+            url = soup.findAll('li', attrs={'class': 'meta-link'})[0].findAll('span', attrs={'class': 'contents'})[0].input["value"]
+            r = await self.bot.session.get(url, allow_redirects=False)
+            url = str(r).split("Location': \'")[1].split("\'")[0].replace("yourather.com", "either.io")
+        except Exception:
+            pass
         return {
             'choice1': op1,
             'votes1': v1,
             'percentage1': p1,
             'choice2': op2,
             'votes2': v2,
+            'url': url,
             'percentage2': p2}
 
     async def get_all_movies(self):
@@ -553,14 +741,9 @@ class games(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True, aliases=["RR"])
     async def russianroulette(self, ctx, amount=6):
-        c = random.randint(1, amount)
-        channel = ctx.channel
-        guy = ctx.author
-        if c == 1:
-            await ctx.reply("YOU DIED, Wait for dagbot to revive")
-            await guy.send("Revived you dude,Say thanks")
-        else:
-            await channel.send("You survived, You can dance with death later")
+        embed = discord.Embed(title="Timed Out", description="Coward, you didn't even make a move. Play again when ready")
+        rr = RussianRoulette(ctx, embed)
+        await ctx.send("Welcome to russian roulette. There are 6 barrels, one has a bullet. Pick the right one and live or die.", view=rr)
 
     @commands.command(cooldown_after_parsing=True, aliases=["onion"])
     @commands.max_concurrency(3, commands.BucketType.channel)
@@ -1230,19 +1413,14 @@ class games(commands.Cog):
         rembed = discord.Embed(
             title='Would you rather?',
             description=f"\U0001f170: {rdict['choice1']}\n**OR**\n\U0001f1e7: "
-                        f"{rdict['choice2']}",
+                        f"{rdict['choice2']}\n\n*Voting Ends*: {discord.utils.format_dt(datetime.now() + timedelta(minutes = 1), 'R')}",
             color=ctx.guild.me.color)
         rembed.set_footer(text='You have 1 minute')
-        msg = await ctx.send(embed=rembed)
-        await msg.add_reaction('\U0001f170')
-        await msg.add_reaction('\U0001f1e7')
-        await asyncio.sleep(60)
-        channel = ctx.channel
-        m_id = msg.id
-        mob = await channel.fetch_message(m_id)
-        list_data = mob.reactions
-        choice1 = int(list_data[0].count) - 1
-        choice2 = int(list_data[1].count) - 1
+        view = WouldYouRather()
+        await ctx.send(embed=rembed, view=view)
+        await view.wait()
+        choice1 = view.a_n
+        choice2 = view.b_n
         if choice1 > choice2:
             win = f"Choice A {rdict['choice1']} has Won!"
         else:
@@ -1256,15 +1434,20 @@ class games(commands.Cog):
         embed.add_field(
             name='Choice A',
             value=f"**Number of A**: {choice1}\n**Percent A**:"
-                  f" {round(((choice1 / tit) * 100), 2)}\n**Online A Percent**"
+                  f" {fraction_to_percent(round(fractions.Fraction(choice1, tit), 2))}\n**Online A Percent**"
                   f":{rdict['percentage1']} ",
             inline=True)
         embed.add_field(
             name='Choice B',
             value=f"**Number of B**: {choice2}\n**Percent B**: "
-                  f"{round(((choice2 / tit) * 100), 2)}\n**Online B Percent**"
+                  f"{fraction_to_percent(round(fractions.Fraction(choice2, tit), 2))}\n**Online B Percent**"
                   f":{rdict['percentage2']} ",
             inline=True)
+        embed.add_field(
+            name="Online Url",
+            value=rdict['url'],
+            inline=False
+            )
         await ctx.send(embed=embed)
 
     @commands.group(invoke_without_command=True, aliases=['ttt'])
@@ -1275,97 +1458,10 @@ class games(commands.Cog):
     @tictactoe.command(aliases=['comp'])
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def computer(self, ctx):
-        def gamecheck(message_check):
-            return message_check.author == ctx.author \
-                   and message_check.channel == ctx.channel \
-                   and len(message_check.content) == 2
-
         game = TicTacToe()
-        await game.makegamegrid()
-        playermoves = []
-        ai = 0
-        user = 1
-        turns = 0
-        embed = discord.Embed(
-            title=f'TicTacToe game. DAGBOT vs {ctx.author.display_name}',
-            color=ctx.guild.me.color)
-        embed.description = 'Please use letters for rows (a,b,c) and ' \
-                            'numbers for columns!' + \
-                            await game.gamegridprinter()
-        await ctx.send(embed=embed)
-        while True:
-            if user == 1:
-                token = 1
-                try:
-                    message = await self.bot.wait_for('message',
-                                                      check=gamecheck,
-                                                      timeout=60.0)
-                except asyncio.TimeoutError:
-                    return await ctx.send(
-                        "No response from player exiting game")
-                else:
-                    text = message.content
-                    try:
-                        nu, nut = await game.converter(text)
-                    except BaseException:
-                        await message.reply(
-                            'We could not convert your input. Please use the '
-                            'format <letter><number> ex `a3` or `b3`')
-                    else:
-                        y = await game.checkempty(nu, nut)
-                        if y:
-                            await game.makemove(nu, nut, token)
-                            ai = 1
-                            user = 0
-                            turns += 1
-                            playermoves.append((nu, nut))
-                        else:
-                            await message.reply(
-                                'That game square is aldready taken please '
-                                'choose another one.')
-
-            else:
-                if ai == 1:
-                    nu, nut = await game.aigamemove(turns, playermoves)
-                    if str(nu) == 'error':
-                        break
-                    else:
-                        token = 2
-                        await game.makemove(nu, nut, token)
-                        ai = 0
-                        user = 1
-                        turns += 1
-
-            grid = await game.sharegamegrid()
-            resl = await game.gamecheck(grid)
-
-            if resl[0]:
-                embed = discord.Embed(
-                    title=f'TicTacToe  DAGBOT vs {ctx.author.display_name}',
-                    color=ctx.guild.me.color)
-                embed.description = 'Please use letters for rows (a,b,c) ' \
-                                    'and numbers for columns!' + \
-                                    await game.gamegridprinter()
-                await ctx.send(embed=embed)
-                if resl[1] == 0:
-                    return await ctx.send(
-                        f'game over. It was a tie! {ctx.author.mention}')
-                elif resl[1] == 1:
-                    return await ctx.send(
-                        f'Guess you won. I\'ll probs win next time '
-                        f'{ctx.author.mention}')
-                else:
-                    return await ctx.send(
-                        f'I won get reckt. {ctx.author.mention}')
-            else:
-                if user == 1:
-                    embed = discord.Embed(
-                        title=f'TicTacToe DAGBOT vs {ctx.author.display_name}',
-                        color=ctx.guild.me.color)
-                    embed.description = 'Please use letters for rows ' \
-                                        '(a,b,c) and numbers for columns!' + \
-                                        await game.gamegridprinter()
-                    await ctx.send(embed=embed)
+        tmt = discord.Embed(title="Game Timed out", description="No Move made withing 60s")
+        view = TicTacToeAi(ctx,tmt, game)
+        await ctx.send("TTT", view=view)
 
     @tictactoe.command()
     async def user(self, ctx):
@@ -1395,7 +1491,6 @@ class games(commands.Cog):
         mlsit.append(user)
         game = TicTacToe()
         playermoves = []
-        await game.makegamegrid()
         embed = discord.Embed(
             title=f'TicTacToe {ctx.author.display_name} vs '
                   f'{mlsit[1].display_name}',

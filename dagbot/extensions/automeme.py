@@ -1,8 +1,6 @@
 import asyncio
-from typing import Optional
 
 from dagbot.bot import Dagbot
-from dagbot.extensions.reddit import reddit
 
 from discord import Webhook
 from discord.ext import commands, tasks
@@ -18,10 +16,7 @@ class automeme(commands.Cog):
         for record in self.bot.automeme_data:
             if record["active"]:
                 webhook = Webhook.from_url(record["webhook_url"],session=self.bot.session)
-                cog: Optional[reddit] = self.bot.get_cog("reddit")
-                if not cog:
-                    continue
-                embed = await cog.meme_embed()
+                embed = await self.bot.reddit_cog.meme_embed()
                 await webhook.send("Automeme", embed=embed)
         self.bot.logger.debug("AUTOMEMES DISPATCHED")
 

@@ -1,4 +1,6 @@
 import asyncio
+from dagbot.bot import Dagbot
+from dagbot.utils.context import MyContext
 
 import discord
 from discord.ext import commands
@@ -7,18 +9,17 @@ from discord.ext import commands
 class settings(commands.Cog):
     """Commands Related to bot configuration"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Dagbot):
         self.bot = bot
 
     @commands.group(invoke_without_command=True)
-    async def prefix(self, ctx):
+    async def prefix(self, ctx: MyContext):
+        prefix = f"{self.bot.user.mention} (run repair to fix. Guild is broken)"
         g_id = ctx.guild.id
         for e in self.bot.prefdict:
             if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
-            else:
-                prefix = "@Dagbot (run repair to fix. Guild is broken)"
         return await ctx.send(
             "Current Command Prefix is: `{}`\n Use prefix help "
             "for more commands".format(
@@ -28,7 +29,7 @@ class settings(commands.Cog):
 
     @prefix.command(name="help")
     @commands.has_permissions(manage_guild=True)
-    async def prefix_help(self, ctx):
+    async def prefix_help(self, ctx: MyContext):
         return await ctx.send(
             """`
     Welcome, Admin Perms are required
@@ -65,7 +66,7 @@ class settings(commands.Cog):
 
     @prefix.command()
     @commands.has_permissions(manage_guild=True)
-    async def revert(self, ctx):
+    async def revert(self, ctx: MyContext):
         g_id = ctx.guild.id
         async with self.bot.pool.acquire() as connection:
             async with connection.transaction():
@@ -81,7 +82,8 @@ class settings(commands.Cog):
         return await ctx.send("PREFIX UPDATED TO ```do ```")
 
     @prefix.command(aliases=["now"])
-    async def current(self, ctx):
+    async def current(self, ctx: MyContext):
+        prefix = f"{self.bot.user.mention} (run repair to fix. Guild is broken)"
         id = ctx.guild.id
         for e in self.bot.prefdict:
             if e["server_id"] == str(id):
@@ -91,7 +93,7 @@ class settings(commands.Cog):
             "Current Command Prefix is: ```{}```".format(prefix))
 
     @commands.group(invoke_without_command=True, aliases=['cogs'])
-    async def cog(self, ctx):
+    async def cog(self, ctx: MyContext):
         embed = discord.Embed(title="List Of cogs", color=ctx.guild.me.color)
         embed.description = '\n'.join(self.bot.coglist)
         return await ctx.send("Please use cog help to get started!",
@@ -139,7 +141,7 @@ class settings(commands.Cog):
             return await ctx.send("The cog you have entered does not exist")
 
     @cog.command()
-    async def status(self, ctx):
+    async def status(self, ctx: MyContext):
         id = ctx.guild.id
         embed = discord.Embed(
             title="COG STATUS FOR THIS SERVER", color=ctx.guild.me.color,
@@ -160,7 +162,7 @@ class settings(commands.Cog):
         return await ctx.send(embed=embed)
 
     @cog.command()
-    async def help(self, ctx):
+    async def help(self, ctx: MyContext):
         return await ctx.send(
             """
         Cog Commands:
@@ -174,7 +176,7 @@ class settings(commands.Cog):
         )
 
     @commands.group(invoke_without_command=True)
-    async def automeme(self, ctx):
+    async def automeme(self, ctx: MyContext):
         await ctx.send("""
         This is the command class used for Dagbots automeme.
         Commands:
@@ -187,125 +189,86 @@ class settings(commands.Cog):
     @automeme.command(name="delete")
     @commands.cooldown(1, 10, commands.BucketType.guild)
     @commands.has_permissions(manage_guild=True)
-    async def dagpi_delete(self, ctx):
-        msg = await ctx.send("Are you SURE you want to DELETE Automeme")
-        await msg.add_reaction('<a:giftick:734746863340748892>')
-
-        # and reaction.author != ctx.author
-
-        def check(reaction, user):
-            # print('reaction')
-            return reaction.message.id == msg.id and not user.bot and \
-                   user.id == ctx.author.id and \
-                   str(reaction.emoji) == '<a:giftick:734746863340748892>'
-
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add',
-                                                     check=check, timeout=60.0)
-
-        except asyncio.TimeoutError:
+    async def dagpi_delete(self, ctx: MyContext):
+        msg = await ctx.confirm("Are you SURE you want to DELETE Automeme")
+        if not msg:
             return await ctx.send(
                 'No response recieved aborting deleteion ')
-        else:
-            await ctx.send("Deleteing Automemer")
-            async with self.bot.pool.acquire() as connection:
-                async with connection.transaction():
-                    query = """
-                    SELECT * FROM automeme WHERE server_id = $1;
-                    """
-                    data = await connection.fetch(query, ctx.guild.id)
-                    try:
-                        adap = discord.AsyncWebhookAdapter(self.bot.session)
-                        hook = discord.Webhook.from_url(data[0]["webhook_url"],
-                                                        adapter=adap)
-                    except KeyError or IndexError:
-                        return await ctx.send(
-                            "Could not find a automemer for this"
-                            "server. Please setup one first")
-                    del_query = """
-                    DELETE FROM automeme WHERE server_id = $1;
-                    """
-                    await connection.execute(del_query, ctx.guild.id)
-            await self.bot.caching.automemecache()
-            try:
-                await hook.delete(reason="Automemer Deletion")
-                return await ctx.send("Deleted the Webook")
-            except discord.Forbidden or discord.HTTPException:
-                return await ctx.send("Deleted webhok from database."
-                                      "Can not delete webhook from discord"
-                                      "Plase manually delete the webhook"
-                                      "Error due to missing perms")
+        await ctx.send("Deleteing Automemer")
+        async with self.bot.pool.acquire() as connection:
+            async with connection.transaction():
+                query = """
+                SELECT * FROM automeme WHERE server_id = $1;
+                """
+                data = await connection.fetch(query, ctx.guild.id)
+                try:
+                    hook = discord.Webhook.from_url(data[0]["webhook_url"],
+                                                    session=self.bot.session)
+                except KeyError or IndexError:
+                    return await ctx.send(
+                        "Could not find a automemer for this"
+                        "server. Please setup one first")
+                del_query = """
+                DELETE FROM automeme WHERE server_id = $1;
+                """
+                await connection.execute(del_query, ctx.guild.id)
+        await self.bot.caching.automemecache()
+        try:
+            await hook.delete(reason="Automemer Deletion")
+            return await ctx.send("Deleted the Webook")
+        except discord.Forbidden or discord.HTTPException:
+            return await ctx.send("Deleted webhok from database."
+                                  "Can not delete webhook from discord"
+                                  "Plase manually delete the webhook"
+                                  "Error due to missing perms")
 
+    
     @automeme.command(name="enable")
     @commands.cooldown(1, 10, commands.BucketType.guild)
     @commands.has_permissions(manage_guild=True)
-    async def enable_automeme(self, ctx):
-        msg = await ctx.send("Are you SURE you want to Enable Automeme")
-        await msg.add_reaction('<a:giftick:734746863340748892>')
+    async def enable_automeme(self, ctx: MyContext):
+        msg = await ctx.confirm("Are you SURE you want to Enable Automeme")
 
-        # and reaction.author != ctx.author
-
-        def check(reaction, user):
-            # print('reaction')
-            return reaction.message.id == msg.id and not user.bot and \
-                   user.id == ctx.author.id and \
-                   str(reaction.emoji) == '<a:giftick:734746863340748892>'
-
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add',
-                                                     check=check, timeout=60.0)
-
-        except asyncio.TimeoutError:
+        if not msg:
             return await ctx.send(
                 'No response recieved aborting enable')
-        else:
-            await ctx.send("Starting Automeme")
-            async with self.bot.pool.acquire() as connection:
-                async with connection.transaction():
-                    del_query = """
-                         UPDATE automeme
-                         SET active = 'y'
-                         WHERE server_id = $1;
-                        """
-                    await connection.execute(del_query, ctx.guild.id)
-            await self.bot.caching.automemecache()
-            return await ctx.send("Automeme has been enabled. Mesmes should "
-                                  "start soon!")
+
+        await ctx.send("Starting Automeme")
+        async with self.bot.pool.acquire() as connection:
+            async with connection.transaction():
+                del_query = """
+                     UPDATE automeme
+                     SET active = 'y'
+                     WHERE server_id = $1;
+                    """
+                await connection.execute(del_query, ctx.guild.id)
+        await self.bot.caching.automemecache()
+        return await ctx.send("Automeme has been enabled. Mesmes should "
+                              "start soon!")
 
     @automeme.command(name="status")
-    async def auomeme_status(self, ctx):
+    async def auomeme_status(self, ctx: MyContext):
         for res in self.bot.automeme_data:
             if res["server_id"] == ctx.guild.id:
-                channel = self.bot.get_channel(res["channel_id"])
-                embed = discord.Embed(color=ctx.guild.me.color,
-                                      title="AUTOMEME STATUS")
-                embed.description = f"`Channel` : {channel.mention}\n" \
-                                    f"`Category`: {channel.category}\n" \
-                                    f"`Active`  : {res['active']}"
-                return await ctx.send(embed=embed)
+                channel = self.bot.get_channel(int(res["channel_id"]))
+
+                if isinstance(channel, discord.TextChannel):
+
+                    embed = discord.Embed(color=ctx.guild.me.color,
+                                          title="AUTOMEME STATUS")
+                    embed.description = f"`Channel` : {channel.mention}\n" \
+                                        f"`Category`: {channel.category}\n" \
+                                        f"`Active`  : {res['active']}"
+                    return await ctx.send(embed=embed)
 
         return await ctx.send("No Automeme Setup yet. use `automeme setup`")
 
     @automeme.command(name="disable")
     @commands.cooldown(1, 10, commands.BucketType.guild)
     @commands.has_permissions(manage_guild=True)
-    async def disable_automeme(self, ctx):
-        msg = await ctx.send("Are you SURE you want to Disable Automeme")
-        await msg.add_reaction('<a:giftick:734746863340748892>')
-
-        # and reaction.author != ctx.author
-
-        def check(reaction, user):
-            # print('reaction')
-            return reaction.message.id == msg.id and not user.bot and \
-                   user.id == ctx.author.id and \
-                   str(reaction.emoji) == '<a:giftick:734746863340748892>'
-
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add',
-                                                     check=check, timeout=60.0)
-
-        except asyncio.TimeoutError:
+    async def disable_automeme(self, ctx: MyContext):
+        msg = await ctx.confirm("Are you SURE you want to Disable Automeme")
+        if not msg:
             return await ctx.send(
                 'No response recieved aborting disable')
         else:
@@ -326,7 +289,7 @@ class settings(commands.Cog):
     @automeme.command()
     @commands.cooldown(1, 10, commands.BucketType.guild)
     @commands.has_permissions(manage_guild=True)
-    async def setup(self, ctx):
+    async def setup(self, ctx: MyContext):
         await ctx.send(
             "Welcome to dagbot automeme. "
             "Have fresh memes sent periodically without typing the command.\n"
@@ -361,7 +324,7 @@ class settings(commands.Cog):
                                f"\n**name**:{str(channel)}\n**id**:"
                                f"{channel.id}\n**Categry**:{channel.category}")
                 try:
-                    byt = await self.bot.user.avatar_url.read()
+                    byt = await self.bot.user.avatar.read()
                     hook = await channel.create_webhook(name="Dagbot Automeme",
                                                         avatar=byt,
                                                         reason="Dagbot "
@@ -388,7 +351,7 @@ class settings(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 30, commands.BucketType.guild)
     @commands.has_permissions(manage_guild=True)
-    async def integrations(self, ctx):
+    async def integrations(self, ctx: MyContext):
         cmd_cog = self.bot.get_command("cog status")
         cmd_automeme = self.bot.get_command("automeme status")
         prefix = self.bot.get_command("prefix status")
@@ -422,7 +385,7 @@ Use the help command to get smart enough to use me: `{prefix}help` """,
     @commands.command()
     @commands.cooldown(1, 600, commands.BucketType.guild)
     @commands.has_permissions(manage_guild=True)
-    async def repair(self, ctx):
+    async def repair(self, ctx: MyContext):
         guild = ctx.guild
         g_id = str(guild.id)
         await ctx.send("Starting to delete all of the Data")

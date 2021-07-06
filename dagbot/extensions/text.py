@@ -1,3 +1,4 @@
+from dagbot.bot import Dagbot
 import random
 
 import art
@@ -7,6 +8,7 @@ from art import text2art, artError
 from cryptography.fernet import Fernet
 from discord.ext import commands
 from owotext import OwO
+from dagbot.utils.context import MyContext
 from vaporwavely import vaporize
 
 client = sr_api.Client()
@@ -19,7 +21,7 @@ def setup(client):
 class text(commands.Cog):
     """Fun ways to make your text more interesting"""
 
-    def __init__(self, client):
+    def __init__(self, client: Dagbot):
         self.client = client
         self.uwu = OwO()
         self.cipher_suite = Fernet(Fernet.generate_key())
@@ -31,7 +33,7 @@ class text(commands.Cog):
                 return bool(e["text"])
 
     @commands.command(cooldown_after_parsing=True)
-    async def reverse(self, ctx, *, text: str):
+    async def reverse(self, ctx: MyContext, *, text: str):
         """ !poow ,ffuts esreveR
         Everything you type after reverse will of course, be reversed
         """
@@ -39,7 +41,7 @@ class text(commands.Cog):
         return await ctx.send(f"{t_rev}")
 
     @commands.command(cooldown_after_parsing=True)
-    async def clapify(self, ctx, *, text):
+    async def clapify(self, ctx: MyContext, *, text: str):
         if len(text) > 1000:
             return await ctx.send("TOO LONG TO PROCESS")
         y = str(text)
@@ -60,17 +62,17 @@ class text(commands.Cog):
         return await ctx.send(maste)
 
     @commands.command(cooldown_after_parsing=True)
-    async def ascii_text(self, ctx, *, text: str):
+    async def ascii_text(self, ctx: MyContext, *, text: str):
         art = text2art(text)
         return await ctx.send(f"```{art}```")
 
     @commands.command(cooldown_after_parsing=True)
-    async def randomfont(self, ctx, *, text: str):
+    async def randomfont(self, ctx: MyContext, *, text: str):
         art = text2art(text, "random")
         return await ctx.send(f"```{art}```")
 
     @commands.command(cooldown_after_parsing=True)
-    async def art(self, ctx, type: str = "random"):
+    async def art(self, ctx: MyContext, type: str = "random"):
         try:
             arto = art(type)
         except artError:
@@ -84,7 +86,7 @@ class text(commands.Cog):
             return await ctx.send(arto)
 
     @commands.command(cooldown_after_parsing=True)
-    async def fontify(self, ctx, font: str, *, text: str):
+    async def fontify(self, ctx: MyContext, font: str, *, text: str):
         try:
             arto = text2art(text, font)
         except artError:
@@ -104,60 +106,60 @@ class text(commands.Cog):
         return await ctx.send(arto)
 
     @commands.command(cooldown_after_parsing=True)
-    async def monospace(self, ctx, *, text):
-        return await ctx.send("`{}`".format(text))
+    async def monospace(self, ctx: MyContext, *, text: str):
+        return await ctx.send("`{}`".format(text: str))
 
     @commands.command(cooldown_after_parsing=True)
-    async def under(self, ctx, *, text):
+    async def under(self, ctx: MyContext, *, text: str):
         return await ctx.send(f"__{text}__")
 
     @commands.command(cooldown_after_parsing=True)
-    async def blue(self, ctx, *, text):
+    async def blue(self, ctx: MyContext, *, text: str):
         y = len(text) * "-"
         return await ctx.send(f"```md\n{text}\n{y}```")
 
     @commands.command(cooldown_after_parsing=True)
-    async def orange(self, ctx, *, text):
+    async def orange(self, ctx: MyContext, *, text: str):
         return await ctx.send(f"```arm\n{text}```")
 
     @commands.command(cooldown_after_parsing=True)
-    async def yellow(self, ctx, *, text):
+    async def yellow(self, ctx: MyContext, *, text: str):
         return await ctx.send(f"```http\n{text}```")
 
     @commands.command(cooldown_after_parsing=True)
-    async def green(self, ctx, *, text):
+    async def green(self, ctx: MyContext, *, text: str):
         return await ctx.send(f"```css\n{text}```")
 
     @commands.command(cooldown_after_parsing=True)
-    async def cyan(self, ctx, *, text):
+    async def cyan(self, ctx: MyContext, *, text: str):
         return await ctx.send(f"```yaml\n{text}```")
 
     @commands.command(cooldown_after_parsing=True)
-    async def red(self, ctx, *, text):
+    async def red(self, ctx: MyContext, *, text: str):
         return await ctx.send(f"```diff\n-{text}```")
 
     @commands.command(cooldown_after_parsing=True)
-    async def spoiler(self, ctx, *, text):
+    async def spoiler(self, ctx: MyContext, *, text: str):
         return await ctx.send("||{}||".format(text))
 
     @commands.command(cooldown_after_parsing=True)
-    async def box(self, ctx, *, text):
+    async def box(self, ctx: MyContext, *, text: str):
         return await ctx.send("```{}```".format(text))
 
     @commands.command(cooldown_after_parsing=True)
-    async def bold(self, ctx, *, text):
+    async def bold(self, ctx: MyContext, *, text: str):
         return await ctx.send("**{}**".format(text))
 
     @commands.command(cooldown_after_parsing=True)
-    async def italics(self, ctx, *, text):
+    async def italics(self, ctx: MyContext, *, text: str):
         return await ctx.send("*{}*".format(text))
 
     @commands.command(cooldown_after_parsing=True)
-    async def striked(self, ctx, *, text):
+    async def striked(self, ctx: MyContext, *, text: str):
         return await ctx.send("~~{}~~".format(text))
 
     @commands.command(cooldown_after_parsing=True)
-    async def emojify(self, ctx, *, text: str):
+    async def emojify(self, ctx: MyContext, *, text: str):
         if len(text) > 1000:
             return await ctx.send("Too long to process")
         emos = []
@@ -188,21 +190,21 @@ class text(commands.Cog):
         return await ctx.send("".join(emos))
 
     @commands.command(cooldown_after_parsing=True, aliases=["encode"])
-    async def encrypt(self, ctx, *, text):
+    async def encrypt(self, ctx: MyContext, *, text: str):
         text = str(text)
         strbytes = text.encode()
         encoded_text = self.cipher_suite.encrypt(strbytes)
         await ctx.author.send(f'Encrypted String\n`{encoded_text}`')
 
     @commands.command(cooldown_after_parsing=True, aliases=["decode"])
-    async def decrypt(self, ctx, *, text):
+    async def decrypt(self, ctx: MyContext, *, text: str):
         text = str(text)
         strbytes = text.encode()
         decoded_text = self.cipher_suite.decrypt(strbytes)
         await ctx.author.send(f"**Finished decryption**\n```{decoded_text}```")
 
     @commands.command(aliases=['zalgo'])
-    async def glitch(self, ctx, *text):
+    async def glitch(self, ctx: MyContext, *, text: str):
         t = zalgoify.process(text)
         if len(t) > 2000:
             return await ctx.send('Your text is too long!')
@@ -210,7 +212,7 @@ class text(commands.Cog):
             return await ctx.send(f'{t}')
 
     @commands.command()
-    async def uwu(self, ctx, *, text):
+    async def uwu(self, ctx: MyContext, *, text: str):
         t = self.uwu.whatsthis(text)
         if len(t) > 2000:
             return await ctx.send('your text is to long')
@@ -218,7 +220,7 @@ class text(commands.Cog):
             return await ctx.send(t)
 
     @commands.command()
-    async def vapor(self, ctx, *, text):
+    async def vapor(self, ctx: MyContext, *, text: str):
         t = vaporize(text)
         if len(t) > 2000:
             return await ctx.send('your text is to long')

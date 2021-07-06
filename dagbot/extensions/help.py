@@ -57,7 +57,7 @@ class DagbotHelpView(discord.ui.View):
 
 
 
-class HelpSelect(discord.ui.Select):
+class HelpSelect(discord.ui.Select['DagbotHelpView']):
 
     view: DagbotHelpView
 

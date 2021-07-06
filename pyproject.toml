@@ -9,7 +9,7 @@ license = "AGPLv3"
 python = "^3.8"
 toml = "^0.10.1"
 aiohttp = "3.7.3"
-"discord.py" = {git = "https://github.com/rapptz/discord.py"}
+"discord.py" = {git = "https://github.com/rapptz/discord.py", branch="performance"}
 art = "^5.1"
 sr-api = "^1.1.3"
 async-cse = "^0.3.0"
@@ -41,6 +41,7 @@ polaroid = "^0.3.2"
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.4"
 autopep8 = "^1.5.4"
+yapf = "^0.31.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,7 +1,7 @@
 from contextlib import suppress
 
 import discord
-from discord import Webhook, AsyncWebhookAdapter
+from discord import Webhook
 from discord.ext import commands
 
 
@@ -92,8 +92,7 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
 
         webhook = Webhook.from_url(
             self.bot.data['guildlog'],
-            adapter=AsyncWebhookAdapter(
-                self.bot.session))
+            session=self.bot.session)
         await webhook.send(
             f"We have  reached our **{len(self.bot.guilds)}th** server ",
             embed=embed, username='Dagbot Guilds')

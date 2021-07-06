@@ -34,7 +34,7 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-def create_logger(name, level):
+def create_logger(name: str, level) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(level)
 

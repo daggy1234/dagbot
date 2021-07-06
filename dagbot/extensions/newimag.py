@@ -134,7 +134,7 @@ class image(commands.Cog):
                                 f"Powered by [dagpi](https://dagpi.xyz)"
             embed.timestamp = datetime.utcnow()
             embed.title = f"Processed Image {feature}"
-            embed.set_footer(icon_url=str(ctx.author.avatar_url),
+            embed.set_footer(icon_url=str(ctx.author.avatar.url),
                              text=f"Called by {ctx.author.display_name}")
             await ctx.reply(embed=embed, file=file)
 
@@ -151,7 +151,7 @@ class image(commands.Cog):
                 embed.description = "Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
             embed.timestamp = datetime.utcnow()
             embed.title = f"Processed Image {feature}"
-            embed.set_footer(icon_url=str(ctx.author.avatar_url),
+            embed.set_footer(icon_url=str(ctx.author.avatar.url),
                              text=f"Called by {ctx.author.display_name}")
             await ctx.reply(embed=embed, file=file)
 
@@ -165,10 +165,10 @@ class image(commands.Cog):
                             "Dagpi Special Endpoint. Can change randomly")
 
     @commands.command(cooldown_after_parsing=True)
-    async def tweet(self, ctx, user: BetterMemberConverter = None, *, text):
+    async def tweet(self, ctx, user: BetterMemberConverter = None, *, text: str):
         if user is None:
             user = ctx.author
-        uname = user.display_name
+        uname = user.name
         text = str(text)
         pfp = str(user.avatar_url_as(format="png", size=1024))
         img = await self.client.dagpi.image_process(ImageFeatures.tweet(),

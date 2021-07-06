@@ -4,7 +4,8 @@ import random
 import time
 from ipaddress import IPv4Address, IPv6Address
 from random import getrandbits
-
+from typing import List
+from dagbot.utils.daggypag import DaggyPaginator
 import discord
 import sr_api
 from PyDictionary import PyDictionary
@@ -94,7 +95,7 @@ class fun(commands.Cog):
         text = await r.text()
         return text
 
-    async def get_giffy(self, query):
+    async def get_giffy(self, query) -> List[str]:
         url = "https://api.giphy.com/v1/gifs/search"
         querystring = {
             "q": "{}".format(query),
@@ -110,6 +111,8 @@ class fun(commands.Cog):
             for i in range(4):
                 urllist.append(cul["data"][i]["images"]["original"]["url"])
             return urllist
+        urllist[0] = 0
+        return urllist
 
     async def corp(self):
         response = await self.client.session.get(
@@ -258,7 +261,7 @@ class fun(commands.Cog):
     @commands.command(cooldown_after_parsing=True, hidden=True)
     async def nou(self, ctx):
         guild = ctx.guild
-        embed = discord.Embed(title=" NO U", Color=guild.me.color)
+        embed = discord.Embed(title=" NO U", color=guild.me.color)
         embed.set_image(
             url="https://preview.redd.it/wiga0fsqors11.png?width=248&auto=webp"
                 "&s=fb46db274487ffcab4fd7316d6e576fbf20ae3d5")
@@ -425,10 +428,19 @@ class fun(commands.Cog):
         await ctx.trigger_typing()
         urllist = await self.get_giffy(query)
         if urllist[0] == 0:
-            await ctx.channel.send("NO GIF")
-        else:
-            m = MyMenugif(urllist)
-            await m.start(ctx)
+            return await ctx.channel.send("NO GIF")
+        embed_list = []
+        for e in urllist:
+            embed = discord.Embed(title="DAGBOT - GIF", color=ctx.guild.me.color)
+            embed.set_thumbnail(
+                url="https://image.ibb.co/b0Gkwo/"
+                    "Poweredby_640px_Black_Vert_Text.png"
+            )
+            embed.set_image(url=e)
+            embed_list.append(embed)
+        view = DaggyPaginator(ctx, embed_list)
+        await ctx.send(embed=embed_list[0],view=view)
+
 
     @commands.command(
         cooldown_after_parsing=True,

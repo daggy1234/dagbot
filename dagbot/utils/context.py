@@ -6,11 +6,49 @@ if TYPE_CHECKING:
     from dagbot.bot import Dagbot
 
 
+class Confirm(discord.ui.View):
+
+    def __init__(self, ctx: MyContext):
+        super().__init__(timeout=100.0)
+        self.value: bool = False
+        self.ctx = ctx
+
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        check = self.ctx.author.id == interaction.user.id
+        if check:
+            return True
+        else:
+            await interaction.response.send_message("Not your help menu :(", ephemeral=True)
+            return False
+
+
+
+    async def on_timeout(self) -> None:
+        await self.ctx.send(f"{self.ctx.author.mention} No option selected within 100s")
+        return await super().on_timeout()
+
+
+    @discord.ui.button(label='✓', style=discord.ButtonStyle.green)
+    async def confirm(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await interaction.response.send_message('Confirmed!', ephemeral=True)
+        self.value = True
+        self.stop()
+
+    @discord.ui.button(label='x', style=discord.ButtonStyle.red)
+    async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await interaction.response.send_message('Cancelled', ephemeral=True)
+        self.value = False
+        self.stop()
+
+
 class MyContext(commands.Context):
 
     bot: Dagbot
     guild: discord.Guild
-    authot: discord.Member
+    author: discord.Member
+    message: discord.Message
+    channel: Union[discord.TextChannel, discord.Thread, discord.DMChannel, discord.GroupChannel]
 
     async def send(self,         
         content: Optional[str] = None,
@@ -51,7 +89,17 @@ class MyContext(commands.Context):
         #typeignore
         return await super().send(content, file=file, embed=embed, 
                                   delete_after=delete_after, nonce=nonce,
-                                  allowed_mentions=allowed_mentions, tts=tts, view=view)
+                                  allowed_mentions=allowed_mentions, tts=tts, view=view) # type: ignore
 
     async def safe_send(self, yes):
         await super().send("Yes this method is cool")
+
+    async def confirm(self, propmpt: str) -> bool:
+        embed = discord.Embed(title="Requesting Confirmation", description=propmpt, color=self.guild.me.color)
+        embed.set_author(name=self.author.name, icon_url=self.author.avatar.url)
+        view = Confirm(self)
+        await self.send(embed=embed, view=view)
+        await view.wait()
+        return view.value
+
+

@@ -1,3 +1,5 @@
+from dagbot.utils.context import MyContext
+from dagbot.bot import Dagbot
 import discord
 from discord.ext import commands
 
@@ -5,7 +7,7 @@ from discord.ext import commands
 class tags(commands.Cog):
     """Commands that can help quickly store and retrive data"""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Dagbot):
         self.bot = bot
 
     async def cog_check(self, ctx):
@@ -15,7 +17,7 @@ class tags(commands.Cog):
                 return bool(e["tags"])
 
     @commands.group(invoke_without_command=True)
-    async def tag(self, ctx, *, name):
+    async def tag(self, ctx: MyContext, *, name: str):
         serverid = ctx.guild.id
         n = str(name).lower()
         if "--" in n:
@@ -47,7 +49,7 @@ class tags(commands.Cog):
                     )
 
     @tag.command(cooldown_after_parsing=True)
-    async def info(self, ctx, *, name):
+    async def info(self, ctx: MyContext, *, name: str):
         guild = ctx.guild
         sid = ctx.guild.id
         if "--" in str(name).lower():
@@ -71,12 +73,14 @@ class tags(commands.Cog):
         embed = discord.Embed(
             title="Tag: {}".format(name), color=guild.me.color
         )
-        embed.add_field(name="Creator", value=guy.mention)
+
+        guy_s = guy.mention if guy else "Unkown"
+        embed.add_field(name="Creator", value=guy_s)
         embed.add_field(name="Uses", value=y[0]["uses"])
         return await ctx.send(embed=embed)
 
     @tag.command(cooldown_after_parsing=True)
-    async def rename(self, ctx, name, newname):
+    async def rename(self, ctx: MyContext, name: str, newname: str):
         auth_id = ctx.author.id
         sid = ctx.guild.id
         newname = newname.lower()
@@ -115,7 +119,7 @@ class tags(commands.Cog):
                             "you cannot rename it")
 
     @tag.command(cooldown_after_parsing=True)
-    async def update(self, ctx, name, *, content):
+    async def update(self, ctx: MyContext, name, *, content: str):
         auth_id = ctx.author.id
         sid = ctx.guild.id
         name = name.lower()
@@ -153,7 +157,7 @@ class tags(commands.Cog):
                             "you cannot update it")
 
     @tag.command(cooldown_after_parsing=True)
-    async def delete(self, ctx, *, name):
+    async def delete(self, ctx: MyContext, *, name: str):
         auth_id = ctx.author.id
         sid = ctx.guild.id
         name = name.lower()
@@ -189,7 +193,7 @@ class tags(commands.Cog):
                             "you cannot delete it")
 
     @tag.command(cooldown_after_parsing=True)
-    async def help(self, ctx):
+    async def help(self, ctx: MyContext):
         return await ctx.send(
             """`
     tags:
@@ -205,7 +209,7 @@ class tags(commands.Cog):
         )
 
     @tag.command(cooldown_after_parsing=True)
-    async def list(self, ctx, member: discord.Member):
+    async def list(self, ctx: MyContext, member: discord.Member):
         mem_id = member.id
         guild = ctx.guild
         sid = ctx.guild.id
@@ -233,7 +237,7 @@ class tags(commands.Cog):
 
     @tag.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 5)
-    async def create(self, ctx, name, *, content):
+    async def create(self, ctx: MyContext, name: str, *, content: str):
         serverid = ctx.guild.id
         guyid = ctx.author.id
         n = str(name)
@@ -267,7 +271,7 @@ class tags(commands.Cog):
                             "Tag {} aldready exists on this server".format(n))
 
     @tag.error
-    async def tage(self, ctx, error):
+    async def tage(self, ctx: MyContext, error):
         if isinstance(error, commands.CommandNotFound):
             return await ctx.send("gay")
 

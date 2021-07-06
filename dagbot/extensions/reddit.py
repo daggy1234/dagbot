@@ -1,27 +1,48 @@
 import asyncio
+from dagbot.utils.context import MyContext
 import json
 import os
 import random
 from datetime import datetime
+from typing import List, Tuple, TypedDict, Union, Literal
 
 import discord
 import humanize
 import matplotlib.pyplot as plt
 from discord.ext import commands, tasks
 
+class KsoftRedditPayload(TypedDict):
+    title: str
+    meme: str
+    auth: str
+    memeurl: str
+    ups: str
+    auth_url: str
+
+
+class RedditPayload(TypedDict):
+    title: str
+    doots: str
+    author: str
+    post: str
+    link: str
+    authorurl: str
+
+SUB_ERROR = Tuple[Literal[False], str]
+SUB_SUCCESS = Tuple[Literal[True], KsoftRedditPayload]
 
 class reddit(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.memcache.start()
 
-    async def cog_check(self, ctx):
+    async def cog_check(self, ctx: MyContext):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
                 return bool(e["reddit"])
 
-    async def randsub(self, subreddit, time="day"):
+    async def randsub(self, subreddit: str, time="day") -> Union[SUB_ERROR, SUB_SUCCESS]:
         url = f"https://api.ksoft.si/images/rand-reddit/{subreddit}"
         headers = {
             "Authorization": self.client.data['ksofttoken'],
@@ -40,8 +61,7 @@ class reddit(commands.Cog):
             auth = auth.replace("/u", "u")
             authurl = "https://reddit.com/" + auth.replace("/u/", "user/")
             url = file["source"]
-            dict_ = {
-                "success": True,
+            dict_: KsoftRedditPayload = {
                 "title": tit,
                 "meme": iurl,
                 "auth": auth,
@@ -49,12 +69,12 @@ class reddit(commands.Cog):
                 "ups": u,
                 "auth_url": authurl,
             }
-            return dict_
+            return True, dict_
         else:
-            dict_ = {"success": False, "error": file["message"]}
-            return dict_
+            # dict_ = {"success": False, "error": file["message"]}
+            return False, file["message"]
 
-    async def sublist(self, sub):
+    async def sublist(self, sub: str) -> List[RedditPayload]:
         danklist = []
         url = f"https://reddit.com/r/{sub}.json"
         headers = {
@@ -83,7 +103,7 @@ class reddit(commands.Cog):
             title = data["title"]
             score = data["score"]
             permurl = "https://reddit.com" + data["permalink"]
-            memdict = {
+            memdict: RedditPayload = {
                 "author": auth,
                 "authorurl": auth_url,
                 "post": purl,
@@ -94,18 +114,18 @@ class reddit(commands.Cog):
             danklist.append(memdict)
         return danklist
 
-    async def memecache(self):
+    async def memecache(self) -> None:
         try:
             with open("./dagbot/data/memes.json", "r") as file:
                 jsdict = json.load(file)
-                jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist(
-                    "dankmemes")
+                jsdict["dankmemes"] = list(set(jsdict["dankmemes"] + await self.sublist(
+                    "dankmemes")))
                 await asyncio.sleep(1)
-                jsdict["memes"] = jsdict["memes"] + await self.sublist("memes")
+                jsdict["memes"] = list(set(jsdict["memes"] + await self.sublist("memes")))
                 await asyncio.sleep(1)
-                jsdict["wholesome"] = jsdict["wholesome"] + await self.sublist(
+                jsdict["wholesome"] = list(set(jsdict["wholesome"] + await self.sublist(
                     "wholesomememes"
-                )
+                )))
         except FileNotFoundError:
             with open("./dagbot/data/memes.json", "x") as file:
                 js = json.dumps(
@@ -146,13 +166,13 @@ class reddit(commands.Cog):
         self.client.logger.info("WAITING FOR ON READY")
         await self.client.wait_until_ready()
 
-    async def loadmeme(self, sub):
+    async def loadmeme(self, sub: str) -> RedditPayload:
         with open("./dagbot/data/memes.json", "r") as file:
             js = json.load(file)
-            memelist = js[sub]
+            memelist: List[RedditPayload] = js[sub]
             return random.choice(memelist)
 
-    async def meme_embed(self):
+    async def meme_embed(self) -> discord.Embed:
         r = random.randint(0, 2)
         if r == 1:
             sub = "dankmemes"
@@ -172,20 +192,19 @@ class reddit(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 2, commands.BucketType.user)
-    async def meme(self, ctx):
+    async def meme(self, ctx: MyContext):
         embed = await self.meme_embed()
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def comic(self, ctx):
-        await ctx.trigger_typing()
+    async def comic(self, ctx: MyContext):
         await ctx.trigger_typing()
         channel = ctx.channel
         guild = ctx.guild
-        meme = await self.randsub("comics")
-        if not meme["success"]:
-            return await ctx.send(meme["error"])
+        suc, meme = await self.randsub("comics")
+        if isinstance(meme, str):
+            return await ctx.send(meme)
 
         embed = discord.Embed(
             title=meme["title"], color=guild.me.color, url=meme["memeurl"]
@@ -199,13 +218,13 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True,
                       aliases=["pqmeme", "PrequelMemes"])
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def starwarsmeme(self, ctx):
+    async def starwarsmeme(self, ctx: MyContext):
         await ctx.trigger_typing()
         channel = ctx.channel
         guild = ctx.guild
-        meme = await self.randsub("PrequelMemes")
-        if not meme["success"]:
-            return await ctx.send(meme["error"])
+        suc, meme = await self.randsub("PrequelMemes")
+        if isinstance(meme, str):
+            return await ctx.send(meme)
 
         embed = discord.Embed(
             title=meme["title"], color=guild.me.color, url=meme["memeurl"]
@@ -218,7 +237,7 @@ class reddit(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def aww(self, ctx):
+    async def aww(self, ctx: MyContext):
         await ctx.trigger_typing()
         return await ctx.send(
             "Please use the animals instead. r/aww is pretty meh")
@@ -226,13 +245,13 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True,
                       aliases=["dankex", "exchange"], hidden=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def dex(self, ctx):
+    async def dex(self, ctx: MyContext):
         await ctx.trigger_typing()
         channel = ctx.channel
         guild = ctx.guild
-        meme = await self.randsub("DankExchange")
-        if not meme["success"]:
-            return await ctx.send(meme["error"])
+        suc, meme = await self.randsub("DankExchange")
+        if isinstance(meme, str):
+            return await ctx.send(meme)
 
         embed = discord.Embed(
             title=meme["title"], color=guild.me.color, url=meme["memeurl"]
@@ -245,7 +264,7 @@ class reddit(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True, aliases=["ii"], hidden=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def investorinfo(self, ctx, *, ruser: str = None):
+    async def investorinfo(self, ctx: MyContext, *, ruser: str = None):
         if not ruser:
             return await ctx.send("Hey please specify a reddit user")
         r = await self.client.session.get(
@@ -280,11 +299,11 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True, aliases=["fi", "firm"],
                       hidden=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def firminfo(self, ctx, *, firm: str = None):
-        if not firm:
+    async def firminfo(self, ctx, *, firm_str: str = None):
+        if not firm_str:
             return await ctx.send("Please specify a valid firm id")
         try:
-            firm = int(firm)
+            firm = int(firm_str)
         except ValueError:
             return await ctx.send(
                 "Please specify a valid firm id. Not the name of the firm")
@@ -321,13 +340,13 @@ class reddit(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True, aliases=["dm"])
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def discord(self, ctx):
+    async def discord(self, ctx: MyContext):
         await ctx.trigger_typing()
         channel = ctx.channel
         guild = ctx.guild
-        meme = await self.randsub("discord")
-        if not meme["success"]:
-            return await ctx.send(meme["error"])
+        suc, meme = await self.randsub("discord")
+        if isinstance(meme, str):
+            return await ctx.send(meme)
 
         embed = discord.Embed(
             title=meme["title"], color=guild.me.color, url=meme["memeurl"]
@@ -340,13 +359,13 @@ class reddit(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def facepalm(self, ctx):
+    async def facepalm(self, ctx: MyContext):
         await ctx.trigger_typing()
         channel = ctx.channel
         guild = ctx.guild
-        meme = await self.randsub("facepalm")
-        if not meme["success"]:
-            return await ctx.send(meme["error"])
+        suc, meme = await self.randsub("facepalm")
+        if isinstance(meme, str):
+            return await ctx.send(meme)
 
         embed = discord.Embed(
             title=meme["title"], color=guild.me.color, url=meme["memeurl"]
@@ -359,13 +378,13 @@ class reddit(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def meirl(self, ctx):
+    async def meirl(self, ctx: MyContext):
         await ctx.trigger_typing()
         channel = ctx.channel
         guild = ctx.guild
-        meme = await self.randsub("me_irl")
-        if not meme["success"]:
-            return await ctx.send(meme["error"])
+        suc, meme = await self.randsub("me_irl")
+        if isinstance(meme, str):
+            return await ctx.send(meme)
 
         embed = discord.Embed(
             title=meme["title"], color=guild.me.color, url=meme["memeurl"]
@@ -379,13 +398,13 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True,
                       aliases=["4chan", "fourchan"])
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def greentext(self, ctx):
+    async def greentext(self, ctx: MyContext):
         await ctx.trigger_typing()
         channel = ctx.channel
         guild = ctx.guild
-        meme = await self.randsub("greentext")
-        if not meme["success"]:
-            return await ctx.send(meme["error"])
+        suc, meme = await self.randsub("greentext")
+        if isinstance(meme, str):
+            return await ctx.send(meme)
 
         embed = discord.Embed(
             title=meme["title"], color=guild.me.color, url=meme["memeurl"]
@@ -401,18 +420,17 @@ class reddit(commands.Cog):
     async def sub(self, ctx, subreddit: str, time: str = "day"):
         time = time.lower()
         guild = ctx.guild
-        meme = await self.randsub(subreddit, time)
-        if not meme["success"]:
-            return await ctx.send(meme["error"])
-
+        suc, meme = await self.randsub(subreddit, time)
+        if isinstance(meme, str):
+            return await ctx.send(meme)
         embed = discord.Embed(
             title=meme["title"], color=guild.me.color, url=meme["memeurl"]
         )
-        embed.add_field(name="User", value=meme["maker"], inline=True)
+        embed.add_field(name="User", value=meme["auth"], inline=True)
         embed.add_field(name="Upvotes", value=meme["ups"], inline=True)
-        url = str(meme["memeimage"])
+        url = str(meme["memeurl"])
         embed.set_image(url=url)
-        embed.set_footer(text=meme["sub"])
+        embed.set_footer(text=subreddit)
         return await ctx.send(embed=embed)
 
     @commands.command()

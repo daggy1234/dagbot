@@ -15,15 +15,19 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from dagbot.bot import Dagbot
+from dagbot.utils.context import MyContext
 import datetime
 import os
 import traceback
-
+import importlib
 import discord
 from discord.ext import commands, menus
 from jishaku.codeblocks import codeblock_converter
 from jishaku.shell import ShellReader
 from tabulate import tabulate
+from dagbot.utils.conventionalpag import DaggyPaginatorClassic
+from dagbot.utils.daggypag import DaggyPaginator
 
 
 class TabulateData(menus.ListPageSource):
@@ -42,20 +46,29 @@ class TabulateData(menus.ListPageSource):
 
 class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Dagbot):
         self.bot = bot
 
     @commands.command()
     @commands.is_owner()
-    async def byebyebot(self, ctx):
+    async def byebyebot(self, ctx: MyContext):
         await self.bot.session.close()
         await self.bot.pool.close()
         await ctx.send('Shutting Down Now <a:catroll:720695153601282068>')
-        await self.bot.logout()
+        await self.bot.close()
 
     @commands.command()
     @commands.is_owner()
-    async def announcement(self, ctx):
+    async def reloadm(self,ctx: MyContext, *, opt_s: str):
+        try:
+            eval(f'__import__("importlib").reload(__import__("dagbot").{opt_s})')
+            await ctx.send(f"successfully reloaded `dagbot.{opt_s}`")
+        except Exception as exc:
+            await ctx.send(f"Error reloading `dagbot.{opt_s}` with \n```\n{''.join(traceback.format_exception(type(exc), exc, exc.__traceback__, 1))}\n```")
+
+    @commands.command()
+    @commands.is_owner()
+    async def announcement(self, ctx: MyContext):
         await ctx.send('Title for the embed')
 
         def check(message):
@@ -82,11 +95,12 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
                   "client_id=675589737372975124&permissions=378944&scope=bot)",
             inline=True)
         channel = self.bot.get_channel(681778906780532757)
-        await channel.send('New update', embed=embed)
+        if isinstance(channel, discord.TextChannel):
+            await channel.send('New update', embed=embed)
 
     @commands.command()
     @commands.is_owner()
-    async def status(self, ctx, kwarg: int, *, status: str):
+    async def status(self, ctx: MyContext, kwarg: int, *, status: str):
         if kwarg == 0:
             await ctx.send("1: Game\n2:Watching\n3.listening\n")
         elif kwarg == 1:
@@ -102,9 +116,25 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def rejectsuggestion(self, ctx, msg_id, *, reason):
+    async def test_pagination_standard(self, ctx: MyContext, num: int = 5):
+        embed_data = [discord.Embed(title=f"Page Number {i+1}", color=ctx.guild.me.color) for i in range(num)]
+        pag = DaggyPaginatorClassic(ctx, embed_data)
+        await ctx.send(embed=embed_data[0], view=pag)
+
+    @commands.command()
+    @commands.is_owner()
+    async def test_pagination_custom(self, ctx: MyContext, num: int = 5):
+        embed_data = [discord.Embed(title=f"Page Number {i+1}", color=ctx.guild.me.color) for i in range(num)]
+        pag = DaggyPaginator(ctx, embed_data)
+        await ctx.send(embed=embed_data[0], view=pag)
+
+    @commands.command()
+    @commands.is_owner()
+    async def rejectsuggestion(self, ctx: MyContext, msg_id, *, reason):
         if str(ctx.author.id) == "491174779278065689":
             channel = self.bot.get_channel(676031268009410570)
+            if not isinstance(channel, discord.TextChannel):
+                return await ctx.send(":(")
             y = await channel.fetch_message(msg_id)
             oldemb = y.embeds[0]
             descrip = str(oldemb.description)
@@ -119,9 +149,11 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def approvesuggestion(self, ctx, msg_id):
+    async def approvesuggestion(self, ctx: MyContext, msg_id):
         if str(ctx.author.id) == "491174779278065689":
             channel = self.bot.get_channel(676031268009410570)
+            if not isinstance(channel, discord.TextChannel):
+                return await ctx.send(":(")
             y = await channel.fetch_message(msg_id)
             oldemb = y.embeds[0]
             descrip = str(oldemb.description)
@@ -135,7 +167,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def reload(self, ctx, *, extension: str):
+    async def reload(self, ctx: MyContext, *, extension: str):
         mst = ""
         if extension == '~':
             files = [('dagbot.extensions.' + f.replace('.py', '')) for f in
@@ -169,7 +201,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def unload(self, ctx, *, extension: str):
+    async def unload(self, ctx: MyContext, *, extension: str):
         files = [(f.replace('.py', '')) for f in os.listdir(
             './dagbot/extensions') if f.endswith('.py')]
         if extension in files:
@@ -191,7 +223,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def load(self, ctx, *, extension: str):
+    async def load(self, ctx: MyContext, *, extension: str):
         files = [(f.replace('.py', '')) for f in os.listdir(
             './dagbot/extensions') if f.endswith('.py')]
         if extension in files:
@@ -213,7 +245,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def socketstats(self, ctx):
+    async def socketstats(self, ctx: MyContext):
         # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/stats.py
         delta = datetime.datetime.utcnow() - self.bot.launch_time
         minutes = delta.total_seconds() / 60
@@ -226,6 +258,8 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
                   sorted(self.bot.socket_stats.items(),
                          key=lambda item: item[1], reverse=True)}
         fl = [[key, val] for key, val in zip(useage.keys(), useage.values())]
+        print(fl)
+        tab_data = TabulateData(fl, ['Event', 'Occurences'], tit)
         pages = menus.MenuPages(
             source=TabulateData(fl, ['Event', 'Occurences'], tit),
             clear_reactions_after=True)
@@ -233,7 +267,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def command_stats(self, ctx):
+    async def command_stats(self, ctx: MyContext):
         useage = {key: value for key, value in
                   sorted(self.bot.useage.items(), key=lambda item: item[1],
                          reverse=True)}
@@ -248,14 +282,14 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def cleanup(self, ctx, message: int = 100):
-        async for message in ctx.channel.history(limit=message):
+    async def cleanup(self, ctx: MyContext, message_int: int = 100):
+        async for message in ctx.channel.history(limit=message_int):
             if message.author == self.bot.user:
                 await message.delete()
 
     @commands.command()
     @commands.is_owner()
-    async def cache(self, ctx):
+    async def cache(self, ctx: MyContext):
         await self.bot.caching.cogcache()
         await self.bot.caching.prefixcache()
         await self.bot.caching.automemecache()
@@ -263,21 +297,25 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def eval(self, ctx, *, code: str):
+    async def eval(self, ctx: MyContext, *, code: str):
         cog = self.bot.get_cog("Jishaku")
+        if not cog:
+            return await ctx.send("No jishaku cog")
         res = codeblock_converter(code)
         await cog.jsk_python(ctx, argument=res)
 
     @commands.command()
     @commands.is_owner()
-    async def shell(self, ctx, *, command: str):
+    async def shell(self, ctx: MyContext, *, command: str):
         cog = self.bot.get_cog("Jishaku")
+        if not cog:
+            return await ctx.send("No jishaku cog")
         code = codeblock_converter(command)
         await cog.jsk_shell(ctx, argument=code)
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def dev_stats(self, ctx):
+    async def dev_stats(self, ctx: MyContext):
         res = await self.bot.session.get(
             "https://dagbot-site.herokuapp.com/api/botstats",
             headers={"Token": self.bot.data["stats"]})
@@ -289,7 +327,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def new_stats(self, ctx):
+    async def new_stats(self, ctx: MyContext):
         res = await self.bot.session.post(
             "https://dagbot-site.herokuapp.com/api/newstats",
             headers={"Token": self.bot.data["stats"]})
@@ -297,7 +335,7 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def neofetch(self, ctx):
+    async def neofetch(self, ctx: MyContext):
 
         l = []
         with ShellReader("neofetch --logo") as read:

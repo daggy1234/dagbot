@@ -2,8 +2,12 @@ import codecs
 import inspect
 import os
 import pathlib
+
+from discord import user
+from dagbot.bot import Dagbot
 import platform
 from datetime import datetime
+from dagbot.utils.context import MyContext
 
 import discord
 from discord.ext import commands
@@ -36,12 +40,12 @@ def linecount():
 class misc(commands.Cog):
     """An assorted bag of ever changing commands """
 
-    def __init__(self, bot):
+    def __init__(self, bot: Dagbot):
         self.bot = bot
 
     @commands.command(aliases=["sugg", "idea"])
     @commands.cooldown(1, 60, commands.BucketType.user)
-    async def suggest(self, ctx, *, suggest):
+    async def suggest(self, ctx: MyContext, *, suggest):
         guild = ctx.guild
         fro = guild.name
         auth = ctx.author.display_name
@@ -61,6 +65,8 @@ class misc(commands.Cog):
         )
         embed.set_footer(text="id")
         channel = self.bot.get_channel(676031268009410570)
+        if not isinstance(channel, discord.TextChannel):
+            return await ctx.send("Not a text channel")
         msg = await channel.send(embed=embed)
         await msg.add_reaction("\U00002705")
         await msg.add_reaction("\U0000274c")
@@ -68,7 +74,7 @@ class misc(commands.Cog):
 
     @commands.command(aliases=["error", "problem"])
     @commands.cooldown(1, 60, commands.BucketType.user)
-    async def bug(self, ctx, *, bug):
+    async def bug(self, ctx: MyContext, *, bug):
         guild = ctx.guild
         fro = guild.name
         auth = ctx.author.display_name
@@ -87,6 +93,8 @@ class misc(commands.Cog):
             value="[Join Now](https://discord.gg/5Y2ryNq)"
         )
         channel = self.bot.get_channel(682199468375932928)
+        if not isinstance(channel, discord.TextChannel):
+            return await ctx.send("Not a text channel")
         await channel.send(embed=embed)
         return await ctx.send(embed=embed)
 
@@ -199,7 +207,7 @@ class misc(commands.Cog):
     #     return await ctx.send(embed=embed)
 
     # @commands.command(aliases=['ui'])
-    # async def userinfo(self, ctx, user=None):
+    # async def userinfo(self, ctx: MyContext, user=None):
     #     sl = {
     #         "online": "<:online:724328584621064193>",
     #         "offline": "<:offline:724328584751349903>",
@@ -319,7 +327,7 @@ class misc(commands.Cog):
     #     return await ctx.send(embed=embed)
     #
     # @commands.command(aliases=['spot'])
-    # async def spotify(self, ctx, *, user=None):
+    # async def spotify(self, ctx: MyContext, *, user=None):
     #     if user is None:
     #         user = ctx.author
     #     else:
@@ -365,7 +373,7 @@ class misc(commands.Cog):
     #     await ctx.send(embed=embed)
     #
     # @commands.command(aliases=['vsc'])
-    # async def visualstudiocode(self, ctx, *, user=None):
+    # async def visualstudiocode(self, ctx: MyContext, *, user=None):
     #     if user is None:
     #         user = ctx.author
     #     else:
@@ -469,9 +477,11 @@ class misc(commands.Cog):
                         value=discord.__version__,
                         inline=True)
         owner = self.bot.get_user(491174779278065689)
+        if not owner:
+            return await ctx.send("No user :(")
         embed.set_author(
             name=str(owner),
-            icon_url=owner.avatar_url,
+            icon_url=owner.avatar.url,
             url="https://github.com/Daggy1234/",
         )
         embed.timestamp = datetime.utcnow()
@@ -499,7 +509,7 @@ class misc(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command()
-    async def source(self, ctx, *, command: str = None):
+    async def source(self, ctx: MyContext, *, command: str = None):
 
         # This is inspired by R.danny source at
         # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/meta.py#L328-L366
@@ -513,7 +523,8 @@ class misc(commands.Cog):
         code = com.callback.__code__
         filename = code.co_filename
         lines, firstline = inspect.getsourcelines(code)
-        location = os.path.relpath(filename).replace('\\', '/')
+        old_path = os.path.relpath(filename).decode('utf-8')
+        location = old_path.replace('\\', '/')
         final_url = (f'{self.bot.repo}/blob/master/{location}'
                      f'#L{firstline}-L{firstline + len(lines) - 1}')
         return await ctx.send(

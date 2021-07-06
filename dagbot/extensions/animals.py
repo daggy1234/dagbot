@@ -15,235 +15,68 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-import random
+from os import name
+from typing import Callable
+from dagbot.bot import Dagbot
+from dagbot.utils.context import MyContext
 
 import discord
 import sr_api
 from discord.ext import commands
 
-client = sr_api.Client()
-
-
 class animals(commands.Cog):
     """Animal facts and images"""
 
-    def __init__(self, client):
+    def __init__(self, client: Dagbot):
         self.client = client
+        self.image_animals = ["dog","cat","panda","red_panda","fox","birb","koala","kangaroo","racoon","whale","pikachu"]
+        self.fact_animals = ["cat","dog"," koala","fox","bird","elephant","panda","racoon","kangaroo","giraffe","whale"]
+        self.srapi = sr_api.Client()
+        
+
+        
+        
+        for animal in self.fact_animals:
+            self.make_fn_fact(animal)
+
+        for animal in self.image_animals:
+            self.make_fn_image(animal)
 
     async def cog_check(self, ctx):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if e["serverid"] == g_id:
                 return bool(e["animals"])
+    
+    def make_fn_fact(self, animal: str):
+        @commands.command(name=f"{animal}fact",
+                          help=f"Get a random fact for {animal}")
+        async def _command(_self, ctx: MyContext):
+            await ctx.trigger_typing()
+            fact = await self.srapi.get_fact(animal)
+            embed = discord.Embed(
+            title=f"{animal.title()} Fact!", description=fact, color=ctx.guild.me.color
+            )
+            return await ctx.send(embed=embed)
 
-    async def get_cat(self):
-        response = await self.client.session.get("http://aws.random.cat/meow")
-        file = await response.json()
-        return file["file"]
+        _command.cog = self
+        self.__cog_commands__ += (_command,)
 
-    async def get_dog(self):
-        response = await self.client.session.get(
-            "https://dog.ceo/api/breeds/image/random")
-        file = await response.json()
-        return file["message"]
+    def make_fn_image(self, animal: str):
+        @commands.command(name=f"{animal}",
+                          help=f"Get a random image for {animal}")
+        async def _command(_self, ctx: MyContext):
+            await ctx.trigger_typing()
+            y = await self.srapi.get_image(animal)
+            embed = discord.Embed(
+            title=f"Cute {animal.title()}!", color=ctx.guild.me.color
+            )
+            embed.set_image(url=y.url)
+            return await ctx.send(embed=embed)
 
-    async def get_cat_fact(self):
-        response = await self.client.session.get(
-            "https://cat-fact.herokuapp.com/facts")
-        ict = await response.json()
-        fileict = ict["all"]
-        y = random.randint(0, len(fileict) - 1)
-        return fileict[y]["text"]
-
-    @commands.command(cooldown_after_parsing=True, aliases=["cat pic", "catp"])
-    async def cat(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        link = await self.get_cat()
-        embed = discord.Embed(
-            title="DAGBOT -  Cat Pictures",
-            color=guild.me.color
-        )
-        embed.set_image(url=link)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True, aliases=["dog pic", "dogp"])
-    async def dog(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        link = await self.get_dog()
-        embed = discord.Embed(
-            title="DAGBOT - Dog Pictures",
-            color=guild.me.color
-        )
-        embed.set_image(url=link)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def panda(self, ctx):
-        await ctx.trigger_typing()
-        y = await client.get_image("panda")
-        embed = discord.Embed(title="Cute Panda!", color=ctx.guild.me.color)
-        embed.set_image(url=y.url)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def fox(self, ctx):
-        await ctx.trigger_typing()
-        y = await client.get_image("fox")
-        embed = discord.Embed(title="Cute Fox!", color=ctx.guild.me.color)
-        embed.set_image(url=y.url)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def racoon(self, ctx):
-        await ctx.trigger_typing()
-        y = await client.get_image("racoon")
-
-        embed = discord.Embed(title="Cute Racoon!", color=ctx.guild.me.color)
-        embed.set_image(url=y.url)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True, aliases=["bird"])
-    async def birb(self, ctx):
-        await ctx.trigger_typing()
-        y = await client.get_image("birb")
-
-        embed = discord.Embed(
-            title="Cute Birb (bird)!",
-            color=ctx.guild.me.color)
-        embed.set_image(url=y.url)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def kangaroo(self, ctx):
-        await ctx.trigger_typing()
-        y = await client.get_image("racoon")
-
-        embed = discord.Embed(title="Cute Kangaroo!", color=ctx.guild.me.color)
-        embed.set_image(url=y.url)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def koala(self, ctx):
-        await ctx.trigger_typing()
-        y = await client.get_image("koala")
-
-        embed = discord.Embed(title="Cute Koala!", color=ctx.guild.me.color)
-        embed.set_image(url=y.url)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True, aliases=["catf", "cf"])
-    async def catfact(self, ctx):
-        await ctx.trigger_typing()
-        guild = ctx.guild
-        cf = await self.get_cat_fact()
-        embed = discord.Embed(title="DAGBOT - CAT FACT", color=guild.me.color)
-        embed.add_field(name="fact", value=cf)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def dogfact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("dog")
-        embed = discord.Embed(
-            title="Dog Fact!",
-            description=fact,
-            color=guild.me.color)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def foxfact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("fox")
-        embed = discord.Embed(
-            title="Fox Fact!",
-            description=fact,
-            color=guild.me.color)
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def koalafact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("koala")
-        embed = discord.Embed(
-            title="Koala Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def birdfact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("bird")
-        embed = discord.Embed(
-            title="Bird Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def elephantfact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("elephant")
-        embed = discord.Embed(
-            title="Elephant Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def pandafact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("panda")
-        embed = discord.Embed(
-            title="Panda Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def racoonfact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("racoon")
-        embed = discord.Embed(
-            title="Racoon Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def kangaroofact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("kangaroo")
-        embed = discord.Embed(
-            title="Kangaroo Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def whalefact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("whale")
-        embed = discord.Embed(
-            title="Whale Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
-
-    @commands.command(cooldown_after_parsing=True)
-    async def giraffefact(self, ctx):
-        guild = ctx.guild
-        await ctx.trigger_typing()
-        fact = await client.get_fact("giraffe")
-        embed = discord.Embed(
-            title="Giraffe Fact!", description=fact, color=guild.me.color
-        )
-        return await ctx.send(embed=embed)
+        _command.cog = self
+        self.__cog_commands__ += (_command,)
 
 
-def setup(client):
+def setup(client: Dagbot):
     client.add_cog(animals(client))
