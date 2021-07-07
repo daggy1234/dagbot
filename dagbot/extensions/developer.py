@@ -20,7 +20,6 @@ from dagbot.utils.context import MyContext
 import datetime
 import os
 import traceback
-import importlib
 import discord
 from discord.ext import commands, menus
 from jishaku.codeblocks import codeblock_converter

@@ -1,95 +1,40 @@
 import asyncio
+from operator import add
+from dagbot.bot import Dagbot
 import json
 import random
 import time
 from ipaddress import IPv4Address, IPv6Address
 from random import getrandbits
-from typing import List
+from typing import List, Tuple, Union
 from dagbot.utils.daggypag import DaggyPaginator
+from dagbot.utils.context import MyContext
 import discord
-import sr_api
-from PyDictionary import PyDictionary
 from bs4 import BeautifulSoup
-from discord.ext import commands, menus
+from discord.ext import commands
 
-dictionary = PyDictionary()
-
-client = sr_api.Client()
-
-
-class MyMenugif(menus.Menu):
-    def __init__(self, urllist):
-        super().__init__()
-        self.urllist = urllist
-
-    async def send_initial_message(self, ctx, channel):
-        guild = ctx.guild
-        embed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
-        embed.set_thumbnail(
-            url="https://image.ibb.co/b0Gkwo/"
-                "Poweredby_640px_Black_Vert_Text.png"
-        )
-        embed.set_image(url=self.urllist[0])
-        return await channel.send(embed=embed)
-
-    @menus.button("1\N{combining enclosing keycap}")
-    async def result_one(self, payload):
-        guild = self.message.guild
-        newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
-        newembed.set_thumbnail(
-            url="https://image.ibb.co/"
-                "b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
-        )
-        newembed.set_image(url=self.urllist[0])
-        await self.message.edit(embed=newembed)
-
-    @menus.button("2\N{combining enclosing keycap}")
-    async def result_2(self, payload):
-        guild = self.message.guild
-        newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
-        newembed.set_thumbnail(
-            url="https://image.ibb.co/"
-                "b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
-        )
-        newembed.set_image(url=self.urllist[1])
-        await self.message.edit(embed=newembed)
-
-    @menus.button("3\N{combining enclosing keycap}")
-    async def result_3(self, payload):
-        guild = self.message.guild
-        newembed = discord.Embed(title="DAGBOT - GIF", color=guild.me.color)
-        newembed.set_thumbnail(
-            url="https://image.ibb.co/"
-                "b0Gkwo/Poweredby_640px_Black_Vert_Text.png"
-        )
-        newembed.set_image(url=self.urllist[2])
-        await self.message.edit(embed=newembed)
-
-    @menus.button("\N{BLACK SQUARE FOR STOP}\ufe0f")
-    async def on_stop(self, payload):
-        self.stop()
 
 
 class fun(commands.Cog):
     """funniest stuff you will ever see"""
 
-    def __init__(self, client):
+    def __init__(self, client: Dagbot):
         self.client = client
 
-    async def cog_check(self, ctx):
+    async def cog_check(self, ctx: MyContext):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
                 return bool(e["fun"])
 
-    async def get_joke(self):
+    async def get_joke(self) -> str:
         header = {"Accept": "application/json"}
         url = "https://icanhazdadjoke.com/"
         r = await self.client.session.get(url, headers=header)
         html = await r.json()
         return html["joke"]
 
-    async def getinpir(self):
+    async def getinpir(self) -> str:
         r = await self.client.session.get(
             'https://inspirobot.me/api?generate=true')
         text = await r.text()
@@ -114,37 +59,39 @@ class fun(commands.Cog):
         urllist[0] = 0
         return urllist
 
-    async def corp(self):
+    async def corp(self) -> str:
         response = await self.client.session.get(
             "https://corporatebs-generator.sameerkumar.website")
         file = await response.json()
         return file["phrase"]
 
-    async def get_advice(self):
+    async def get_advice(self) -> str:
         url = "https://api.adviceslip.com/advice"
-        response = self.client.session.get(url)
+        response = await self.client.session.get(url)
         file = await json.loads(await response.text())
         return file["slip"]["advice"]
 
-    async def chuck_norris(self):
+    async def chuck_norris(self) -> str:
         response = await self.client.session.get(
             "https://api.chucknorris.io/jokes/random")
         file = await response.json()
         return file["value"]
 
-    async def getcomi(self):
-        y = random.randint(1, 2325)
+    async def getcomi(self) -> Union[bool, Tuple[str, str, int]]:
+        y = random.randint(1, 2485)
         url = f"https://xkcd.com/{y}/"
         r = await self.client.session.get(url)
         html = await r.text()
         soup = BeautifulSoup(html, "html.parser")
         res = soup.find("div", id="comic")
-        title = res.img["title"]
-        url = f"https:{res.img['src']}"
-        return (title, url, y)
+        if res:
+            title = str(res.img["title"])
+            url = f"https:{res.img['src']}"
+            return title, url, y
+        return False
 
     @commands.command(cooldown_after_parsing=True)
-    async def ping(self, ctx):
+    async def ping(self, ctx: MyContext):
         start = time.perf_counter()
         message = await ctx.send("Nope Not gonna do that")
         end = time.perf_counter()
@@ -153,13 +100,13 @@ class fun(commands.Cog):
         await asyncio.sleep(2)
         dp = round(await self.client.dagpi.data_ping(), 2)
         await message.edit(
-            content="I'm Weak\n```diff\nPONG!\n- Websocket Latency:"
-                    "{} ms\n+ Message {:.2f}\nDagpi: {}```".format(client_lat,
+            content="I'm Weak\ndiff\nPONG!\n- Websocket Latency:"
+                    "{} ms\n+ Message {:.2f}\nDagpi: {}".format(client_lat,
                                                                    duration,
                                                                    dp))
 
     @commands.command(cooldown_after_parsing=True)
-    async def dadjoke(self, ctx):
+    async def dadjoke(self, ctx: MyContext):
         await ctx.trigger_typing()
         guild = ctx.guild
         y = await self.get_joke()
@@ -169,7 +116,7 @@ class fun(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True, hidden=True)
-    async def peace(self, ctx):
+    async def peace(self, ctx: MyContext):
         guild = ctx.guild
         embed = discord.Embed(title="DAGBOT - PEACE", color=guild.me.color)
         embed.add_field(
@@ -198,27 +145,17 @@ class fun(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True, aliases=["coin", "flip"])
-    async def coinflip(self, ctx):
+    async def coinflip(self, ctx: MyContext):
         res = random.randint(1, 2)
         guild = ctx.guild
         # heads = 'http://www.virtualcointoss.com/img/quarter_front.png'55
         # tails = 'http://www.virtualcointoss.com/img/quarter_back.png'
-        if res == 1:
-            embed = discord.Embed(
-                title="Dagbot Coin Flip: Heads",
-                color=guild.me.color)
-            embed.set_image(
-                url="http://www.virtualcointoss.com/img/quarter_front.png")
-            return await ctx.send(embed=embed)
-        elif res == 2:
-            embed = discord.Embed(
-                title="Dagbot Coin Flip: Tails",
-                color=guild.me.color)
-            embed.set_image(
-                url="http://www.virtualcointoss.com/img/quarter_back.png")
-            return await ctx.send(embed=embed)
-        else:
-            return await ctx.send("Unknown Error")
+        embed = discord.Embed(
+            title="Dagbot Coin Flip: Heads",
+            color=guild.me.color)
+        embed.set_image(
+            url= "http://www.virtualcointoss.com/img/quarter_front.png" if res == 1 else "http://www.virtualcointoss.com/img/quarter_back.png")
+        return await ctx.send(embed=embed)
 
     # @commands.command(cooldown_after_parsing=True)
     # @commands.cooldown(1, 3, commands.BucketType.user)
@@ -237,7 +174,7 @@ class fun(commands.Cog):
     #     await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
-    async def randam(self, ctx):
+    async def randam(self, ctx: MyContext):
         embed = discord.Embed(title="Number: 4", color=ctx.guild.me.color)
         embed.set_image(url="https://imgs.xkcd.com/comics/random_number.png")
         return await ctx.send(embed=embed)
@@ -259,7 +196,7 @@ class fun(commands.Cog):
             await channel.send("**{} SENDS A SLAP TO {}**".format(send, guy))
 
     @commands.command(cooldown_after_parsing=True, hidden=True)
-    async def nou(self, ctx):
+    async def nou(self, ctx: MyContext):
         guild = ctx.guild
         embed = discord.Embed(title=" NO U", color=guild.me.color)
         embed.set_image(
@@ -268,7 +205,7 @@ class fun(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True, hidden=True)
-    async def wrongopinion(self, ctx):
+    async def wrongopinion(self, ctx: MyContext):
         msg = (
                 "DAGBOTS RESPONSE TO YOUR OPINION"
                 + "\nhttps://cdn.discordapp.com/attachments/319109213664313354/"
@@ -300,7 +237,7 @@ class fun(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def advice(self, ctx):
+    async def advice(self, ctx: MyContext):
         guild = ctx.guild
         await ctx.trigger_typing()
         cn = await self.get_advice()
@@ -311,7 +248,7 @@ class fun(commands.Cog):
     @commands.command(cooldown_after_parsing=True,
                       aliases=["advic", "cn", "norris"])
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def chucknorris(self, ctx):
+    async def chucknorris(self, ctx: MyContext):
         guild = ctx.guild
         await ctx.trigger_typing()
         cn = await self.chuck_norris()
@@ -343,7 +280,7 @@ class fun(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True, hidden=True)
-    async def war(self, ctx):
+    async def war(self, ctx: MyContext):
         guild = ctx.guild
         embed = discord.Embed(title="DAGBOT - WAR", color=guild.me.color)
         embed.add_field(
@@ -393,7 +330,7 @@ class fun(commands.Cog):
                 title="**{} SENDS A HUG TO {}**".format(send, guy),
                 color=guild.me.color
             )
-            img = await client.get_gif("hug")
+            img = await self.client.sr_api.get_gif("hug")
             embed.set_image(url=img.url)
             await channel.send(embed=embed)
 
@@ -510,24 +447,8 @@ class fun(commands.Cog):
     async def hack(self, ctx, target: discord.Member = None):
         if target is None:
             target = ctx.message.author
-        v = 4
-        if v == 4:
-            bits = getrandbits(32)  # generates an integer with 32 random bits
-            # instances an IPv4Address object from those bits
-            addr = IPv4Address(bits)
-            fake_ip = str(
-                addr)  # get the IPv4Address object's string representation
-        elif v == 6:
-            # generates an integer with 128 random bits
-            bits = getrandbits(128)
-            # instances an IPv6Address object from those bits
-            addr = IPv6Address(bits)
-            # .compressed contains the short version of the IPv6 address
-            # str(addr) always returns the short address
-            # .exploded is the opposite of this, always returning the full
-            # address with all-zero groups and so on
-            fake_ip = addr.compressed
-
+        bits = getrandbits(32) 
+        addr = IPv4Address(bits)
         async def random_with_N_digits(n):
             range_start = 10 ** (n - 1)
             range_end = (10 ** n) - 1
@@ -540,27 +461,30 @@ class fun(commands.Cog):
         if j > 65535:
             j = 65535
         hack_sequence = (
-            '```css\nMember found!\n```', '```css\nGetting ip...\n```',
-            '```css\nip found\n```', f'```css\nip={fake_ip}\n```',
-            '```css\nVirus pushed to ip address\n```',
-            '```css\nGetting info...\n```',
-            f'```css\nemail={b}{f}@gmail.com\n```',
-            '```css\npassword=******\n```',
-            '```css\nDeleting files...\n```', '```css\nFiles deleted.\n```',
-            '```css\nClosing connection...\n```',
-            '```css\nConnection closed.\n```', f'```css\nExited port {j}\n```')
-        message = await ctx.send("```css\nHacking...```")
+            'Member found!\n', 'Getting ip...\n',
+            'ip found\n', f'ip={addr}\n',
+            'Virus pushed to ip address\n',
+            'Getting info...\n',
+            f'email={b}{f}@gmail.com\n',
+            'password=******\n',
+            'Deleting files...\n', 'Files deleted.\n',
+            'Closing connection...\n',
+            'Connection closed.\n', f'Exited port {j}\n')
+        message = await ctx.send("Hacking...")
         for i in hack_sequence:
-            await message.edit(content=message.content + f'\n{i}')
+            await message.edit(content=f"\n" + message.content + f'\n{i}')
             await asyncio.sleep(2)
         return await ctx.send(
             f"Finished hacking user **{target.display_name}**.")
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def xkcd(self, ctx):
+    async def xkcd(self, ctx: MyContext):
         await ctx.trigger_typing()
-        tit, ur, inti = await self.getcomi()
+        res = await self.getcomi()
+        if isinstance(res, bool):
+            return await ctx.send("Error getting comics")
+        tit, ur, inti = res
         embed = discord.Embed(
             title=f"XKCD COMIC: {inti}\n**{tit}**", color=ctx.guild.me.color
         )
@@ -569,21 +493,21 @@ class fun(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
-    async def inspiration(self, ctx):
+    async def inspiration(self, ctx: MyContext):
         url = await self.getinpir()
         embed = discord.Embed(color=ctx.guild.me.color)
         embed.set_image(url=url)
         return await ctx.send(embed=embed)
 
     @commands.command(hidden=True)
-    async def sex(self, ctx):
+    async def sex(self, ctx: MyContext):
         await ctx.send(f"Go to horny Jail <:bonk:790280836754833409>")
 
     @commands.command(name="barrel_roll",
                       aliased=["barrel-roll", "a-barrel-roll",
                                "a_barrel_role"],
                       hidden=True)
-    async def barrelrole(self, ctx):
+    async def barrelrole(self, ctx: MyContext):
         await ctx.send("Yes I can")
 
     @commands.command(hidden=True)

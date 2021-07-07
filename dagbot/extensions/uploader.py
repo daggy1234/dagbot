@@ -1,15 +1,16 @@
 import asyncio
+from dagbot.bot import Dagbot
 
 import aiohttp
 from discord.ext import commands, tasks
 
 
 class Uploader(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Dagbot):
         self.bot = bot
         self.stat_post.start()
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=60)
     async def stat_post(self):
         url = "https://dagbot-site.herokuapp.com/api/newstats"
         stats = {

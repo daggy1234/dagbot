@@ -28,6 +28,7 @@ class DagbotHelpView(discord.ui.View):
 
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        assert interaction.user is not None
         check = self.ctx.author.id == interaction.user.id
         if check:
             return True
@@ -40,7 +41,7 @@ class DagbotHelpView(discord.ui.View):
         if not data:
             raise Exception("No Data")
         try:
-            opt: str = data["values"][0]
+            opt: str = data["values"][0] #type: ignore
             if opt == "help":
                 return await interaction.response.edit_message(embed=self.help_embed)
             else:
@@ -105,7 +106,7 @@ reactions below.'''
         cog_list.append('settings')
         embed.add_field(name='prefix', value=f'`{prefix}`')
         view = DagbotHelpView(ctx, cog_list, embed)
-        msg = await ctx.send(embed=embed, view=view)
+        await ctx.send(embed=embed, view=view)
 
     @staticmethod
     async def cog_help_maker(cog: commands.Cog, ctx: MyContext) -> discord.Embed:
@@ -178,7 +179,8 @@ reactions below.'''
         return embed
 
     async def send_cog_help(self, cog):
-        ctx = self.context
+        assert self.context is not None
+        ctx: MyContext = self.context
         r = False
         g_id = ctx.guild.id
         for record in ctx.bot.cogdata:
@@ -193,9 +195,9 @@ reactions below.'''
             return await ctx.send('The cog has been disabled in the server')
 
     async def send_group_help(self, group):
+        assert self.context is not None
         ctx = self.context
         guild = ctx.guild
-        ctx = self.context
 
         embed = discord.Embed(color=guild.me.color, )
 
@@ -204,7 +206,7 @@ reactions below.'''
         else:
             embed.title = f"{group.qualified_name} group"
         try:
-            hel = data.grouphelp[group.qualified_name]
+            hel = textdata.grouphelp[group.qualified_name]
         except BaseException:
             embed.description = (
                 "We are in the process of adding help to this group.\n\n"
@@ -214,7 +216,7 @@ reactions below.'''
 
         return await ctx.send(embed=embed)
 
-    async def bucket_type_processor(self, btype: commands.BucketType):
+    async def bucket_type_processor(self, btype: commands.BucketType) -> str:
         if btype == commands.BucketType.user:
             return "user"
         elif btype == commands.BucketType.channel:
@@ -266,6 +268,7 @@ reactions below.'''
         return await ctx.send(embed=embed)
 
     def command_not_found(self, string):
+        assert self.context is not None
         ctx = self.context
         com = [command.qualified_name for command in ctx.bot.commands]
         matches = difflib.get_close_matches(string, com)
@@ -276,9 +279,11 @@ reactions below.'''
         return base + coms
 
     def get_destination(self):
+        assert self.context is not None
         return self.context.channel
 
     async def send_error_message(self, error):
+        assert self.context is not None
         ctx = self.context
         destination = self.get_destination()
         embed = discord.Embed(title="Help Error",

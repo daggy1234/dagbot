@@ -6,7 +6,7 @@ from typing import Dict, TypedDict, List, Union
 import async_cse
 import discord
 from bs4 import BeautifulSoup
-from discord.ext import commands, menus
+from discord.ext import commands
 from discord.ext.commands import BucketType
 from jishaku.codeblocks import codeblock_converter, Codeblock
 from dagbot.utils.daggypag import DaggyPaginator
@@ -24,39 +24,6 @@ class YtResponse(TypedDict):
     channel: List[str]
     time: List[str]
     kind: List[str]
-
-class MyMenugoogle(menus.Menu):
-    def __init__(self, reslist):
-        super().__init__()
-        self.reslist = reslist
-
-    async def send_initial_message(self, ctx, channel):
-        return await channel.send(self.reslist[0].url)
-
-    @menus.button("1\N{combining enclosing keycap}")
-    async def result_one(self, payload):
-        await self.message.edit(content=self.reslist[0].url)
-
-    @menus.button("2\N{combining enclosing keycap}")
-    async def result_2(self, payload):
-        await self.message.edit(content=self.reslist[1].url)
-
-    @menus.button("3\N{combining enclosing keycap}")
-    async def result_3(self, payload):
-        await self.message.edit(content=self.reslist[2].url)
-
-    @menus.button("4\N{combining enclosing keycap}")
-    async def result_4(self, payload):
-        await self.message.edit(content=self.reslist[3].url)
-
-    @menus.button("5\N{combining enclosing keycap}")
-    async def result_5(self, payload):
-        await self.message.edit(content=self.reslist[4].url)
-
-    @menus.button("\N{BLACK SQUARE FOR STOP}\ufe0f")
-    async def on_stop(self, payload):
-        self.stop()
-
 
 class util(commands.Cog):
     """useful features (might actually help)"""
@@ -253,6 +220,8 @@ pressure:              {}hPa```""".format(
         guild = ctx.guild
         await ctx.trigger_typing()
         tcor = await self.gettaco()
+        if isinstance(tcor, bool):
+            return await ctx.send("Error parsing taco")
         embed = discord.Embed(
             title="DAGBOT - RANDOM TACO",
             color=guild.me.color)

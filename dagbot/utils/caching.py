@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict, List, Mapping, Optional, TYPE_CHECKING
+from typing import List, Mapping, Optional, TYPE_CHECKING
 
 from discord.ext import commands
 if TYPE_CHECKING:

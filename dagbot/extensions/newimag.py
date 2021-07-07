@@ -1,6 +1,8 @@
+from __future__ import annotations
+from dagbot.utils.context import MyContext
 import random
 import time
-import typing
+from typing import Union, Optional
 from datetime import datetime
 from io import BytesIO
 
@@ -10,8 +12,7 @@ from asyncdagpi import ImageFeatures, Image
 from discord.ext import commands
 
 from dagbot.utils.exceptions import NoImageFound
-from ..utils.converters import BetterMemberConverter, ImageConverter, \
-    StaticImageConverter
+from ..utils.converters import  ImageConverter, StaticImageConverter, BetterMemberConverter
 
 
 # atMoMn2Pg3EUmZ065QBvdJN4IcjNxCQRMv1oZTZWg98i7HelIdvJwHtZFKPgCtf
@@ -83,11 +84,11 @@ class image(commands.Cog):
         self.make_fn_alex("jokeoverhead", StaticImageConverter())
 
     def make_fn(self, feature: asyncdagpi.ImageFeatures,
-                converter: typing.Union
+                converter: Union
                 [ImageConverter, StaticImageConverter]):
         @commands.command(name=feature.value.replace("/", ""),
                           help=feature.description)
-        async def _command(_self, ctx, *, to_convert: str = ""):
+        async def _command(_self, ctx: MyContext, *, to_convert: str = ""):
             source = await converter.convert(ctx, to_convert)
             if source is None:
                 raise NoImageFound('Please provide a valid image')
@@ -97,17 +98,17 @@ class image(commands.Cog):
             await self.to_embed(ctx, img, feature.value.replace("/", ""))
 
         _command.cog = self
-        self.__cog_commands__ += (_command,)
+        self.__cog_commands__ += (_command,) # type: ignore
 
     async def process_alex(self, url: str) -> BytesIO:
         out = await self.client.session.get(url, headers={
             "Authorization": self.client.data["alex"]})
         return BytesIO(await out.read())
 
-    def make_fn_alex(self, feature: str, converter: typing.Union
+    def make_fn_alex(self, feature: str, converter: Union
     [ImageConverter, StaticImageConverter]):
         @commands.command(name=feature)
-        async def _command(_self, ctx, *, to_convert: str = ""):
+        async def _command(_self, ctx: MyContext, *, to_convert: str = ""):
             source = await converter.convert(ctx, to_convert)
             start = time.perf_counter()
             url = f"https://api.alexflipnote.dev/{feature}?image={source}"
@@ -116,7 +117,7 @@ class image(commands.Cog):
             await self.to_embed_alex(ctx, img, end - start, feature)
 
         _command.cog = self
-        self.__cog_commands__ += (_command,)
+        self.__cog_commands__ += (_command,) # type: ignore
 
     async def cog_check(self, ctx):
         g_id = str(ctx.guild.id)
@@ -124,7 +125,7 @@ class image(commands.Cog):
             if str(e["serverid"]) == str(g_id):
                 return bool(e["image"])
 
-    async def to_embed(self, ctx, img: Image, feature: str):
+    async def to_embed(self, ctx: MyContext, img: Image, feature: str):
         async with ctx.typing():
             io = img.image
             embed = discord.Embed(color=ctx.guild.me.color)
@@ -138,8 +139,8 @@ class image(commands.Cog):
                              text=f"Called by {ctx.author.display_name}")
             await ctx.reply(embed=embed, file=file)
 
-    async def to_embed_alex(self, ctx, img: BytesIO,
-                            time: typing.Optional[float], feature: str):
+    async def to_embed_alex(self, ctx: MyContext, img: BytesIO,
+                            time: Optional[float], feature: str):
         async with ctx.typing():
             embed = discord.Embed(color=ctx.guild.me.color)
             filename = f"dagbot=process-image-{feature}.png"
@@ -156,7 +157,7 @@ class image(commands.Cog):
             await ctx.reply(embed=embed, file=file)
 
     @commands.command(cooldown_after_parsing=True)
-    async def special(self, ctx, *, to_convert: str = ""):
+    async def special(self, ctx: MyContext, *, to_convert: str = ""):
         image = await ImageConverter().convert(ctx, to_convert)
         if image is None:
             raise NoImageFound('Please provide a valid image')
@@ -165,12 +166,12 @@ class image(commands.Cog):
                             "Dagpi Special Endpoint. Can change randomly")
 
     @commands.command(cooldown_after_parsing=True)
-    async def tweet(self, ctx, user: BetterMemberConverter = None, *, text: str):
-        if user is None:
-            user = ctx.author
+    async def tweet(self, ctx: MyContext, user: Optional[Union[BetterMemberConverter, discord.User]] = None, *, text: str):
+        user = user or ctx.author._user
+        if not isinstance(user, discord.User):
+            return await ctx.send("Error parsing user :(")
         uname = user.name
-        text = str(text)
-        pfp = str(user.avatar_url_as(format="png", size=1024))
+        pfp = str(user.avatar.with_format("png").with_size(1024))
         img = await self.client.dagpi.image_process(ImageFeatures.tweet(),
                                                     url=pfp,
                                                     username=uname,
@@ -178,23 +179,25 @@ class image(commands.Cog):
         await self.to_embed(ctx, img, "tweet")
 
     @commands.command(cooldown_after_parsing=True)
-    async def captcha(self, ctx, user: BetterMemberConverter = None, *,
+    async def captcha(self, ctx: MyContext, user: Optional[Union[BetterMemberConverter, discord.User]]  = None, *,
                       text: str):
-        if user is None:
-            user = ctx.author
-        pfp = str(user.avatar_url_as(format="png", size=1024))
+        user = user or ctx.author._user
+        if not isinstance(user, discord.User):
+            return await ctx.send("Error parsing user :(")
+        pfp = str(user.avatar.with_format("png").with_size(1024))
         img = await self.client.dagpi.image_process(ImageFeatures.captcha(),
                                                     url=pfp,
                                                     text=text)
         await self.to_embed(ctx, img, "captcha")
 
     @commands.command(cooldown_after_parsing=True)
-    async def message(self, ctx, user: BetterMemberConverter = None, *, text):
-        if user is None:
-            user = ctx.author
+    async def message(self, ctx: MyContext, user: Optional[Union[BetterMemberConverter, discord.User]] = None, *, text):
+        user = user or ctx.author._user
+        if not isinstance(user, discord.User):
+            return await ctx.send("Error parsing user :(")
         uname = user.display_name
         text = str(text)
-        pfp = str(user.avatar_url_as(format="png", size=1024))
+        pfp = str(user.avatar.with_format("png").with_size(1024))
         img = await self.client.dagpi.image_process(ImageFeatures.discord(),
                                                     url=pfp,
                                                     username=uname,
@@ -202,12 +205,13 @@ class image(commands.Cog):
         await self.to_embed(ctx, img, "message")
 
     @commands.command(cooldown_after_parsing=True)
-    async def comment(self, ctx, user: BetterMemberConverter = None, *, text):
-        if user is None:
-            user = ctx.author
-        uname = user.display_name
+    async def comment(self, ctx: MyContext, user: Optional[Union[BetterMemberConverter, discord.User]] = None, *, text):
+        user = user or ctx.author._user
+        if not isinstance(user, discord.User):
+            return await ctx.send("Error parsing user :(")
+        uname = user.name
         text = str(text)
-        pfp = str(user.avatar_url_as(format="png", size=1024))
+        pfp = str(user.avatar.with_format("png").with_size(1024))
         img = await self.client.dagpi.image_process(ImageFeatures.youtube(),
                                                     url=pfp,
                                                     username=uname,
@@ -215,13 +219,12 @@ class image(commands.Cog):
         await self.to_embed(ctx, img, "comment")
 
     @commands.command(cooldown_after_parsing=True, aliases=['av', 'pfp'])
-    async def avatar(self, ctx, *, user=None):
+    async def avatar(self, ctx: MyContext, *, user: Optional[Union[BetterMemberConverter, discord.User]] = None):
         await ctx.trigger_typing()
-        if user is None:
-            user = ctx.author
-        else:
-            user = await BetterMemberConverter().convert(ctx, user)
-        url = user.avatar_url
+        user = user or ctx.author._user
+        if not isinstance(user, discord.User):
+            return await ctx.send("Error parsing user :(")
+        url = user.avatar.url
         guy = user.display_name
         embed = discord.Embed(
             title=f"{guy}'s Profile Pic",
@@ -230,13 +233,13 @@ class image(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
-    async def achievement(self, ctx, *, text):
+    async def achievement(self, ctx: MyContext, *, text: str):
         url = f"https://api.alexflipnote.dev/achievement?text={text}&icon={random.randint(1, 44)}"
         await self.to_embed_alex(ctx, await self.process_alex(url), None,
                                  "achievement")
 
     @commands.command(cooldown_after_parsing=True)
-    async def challenge(self, ctx, *, text):
+    async def challenge(self, ctx: MyContext, *, text: str):
         url = f"https://api.alexflipnote.dev/challenge?text={text}&icon={random.randint(1, 44)}"
         await self.to_embed_alex(ctx, await self.process_alex(url), None,
                                  "challenge")
@@ -284,11 +287,13 @@ class image(commands.Cog):
                                  "pornhub")
 
     @commands.command(cooldown_after_parsing=True)
-    async def ship(self, ctx, user: BetterMemberConverter,
-                   usert: BetterMemberConverter):
-        urla = str(user.avatar_url_as(format="png", size=1024))
+    async def ship(self, ctx: MyContext, user: Optional[Union[BetterMemberConverter, discord.User]],
+                  usert: Union[BetterMemberConverter, discord.User]):
+        if not (isinstance(user, discord.User) and isinstance(usert, discord.User)):
+            return await ctx.send("Not User's")
+        urla = str(user.avatar.with_format("png").with_size(1024))
         guya = user.display_name
-        urlb = str(usert.avatar_url_as(format="png", size=1024))
+        urlb = str(usert.avatar.with_format("png").with_size(1024))
         guyb = usert.display_name
         if guya == guyb:
             return await ctx.send("Thats just loving yourself.")

@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from dagbot.utils.context import MyContext
-from typing import Dict, Tuple, Union
+from typing import Tuple
 from dagbot.bot import Dagbot
 import json
 

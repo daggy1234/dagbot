@@ -6,12 +6,15 @@ from typing import List, Dict, Optional
 import aiohttp
 import asyncpg
 import discord
+from discord.enums import MessageType
 import sentry_sdk
 import yaml
+from PyDictionary import PyDictionary
 from asyncdagpi import Client
 from discord import Webhook
 from dagbot.extensions.reddit import reddit
 from discord.ext import commands
+import sr_api
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
 from .utils.badwordcheck import bword
@@ -82,6 +85,8 @@ class Dagbot(commands.AutoShardedBot):
         self.bwordchecker: bword = bword()
         self.bwordchecker.loadbword()
         self.useage: Dict[str, int] = {}
+        self.sr_api = sr_api.Client()
+        self.dictionary = PyDictionary()
         self.commands_called: int = 0
 
         # self.add_cog(Help(bot))
@@ -115,7 +120,11 @@ class Dagbot(commands.AutoShardedBot):
         )
         self.logger.info("Ready to roll")
 
-    async def process_commands(self, message):
+    async def process_commands(self, message: discord.Message):
+
+        if not message.guild:
+            return
+
         if message.author.bot and message.guild.id != 491175207122370581:
             return
 

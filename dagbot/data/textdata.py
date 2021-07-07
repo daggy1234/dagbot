@@ -15,7 +15,10 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-cmdhelp = {
+from typing import Dict, List
+
+
+cmdhelp: Dict[str, str] = {
     "clapify": "*inert slow clap*",
     "monospace": "adds a black box around text to make it fancy",
     "under": "__underlines text__",
@@ -111,7 +114,7 @@ cmdhelp = {
     "Dagbotmeme": "Memes from just r/memes and r/dankmemes",
 }
 
-grouphelp = {
+grouphelp: Dict[str, str] = {
     "tag": """`tags`:
 `tag <name>`: has the bot output the content of the tag
 `tag create <name> <content>`: stores tga with the content
@@ -140,7 +143,7 @@ enter cancel to terminate the game. `
 """
 }
 
-emojilist = {
+emojilist: Dict[str, str] = {
     "text": "\U0001f1f9",
     "games": "\U0001f3b2",
     "reddit": "\U0001f534",
@@ -157,7 +160,7 @@ emojilist = {
     "ai": "\U0001f916",
     "settings": "\U00002699",
 }
-notfoundelist = [
+notfoundelist: List[str] = [
     "Error 404: That member does not exist",
     "Hey see the member list  and find dude I actually know ",
     "Imaginary members and your imaginary gf sound like a dream team",
@@ -176,7 +179,7 @@ notfoundelist = [
     "I cannot make people out of thin air smh",
     "Please mention some actual people and not your imaginary friends",
 ]
-missingargs = [
+missingargs: List[str] = [
     "Hey, you lazy bum! Add some arguments first, 'kay?",
     "Learn how to type in the correct info ,doof",
     "I am a bot, I do not understand idiots who "
@@ -191,7 +194,7 @@ missingargs = [
     "If do not have arguments, I wonder what else you do not have",
     "Oh boy! Here I go teaching humands how to type again",
 ]
-cooldowncom = [
+cooldowncom: List[str] = [
     "Bruh chill tf out I need a break gimme about ",
     "Slow your roll buddy these take a lot of energy to do and "
     "I'm lazy so can you wait for ",
@@ -199,14 +202,14 @@ cooldowncom = [
     "I have to use the toilet brb in ",
     "Running kinda hot right now. Lemme Cooldown a bit",
 ]
-missingperms = [
+missingperms: List[str] = [
     "Come back when you have real power to do this ",
     "Are you really in charge here?",
     "I will wait for the  return of the king",
     "Hmmm stop acting like my boss",
     "Ngl I am not wasting my time  on you.Come back with more power",
 ]
-concur = [
+concur: List[str] = [
     "I am running at 100%",
     "Too much happening......Process Overload",
     "BEEP BOOP , I AM A BOT NOT  FRICKIN GOD",

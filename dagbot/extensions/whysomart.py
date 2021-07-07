@@ -1,21 +1,13 @@
 from __future__ import annotations
 import functools
-from typing import Any, Dict, Tuple, List, Union, TYPE_CHECKING
+from typing import Any, Dict, Tuple, List, Union
 from dagbot.bot import Dagbot
 from dagbot.utils.context import MyContext
 import random
-from contextlib import suppress
 
 import discord
-from PyDictionary import PyDictionary
 from bs4 import BeautifulSoup
 from discord.ext import commands
-
-
-if TYPE_CHECKING:
-    from dagbot.utils.json_type import JSONValue
-
-dictionary = PyDictionary()
 
 
 
@@ -372,7 +364,7 @@ class smart(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     async def define(self, ctx: MyContext, *, word: str):
         await ctx.trigger_typing()
-        fn = functools.partial(dictionary.meaning, word)
+        fn = functools.partial(self.client.dictionary.meaning, word)
         dict_ =  await self.client.loop.run_in_executor(None, fn)
         if not dict_:
             return await ctx.send("No Definitons")

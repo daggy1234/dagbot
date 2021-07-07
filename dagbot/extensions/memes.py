@@ -1,6 +1,7 @@
 import asyncio
 import json
 from io import BytesIO
+from typing import List
 
 import discord
 from asyncdagpi import ImageFeatures
@@ -13,14 +14,7 @@ def setup(client):
     client.add_cog(memes(client))
 
 
-topasslist = []
-with open("./dagbot/data/imgfliptemplates.json") as file:
-    f = json.load(file)
-    li = f["data"]["memes"]
-    for e in li:
-        elstring = f"[{e['name']}]({e['url']}): {e['box_count']} text boxes"
-        topasslist.append(elstring)
-    file.close()
+
 
 
 class Test:
@@ -29,8 +23,7 @@ class Test:
         self.value = value
 
 
-keylist = ["Dagbot's meme generator"]
-data = [Test(key=key, value=value) for key in keylist for value in topasslist]
+
 
 
 class Source(menus.GroupByPageSource):
@@ -62,6 +55,13 @@ class memes(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+        topasslist: List[str] = []
+        with open("./dagbot/data/imgfliptemplates.json", "r") as file:
+            f = json.load(file)
+            li = f["data"]["memes"]
+            for e in li:
+                elstring = f"[{e['name']}]({e['url']}): {e['box_count']} text boxes"
+                topasslist.append(elstring)
         self.data = [Test(key=key, value=value) for key in [
             "Dagbot's meme generator"] for value in topasslist]
 
@@ -166,7 +166,7 @@ class memes(commands.Cog):
             try:
                 cont = msg.content
                 member = await BetterMemberConverter().convert(ctx, cont)
-                image_url = member.avatar_url(static_format='png', size='1024')
+                image_url = str(member.avatar.with_static_format("png").with_size(1024))
             except Exception:
                 pass
             if len(msg.attachments) != 0:
@@ -254,7 +254,7 @@ class memes(commands.Cog):
             try:
                 cont = msg.content
                 member = await BetterMemberConverter().convert(ctx, cont)
-                image_url = member.avatar_url(static_format='png', size='1024')
+                image_url = str(member.avatar.with_static_format("png").with_size(1024))
             except Exception:
                 pass
             if len(msg.attachments) != 0:
@@ -366,8 +366,7 @@ class memes(commands.Cog):
             try:
                 cont = msg.content
                 member = await BetterMemberConverter().convert(ctx, cont)
-                image_url = member.avatar_url(static_format='png',
-                                              size='1024')
+                image_url = str(member.avatar.with_static_format("png").with_size(1024))
             except BaseException:
                 pass
             if len(msg.attachments) != 0:

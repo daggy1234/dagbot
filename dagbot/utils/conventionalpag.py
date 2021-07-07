@@ -21,7 +21,7 @@ class DaggyPaginatorClassic(discord.ui.View):
 	def __init__(self, ctx: MyContext,embeds: List[discord.Embed]):
 	    super().__init__(timeout=60.0)
 	    self.ctx = ctx
-	    self.embeds = embeds
+	    self.embeds: List[discord.Embed] = embeds
 	    self.embed_pos = 0
 	    self.max = len(embeds)
 
@@ -76,5 +76,5 @@ class DaggyPaginatorClassic(discord.ui.View):
 
 	async def process_callback(self,select: discord.ui.Select, interaction: discord.Interaction):
 		assert interaction.data is not None
-		opt: str = int(interaction.data["values"][0])
+		opt: int = int(interaction.data["values"][0]) #type: ignore
 		await interaction.response.edit_message(embed=self.embeds[opt])

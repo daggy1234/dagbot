@@ -19,12 +19,11 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
     async def on_message(self, message):
         channel = message.channel
         g_id = message.guild.id
+        prefix = "@Dagbot (run repair to fix. Guild is broken)"
         for e in self.bot.prefdict:
             if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
-            else:
-                prefix = "@Dagbot (run repair to fix. Guild is broken)"
         ctx = await self.bot.get_context(message)
         if not ctx.valid and self.bot.user in message.mentions:
             embed = discord.Embed(
@@ -84,11 +83,13 @@ class EventHandler(commands.Cog, command_attrs=dict(hidden=True)):
         )
         with suppress(Exception):
             # Tries to disclose who added the bot
-            async for thing in guild.audit_logs(limit=10):
+            added_event = None
+            async for thing in guild.audit_logs(limit=100):
                 if thing.action == discord.AuditLogAction.bot_add:
                     added_event = thing
                     break
-            embed.add_field(name="Added By", value=added_event.user)
+            if added_event:
+                embed.add_field(name="Added By", value=added_event.user)
 
         webhook = Webhook.from_url(
             self.bot.data['guildlog'],

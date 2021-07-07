@@ -1,6 +1,8 @@
+from typing import Set, Tuple, Union
+
 class bword:
     def __init__(self):
-        self.bord = set()
+        self.bord: Set[str] = set()
 
     def loadbword(self):
         with open("dagbot/data/dirtywords.txt", "r") as file:
@@ -9,14 +11,14 @@ class bword:
                 i = i.strip("\n")
                 self.bord.add(i)
 
-    async def setcheck(self, nset):
+    async def setcheck(self, nset: Set[str]) -> Tuple[bool, Union[str, Set[str]]]:
         f = nset.intersection(self.bord)
         if len(f) == 0:
             return (False, "nothing")
         else:
             return (True, f)
 
-    async def constructwordset(self, sent):
+    async def constructwordset(self, sent: str) -> Set[str]:
         split = sent.split(" ")
         nset = set()
         for w in split:
@@ -24,7 +26,7 @@ class bword:
             nset.add(w)
         return nset
 
-    async def itercheck(self, sent):
+    async def itercheck(self, sent: str) -> Tuple[bool, str]:
         sent = sent.lower()
         sent = sent.strip(" ")
         sent = sent.replace(" ", "")
@@ -35,7 +37,7 @@ class bword:
                 continue
         return (False, "nothing")
 
-    async def bwordcheck(self, sent):
+    async def bwordcheck(self, sent: str) -> Tuple[bool, str]:
         s = await self.constructwordset(sent)
         r, f = await self.setcheck(s)
         if r:

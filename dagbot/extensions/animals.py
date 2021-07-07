@@ -15,13 +15,10 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from os import name
-from typing import Callable
 from dagbot.bot import Dagbot
 from dagbot.utils.context import MyContext
 
 import discord
-import sr_api
 from discord.ext import commands
 
 class animals(commands.Cog):
@@ -31,7 +28,7 @@ class animals(commands.Cog):
         self.client = client
         self.image_animals = ["dog","cat","panda","red_panda","fox","birb","koala","kangaroo","racoon","whale","pikachu"]
         self.fact_animals = ["cat","dog"," koala","fox","bird","elephant","panda","racoon","kangaroo","giraffe","whale"]
-        self.srapi = sr_api.Client()
+        self.srapi = client.sr_api
         
 
         
@@ -60,7 +57,7 @@ class animals(commands.Cog):
             return await ctx.send(embed=embed)
 
         _command.cog = self
-        self.__cog_commands__ += (_command,)
+        self.__cog_commands__ += (_command,) #type: ignore
 
     def make_fn_image(self, animal: str):
         @commands.command(name=f"{animal}",
@@ -75,7 +72,7 @@ class animals(commands.Cog):
             return await ctx.send(embed=embed)
 
         _command.cog = self
-        self.__cog_commands__ += (_command,)
+        self.__cog_commands__ += (_command,) #type: ignore
 
 
 def setup(client: Dagbot):

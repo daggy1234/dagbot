@@ -2,7 +2,6 @@ from dagbot.bot import Dagbot
 import random
 
 import art
-import sr_api
 import zalgoify
 from art import text2art, artError
 from cryptography.fernet import Fernet
@@ -11,10 +10,8 @@ from owotext import OwO
 from dagbot.utils.context import MyContext
 from vaporwavely import vaporize
 
-client = sr_api.Client()
 
-
-def setup(client):
+def setup(client: Dagbot):
     client.add_cog(text(client))
 
 
@@ -23,7 +20,7 @@ class text(commands.Cog):
 
     def __init__(self, client: Dagbot):
         self.client = client
-        self.uwu = OwO()
+        self.uwu_if = OwO()
         self.cipher_suite = Fernet(Fernet.generate_key())
 
     async def cog_check(self, ctx):
@@ -107,7 +104,7 @@ class text(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     async def monospace(self, ctx: MyContext, *, text: str):
-        return await ctx.send("`{}`".format(text: str))
+        return await ctx.send("`{}`".format(text))
 
     @commands.command(cooldown_after_parsing=True)
     async def under(self, ctx: MyContext, *, text: str):
@@ -213,7 +210,7 @@ class text(commands.Cog):
 
     @commands.command()
     async def uwu(self, ctx: MyContext, *, text: str):
-        t = self.uwu.whatsthis(text)
+        t = self.uwu_if.whatsthis(text)
         if len(t) > 2000:
             return await ctx.send('your text is to long')
         else:

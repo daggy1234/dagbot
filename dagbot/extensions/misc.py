@@ -520,7 +520,7 @@ class misc(commands.Cog):
             return await ctx.send(
                 f'There is no command with that name. Maybe check repo\n'
                 f'{self.bot.repo}')
-        code = com.callback.__code__
+        code = com.callback.__code__ #type: ignore
         filename = code.co_filename
         lines, firstline = inspect.getsourcelines(code)
         old_path = os.path.relpath(filename).decode('utf-8')

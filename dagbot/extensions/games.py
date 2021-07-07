@@ -1,7 +1,10 @@
 import asyncio
+from sys import platform
+
+from discord import player
 from dagbot.bot import Dagbot
 from operator import ne
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from discord.ui import view
 from dagbot.data.hangman import hangmanassest
@@ -283,7 +286,7 @@ class RussianRoulette(BaseDagbotGameView):
                     item.emoji = "<:bullet:860793990487998517>" if item.has_bullet else "\U000026ab"
 
 
-class TicTacToeButton(discord.ui.Button['TicTacToeAi']):
+class TicTacToeButtonAi(discord.ui.Button['TicTacToeAi']):
 
     def __init__(self, x: int, y: int, tt: TicTacToe):
            super().__init__(style=discord.ButtonStyle.secondary, label='\u200b', row=y)
@@ -321,12 +324,83 @@ class TicTacToeButton(discord.ui.Button['TicTacToeAi']):
         await interaction.response.edit_message(view=view)
 
 
+class TicTacToeButton(discord.ui.Button['TicTacToeVs']):
+
+    def __init__(self, x: int, y: int, tt: TicTacToe):
+           super().__init__(style=discord.ButtonStyle.secondary, label='\u200b', row=y)
+           self.x = x
+           self.y = y
+           self.tt = tt
+
+    async def callback(self, interaction: discord.Interaction):
+        assert self.view is not None
+        assert interaction.user is not None
+        view : TicTacToeVs = self.view
+        token  = 1 if interaction.user.id == view.player_a.id else 2
+        self.label  = 'X' if interaction.user.id == view.player_a.id else 'O'
+        self.disabled = True
+        self.style = discord.ButtonStyle.red if interaction.user.id == view.player_a.id else discord.ButtonStyle.green
+        view.player_a_turn = not view.player_a.id == interaction.user.id
+        view.moves.append((self.y, self.x))
+        view.turns += 1
+        await self.tt.makemove(self.y, self.x, token)
+        win, t = await self.tt.check_win()
+        if win:
+            winner = "Na"
+            message = "Both Players have drawn"
+            if t == 1:
+                winner = "X"
+                message = f"{view.player_a.mention}, played `{winner}` and has won today"
+            elif t == 2:
+                winner = "O"
+                message = f"{view.player_b.mention}, played `{winner}` and has won today"
+            else:
+                pass
+            view.disable_all()
+            await interaction.response.edit_message(content=f"Result\nThe winner is `{winner}`\n{message}",view=view)
+            view.stop()
+            return
+
+        await interaction.response.edit_message(view=view)
+
+
+
+
+class TicTacToeVs(BaseDagbotGameView):
+
+    children: List[TicTacToeButton]
+
+    def __init__(self, ctx: MyContext, timeout_embed: discord.Embed, tt: TicTacToe, player_a: discord.User, player_b: discord.User):
+        super().__init__(ctx, timeout_embed)
+        self.tt = tt
+        self.moves: List[Tuple[int, int]] = []
+        self.turns = 0
+        self.player_a = player_a
+        self.player_b = player_b
+        self.player_a_turn = True
+        for x in range(3):
+            for y in range(3):
+                self.add_item(TicTacToeButton(x, y, tt))
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        assert interaction.user is not None
+        if interaction.user.id not in [self.player_a.id, self.player_b.id]:
+            await interaction.response.send_message("Not your game", ephemeral=True)
+            return False
+        if self.player_a_turn and interaction.user.id == self.player_b.id:
+            await interaction.response.send_message(f"{self.player_a.mention} is Playing", ephemeral=True)
+            return False
+        if self.player_a_turn == False and interaction.user.id == self.player_a.id:
+            await interaction.response.send_message(f"{self.player_b.mention} is Playing", ephemeral=True)
+            return False
+        return True
+
 
 
 
 class TicTacToeAi(BaseDagbotGameView):
 
-    children: List[TicTacToeButton]
+    children: List[TicTacToeButtonAi]
 
     def __init__(self, ctx: MyContext, timeout_embed: discord.Embed, tt: TicTacToe):
         super().__init__(ctx, timeout_embed)
@@ -335,7 +409,7 @@ class TicTacToeAi(BaseDagbotGameView):
         self.turns = 0
         for x in range(3):
             for y in range(3):
-                self.add_item(TicTacToeButton(x, y, tt))
+                self.add_item(TicTacToeButtonAi(x, y, tt))
 
 
     async def make_parent_ai(self):
@@ -626,18 +700,22 @@ class games(commands.Cog):
             if str(e["serverid"]) == str(g_id):
                 return bool(e["games"])
 
-    async def getcountry(self):
+    async def getcountry(self) -> Union[bool, Dict[str, str]]:
         url = "https://random.country/"
         file = await self.bot.session.get(url)
         r = file.content
         html = await r.read()
 
         soup = BeautifulSoup(html, "html.parser")
-        name = soup.find("h2").text
-        info = soup.find("p").text
+        name_s = soup.find("h2")
+        name = name_s.text if name_s else None
+        info_s = soup.find("p")
+        info = info_s.text if info_s else None
         dic = soup.find_all("img")
         hr = dic[1]["src"]
         flg = f"https://random.country{hr}"
+        if name is None or info is None:
+            return False
         return {"country": name, "info": info, "wiki": hr, "flag": flg}
 
     async def question(self):
@@ -646,7 +724,7 @@ class games(commands.Cog):
         file = await response.json()
         return file
 
-    async def geteither(self):
+    async def geteither(self) -> Dict[str, Union[str, int]]:
         y = await self.bot.session.get('http://either.io/')
         html = await y.text()
         soup = BeautifulSoup(html, 'html.parser')
@@ -979,13 +1057,14 @@ class games(commands.Cog):
             ".",
             " ",
         ]
+        wordllist = []
+        blankguesslist = []
+        f = None
+        url = None
         if num < 5:
             if num == 0:
                 movies = await self.get_all_movies()
                 mov = random.sample(movies, 1)
-                wordllist = []
-
-                blankguesslist = []
                 movtit = mov[0]["name"]
                 f = movtit.lower()
                 id = mov[0]["img"]
@@ -1005,8 +1084,6 @@ class games(commands.Cog):
                 ann = (random.sample(animal, 1))[0]
                 url = f"https://www.randomlists.com/img/animals/" \
                       f"{ann.replace(' ', '_')}.jpg"
-                wordllist = []
-                blankguesslist = []
 
                 f = ann.lower()
                 for i in range(0, len(f)):
@@ -1020,8 +1097,8 @@ class games(commands.Cog):
                     i += 1
             elif num == 4:
                 cdict = await self.getcountry()
-                wordllist = []
-                blankguesslist = []
+                if isinstance(cdict, bool):
+                    return await ctx.send("No country found :(")
                 url = cdict["flag"]
 
                 f = cdict["country"].lower()
@@ -1039,8 +1116,6 @@ class games(commands.Cog):
                 thing = (random.sample(thingl, 1))[0]
                 url = f"https://www.randomlists.com/img/things/" \
                       f"{thing.replace(' ', '_')}.jpg"
-                wordllist = []
-                blankguesslist = []
 
                 f = thing.lower()
                 for i in range(0, len(f)):
@@ -1057,12 +1132,12 @@ class games(commands.Cog):
                 url = "No url found"
                 t = r.random_word()
                 f = t.lower()
-                wordllist = []
-                blankguesslist = []
                 for i in range(0, len(f)):
                     wordllist.append(f[i])
                     blankguesslist.append("\u25EF")
                     i += 1
+            if f is None or url is None:
+                return await ctx.send("Error getting question")
             numlist = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
             guesselist = []
             tries = 0
@@ -1387,7 +1462,7 @@ class games(commands.Cog):
                                                 check=check)
             except asyncio.TimeoutError:
                 await channel.send("TIME IS UP")
-                await channel.send("NUMBER WAS: {}".format(y))
+                return await channel.send("NUMBER WAS: {}".format(y))
             try:
                 guessf = int(guess.content)
             except BaseException:
@@ -1464,11 +1539,9 @@ class games(commands.Cog):
         await ctx.send("TTT", view=view)
 
     @tictactoe.command()
-    async def user(self, ctx):
-        mlsit = []
-        mlsit.append(ctx.author)
+    async def user(self, ctx: MyContext, *, big_user: discord.User):
         msg = await ctx.send(
-            f'React if you wanna join {ctx.author.mention} '
+            f'{big_user.mention} react if you wanna join {ctx.author.mention} '
             f'for a game of tictactoe')
         await msg.add_reaction('<a:giftick:734746863340748892>')
 
@@ -1477,7 +1550,7 @@ class games(commands.Cog):
         def check(reaction, user):
             # print('reaction')
             return reaction.message.id == msg.id and not user.bot and str(
-                reaction.emoji) == '<a:giftick:734746863340748892>'
+                reaction.emoji) == '<a:giftick:734746863340748892>' and big_user.id == user.id
 
         try:
             reaction, user = await self.bot.wait_for('reaction_add',
@@ -1488,119 +1561,121 @@ class games(commands.Cog):
                 'sorry no one wants to play with you. \
                 Maybe play with me? `ttt ai`')
 
-        mlsit.append(user)
         game = TicTacToe()
-        playermoves = []
-        embed = discord.Embed(
-            title=f'TicTacToe {ctx.author.display_name} vs '
-                  f'{mlsit[1].display_name}',
-            color=ctx.guild.me.color)
-        embed.description = 'Please use letters for rows (a,b,c) and ' \
-                            'numbers for columns!' + \
-                            await game.gamegridprinter()
-        await ctx.send(embed=embed)
+        tmt = discord.Embed(title="Game Timed out", description="No Move made withing 60s")
+        view = TicTacToeVs(ctx, tmt, game, ctx.author._user, user)
+        await ctx.send(f"TicTacToe {ctx.author.display_name} VS {user.name}",view=view)
+        # playermoves = []
+        # embed = discord.Embed(
+        #     title=f'TicTacToe {ctx.author.display_name} vs '
+        #           f'{mlsit[1].display_name}',
+        #     color=ctx.guild.me.color)
+        # embed.description = 'Please use letters for rows (a,b,c) and ' \
+        #                     'numbers for columns!' + \
+        #                     await game.gamegridprinter()
+        # await ctx.send(embed=embed)
 
-        player = 0
-        turns = 0
+        # player = 0
+        # turns = 0
 
-        def p1check(message):
-            return message.author == ctx.author and \
-                   message.channel == ctx.channel and \
-                   len(message.content) == 2
+        # def p1check(message):
+        #     return message.author == ctx.author and \
+        #            message.channel == ctx.channel and \
+        #            len(message.content) == 2
 
-        def p2check(message):
-            return message.author == mlsit[
-                1] and message.channel == ctx.channel and len(
-                message.content) == 2
+        # def p2check(message):
+        #     return message.author == mlsit[
+        #         1] and message.channel == ctx.channel and len(
+        #         message.content) == 2
 
-        while True:
-            if player == 0:
-                token = 1
-                try:
-                    message = await self.bot.wait_for('message', check=p1check,
-                                                      timeout=60.0)
-                except asyncio.TimeoutError:
-                    return await ctx.send(
-                        f"No response from {ctx.author.mention} exiting game")
-                else:
-                    text = message.content
-                    try:
-                        nu, nut = await game.converter(text)
-                    except BaseException:
-                        await message.reply(
-                            'We could not convert your input. Please use the '
-                            'format <letter><number>   ex `a3` or `b3`')
-                    else:
-                        y = await game.checkempty(nu, nut)
-                        if y:
-                            await game.makemove(nu, nut, token)
-                            player = 1
-                            turns += 1
-                            playermoves.append((nu, nut))
-                        else:
-                            await message.reply(
-                                'That game square is aldready taken please '
-                                'choose another one.')
+        # while True:
+        #     if player == 0:
+        #         token = 1
+        #         try:
+        #             message = await self.bot.wait_for('message', check=p1check,
+        #                                               timeout=60.0)
+        #         except asyncio.TimeoutError:
+        #             return await ctx.send(
+        #                 f"No response from {ctx.author.mention} exiting game")
+        #         else:
+        #             text = message.content
+        #             try:
+        #                 nu, nut = await game.converter(text)
+        #             except BaseException:
+        #                 await message.reply(
+        #                     'We could not convert your input. Please use the '
+        #                     'format <letter><number>   ex `a3` or `b3`')
+        #             else:
+        #                 y = await game.checkempty(nu, nut)
+        #                 if y:
+        #                     await game.makemove(nu, nut, token)
+        #                     player = 1
+        #                     turns += 1
+        #                     playermoves.append((nu, nut))
+        #                 else:
+        #                     await message.reply(
+        #                         'That game square is aldready taken please '
+        #                         'choose another one.')
 
-            else:
-                token = 2
-                try:
-                    message = await self.bot.wait_for('message', check=p2check,
-                                                      timeout=60.0)
-                except asyncio.TimeoutError:
-                    return await ctx.send(
-                        f"No response from {mlsit[1].mention} exiting game")
-                else:
-                    text = message.content
-                    try:
-                        nu, nut = await game.converter(text)
-                    except BaseException:
-                        await message.reply(
-                            'We could not convert your input. Please use the '
-                            'format <letter><number> ex `a3` or `b3`')
-                    else:
-                        y = await game.checkempty(nu, nut)
-                        if y:
-                            await game.makemove(nu, nut, token)
-                            player = 0
-                            turns += 1
-                            playermoves.append((nu, nut))
-                        else:
-                            await message.reply(
-                                'That game square is aldready taken please '
-                                'choose another one.')
+        #     else:
+        #         token = 2
+        #         try:
+        #             message = await self.bot.wait_for('message', check=p2check,
+        #                                               timeout=60.0)
+        #         except asyncio.TimeoutError:
+        #             return await ctx.send(
+        #                 f"No response from {mlsit[1].mention} exiting game")
+        #         else:
+        #             text = message.content
+        #             try:
+        #                 nu, nut = await game.converter(text)
+        #             except BaseException:
+        #                 await message.reply(
+        #                     'We could not convert your input. Please use the '
+        #                     'format <letter><number> ex `a3` or `b3`')
+        #             else:
+        #                 y = await game.checkempty(nu, nut)
+        #                 if y:
+        #                     await game.makemove(nu, nut, token)
+        #                     player = 0
+        #                     turns += 1
+        #                     playermoves.append((nu, nut))
+        #                 else:
+        #                     await message.reply(
+        #                         'That game square is aldready taken please '
+        #                         'choose another one.')
 
-            grid = await game.sharegamegrid()
-            resl = await game.gamecheck(grid)
+        #     grid = await game.sharegamegrid()
+        #     resl = await game.gamecheck(grid)
 
-            if resl[0]:
-                embed = discord.Embed(
-                    title=f'TicTacToe  DAGBOT vs {ctx.author.display_name}',
-                    color=ctx.guild.me.color)
-                embed.description = 'Please use letters for rows (a,b,c) and' \
-                                    'numbers for columns!' + \
-                                    await game.gamegridprinter()
-                await ctx.send(embed=embed)
-                if resl[1] == 0:
-                    return await ctx.send(
-                        f'game over. It was a tie! {ctx.author.mention}')
-                elif resl[1] == 1:
-                    return await ctx.send(
-                        f'{ctx.author.mention} has one this game of tictactoe.'
-                        f'{mlsit[1].mention}')
-                else:
-                    return await ctx.send(
-                        f'{mlsit[1].mention} has one this game of tictactoe. '
-                        f'{ctx.author.mention}')
-            else:
+        #     if resl[0]:
+        #         embed = discord.Embed(
+        #             title=f'TicTacToe  DAGBOT vs {ctx.author.display_name}',
+        #             color=ctx.guild.me.color)
+        #         embed.description = 'Please use letters for rows (a,b,c) and' \
+        #                             'numbers for columns!' + \
+        #                             await game.gamegridprinter()
+        #         await ctx.send(embed=embed)
+        #         if resl[1] == 0:
+        #             return await ctx.send(
+        #                 f'game over. It was a tie! {ctx.author.mention}')
+        #         elif resl[1] == 1:
+        #             return await ctx.send(
+        #                 f'{ctx.author.mention} has one this game of tictactoe.'
+        #                 f'{mlsit[1].mention}')
+        #         else:
+        #             return await ctx.send(
+        #                 f'{mlsit[1].mention} has one this game of tictactoe. '
+        #                 f'{ctx.author.mention}')
+        #     else:
 
-                embed = discord.Embed(
-                    title=f'TicTacToe DAGBOT vs {ctx.author.display_name}',
-                    color=ctx.guild.me.color)
-                embed.description = 'Please use letters for rows (a,b,c) and' \
-                                    'numbers for columns!' + \
-                                    await game.gamegridprinter()
-                await ctx.send(embed=embed)
+        #         embed = discord.Embed(
+        #             title=f'TicTacToe DAGBOT vs {ctx.author.display_name}',
+        #             color=ctx.guild.me.color)
+        #         embed.description = 'Please use letters for rows (a,b,c) and' \
+        #                             'numbers for columns!' + \
+        #                             await game.gamegridprinter()
+                # await ctx.send(embed=embed)
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.channel)
