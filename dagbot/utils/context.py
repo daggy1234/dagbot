@@ -8,14 +8,16 @@ if TYPE_CHECKING:
 
 class Confirm(discord.ui.View):
 
-    def __init__(self, ctx: MyContext):
+    def __init__(self, ctx: MyContext, user: discord.User):
         super().__init__(timeout=100.0)
         self.value: bool = False
         self.ctx = ctx
+        self.user = user
 
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        check = self.ctx.author.id == interaction.user.id
+        assert interaction.user is not  None
+        check = self.user.id == interaction.user.id
         if check:
             return True
         else:
@@ -94,10 +96,11 @@ class MyContext(commands.Context):
     async def safe_send(self, yes):
         await super().send("Yes this method is cool")
 
-    async def confirm(self, propmpt: str) -> bool:
+    async def confirm(self, propmpt: str, *, user: Optional[discord.User] = None) -> bool:
         embed = discord.Embed(title="Requesting Confirmation", description=propmpt, color=self.guild.me.color)
         embed.set_author(name=self.author.name, icon_url=self.author.avatar.url)
-        view = Confirm(self)
+        user_conf = user or self.author._user
+        view = Confirm(self, user_conf)
         await self.send(embed=embed, view=view)
         await view.wait()
         return view.value

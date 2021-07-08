@@ -1,7 +1,9 @@
 import asyncio
 from sys import platform
+from asyncdagpi.objects import BaseDagpiObject
 
 from discord import player
+from discord.ui.button import button
 from dagbot.bot import Dagbot
 from operator import ne
 from typing import Dict, List, Optional, Tuple, Union
@@ -490,68 +492,31 @@ class MCQView(BaseDagbotGameView):
     async def option_d(self,button: discord.ui.Button, interaction: discord.Interaction):
         await self.process_answer(4,button, interaction)
    
-
-
-class Mymenuhead(menus.Menu):
-    def __init__(self, headline, ans):
-        super().__init__(timeout=30.0)
-        self.result = None
+class HeadlineGame(BaseDagbotGameView):
+    def __init__(self, ctx: MyContext, timeout_embed: discord.Embed, correct_answer: bool, headline: str):
+        super().__init__(ctx, timeout_embed)
+        self.correct_answer = correct_answer
         self.headline = headline
-        self.ans = ans
 
-    async def send_initial_message(self, ctx, channel):
-        guild = ctx.guild
-        embed = discord.Embed(
-            title="DAGBOT - HEADLINE GAME",
-            description=self.headline,
-            color=guild.me.color,
-        )
-        embed.add_field(name="?", value="True or False")
-        return await channel.send(embed=embed)
 
-    @menus.button("<a:giftick:734746863340748892>")
-    async def right(self, payload):
-        guild = self.message.guild
-        if int(self.ans) == 1:
-            embed = discord.Embed(
-                title="HEADLINE WAS CORRECTLY GUESSED AS TRUE",
-                description=str(self.headline),
-                color=guild.me.color,
-            )
+    async def process_answer(self, interaction: discord.Interaction, status: bool):
+        if self.correct_answer == status:
+            embed = discord.Embed(title=f"Headline was correctly guessed as {self.correct_answer}")
+            embed.add_field(name="headline", value=self.headline)
         else:
-            embed = discord.Embed(
-                title="HEADLINE WAS INCORRECTLY GUESSED AS TRUE\n It is FALSE",
-                description=str(self.headline),
-                color=guild.me.color,
-            )
-
-        await self.message.edit(embed=embed)
-        self.result = True
+            embed = discord.Embed(title=f"Headline was incorrectly guessed as {status}, it is actually {self.correct_answer}")
+            embed.add_field(name="headline", value=self.headline)
+        self.disable_all()
+        await interaction.response.edit_message(embed=embed, view=self)
         self.stop()
 
-    @menus.button("<a:gifcross:734746864280404018>")
-    async def wrong(self, payload):
-        guild = self.message.guild
-        if int(self.ans) != 1:
-            embed = discord.Embed(
-                title="HEADLINE WAS CORRECTLY GUESSED AS FALSE",
-                description=str(self.headline),
-                color=guild.me.color,
-            )
-        else:
-            embed = discord.Embed(
-                title="HEADLINE WAS INCORRECTLY GUESSED AS FALSE\n It is TRUE",
-                description=str(self.headline),
-                color=guild.me.color,
-            )
+    @discord.ui.button(label="True", emoji="<a:giftick:734746863340748892>", style=discord.ButtonStyle.green)
+    async def true_answer(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.process_answer(interaction, True)
 
-        await self.message.edit(embed=embed)
-        self.result = False
-        self.stop()
-
-    async def prompt(self, ctx):
-        await self.start(ctx, wait=True)
-        return self.result
+    @discord.ui.button(label="False", emoji="<a:gifcross:734746864280404018>", style=discord.ButtonStyle.red)
+    async def false_answer(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.process_answer(interaction, False)
 
 
 class WouldYouRather(discord.ui.View):
@@ -825,23 +790,28 @@ class games(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True, aliases=["onion"])
     @commands.max_concurrency(3, commands.BucketType.channel)
-    async def headlinegame(self, ctx):
+    async def headlinegame(self, ctx: MyContext):
         fr = random.randint(0, 1)
         guild = ctx.guild
         if fr == 1:
             headline = random.choice(self.onion_headlines)
-            kw = "True"
+            kw = False
         else:
             headline = random.choice(self.not_onion_headlines)
-            kw = "False"
-        m = await Mymenuhead(headline, fr).prompt(ctx)
-        if m is None:
-            newembed = discord.Embed(
+            kw = False
+        embed = discord.Embed(
+            title="Dagbot - HeadlineGame",
+            description=headline,
+            color=ctx.guild.me.color
+        )
+        embed.add_field(name="?", value="True or False?")
+        newembed = discord.Embed(
                 title="DAGBOT - Headline Timeout",
-                description=f"headline\nThe headline is : **{kw}**",
+                description=f"headline: {headline}\n\nThe headline is : **{kw}**",
                 color=guild.me.color,
-            )
-            await ctx.send(embed=newembed)
+        )
+        view = HeadlineGame(ctx, newembed, kw, headline)
+        await ctx.send(embed=embed, view=view)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(3, commands.BucketType.channel)
@@ -1540,170 +1510,43 @@ class games(commands.Cog):
 
     @tictactoe.command()
     async def user(self, ctx: MyContext, *, big_user: discord.User):
-        msg = await ctx.send(
+
+        if ctx.author.id == big_user.id:
+            return await ctx.send("You cannot play against yourself.")
+
+        msg = await ctx.confirm(
             f'{big_user.mention} react if you wanna join {ctx.author.mention} '
-            f'for a game of tictactoe')
-        await msg.add_reaction('<a:giftick:734746863340748892>')
+            f'for a game of tictactoe', user=big_user)
 
-        # and reaction.author != ctx.author
-
-        def check(reaction, user):
-            # print('reaction')
-            return reaction.message.id == msg.id and not user.bot and str(
-                reaction.emoji) == '<a:giftick:734746863340748892>' and big_user.id == user.id
-
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add',
-                                                     check=check, timeout=60.0)
-
-        except asyncio.TimeoutError:
+        if not msg:
             return await ctx.send(
                 'sorry no one wants to play with you. \
                 Maybe play with me? `ttt ai`')
 
         game = TicTacToe()
         tmt = discord.Embed(title="Game Timed out", description="No Move made withing 60s")
-        view = TicTacToeVs(ctx, tmt, game, ctx.author._user, user)
-        await ctx.send(f"TicTacToe {ctx.author.display_name} VS {user.name}",view=view)
-        # playermoves = []
-        # embed = discord.Embed(
-        #     title=f'TicTacToe {ctx.author.display_name} vs '
-        #           f'{mlsit[1].display_name}',
-        #     color=ctx.guild.me.color)
-        # embed.description = 'Please use letters for rows (a,b,c) and ' \
-        #                     'numbers for columns!' + \
-        #                     await game.gamegridprinter()
-        # await ctx.send(embed=embed)
-
-        # player = 0
-        # turns = 0
-
-        # def p1check(message):
-        #     return message.author == ctx.author and \
-        #            message.channel == ctx.channel and \
-        #            len(message.content) == 2
-
-        # def p2check(message):
-        #     return message.author == mlsit[
-        #         1] and message.channel == ctx.channel and len(
-        #         message.content) == 2
-
-        # while True:
-        #     if player == 0:
-        #         token = 1
-        #         try:
-        #             message = await self.bot.wait_for('message', check=p1check,
-        #                                               timeout=60.0)
-        #         except asyncio.TimeoutError:
-        #             return await ctx.send(
-        #                 f"No response from {ctx.author.mention} exiting game")
-        #         else:
-        #             text = message.content
-        #             try:
-        #                 nu, nut = await game.converter(text)
-        #             except BaseException:
-        #                 await message.reply(
-        #                     'We could not convert your input. Please use the '
-        #                     'format <letter><number>   ex `a3` or `b3`')
-        #             else:
-        #                 y = await game.checkempty(nu, nut)
-        #                 if y:
-        #                     await game.makemove(nu, nut, token)
-        #                     player = 1
-        #                     turns += 1
-        #                     playermoves.append((nu, nut))
-        #                 else:
-        #                     await message.reply(
-        #                         'That game square is aldready taken please '
-        #                         'choose another one.')
-
-        #     else:
-        #         token = 2
-        #         try:
-        #             message = await self.bot.wait_for('message', check=p2check,
-        #                                               timeout=60.0)
-        #         except asyncio.TimeoutError:
-        #             return await ctx.send(
-        #                 f"No response from {mlsit[1].mention} exiting game")
-        #         else:
-        #             text = message.content
-        #             try:
-        #                 nu, nut = await game.converter(text)
-        #             except BaseException:
-        #                 await message.reply(
-        #                     'We could not convert your input. Please use the '
-        #                     'format <letter><number> ex `a3` or `b3`')
-        #             else:
-        #                 y = await game.checkempty(nu, nut)
-        #                 if y:
-        #                     await game.makemove(nu, nut, token)
-        #                     player = 0
-        #                     turns += 1
-        #                     playermoves.append((nu, nut))
-        #                 else:
-        #                     await message.reply(
-        #                         'That game square is aldready taken please '
-        #                         'choose another one.')
-
-        #     grid = await game.sharegamegrid()
-        #     resl = await game.gamecheck(grid)
-
-        #     if resl[0]:
-        #         embed = discord.Embed(
-        #             title=f'TicTacToe  DAGBOT vs {ctx.author.display_name}',
-        #             color=ctx.guild.me.color)
-        #         embed.description = 'Please use letters for rows (a,b,c) and' \
-        #                             'numbers for columns!' + \
-        #                             await game.gamegridprinter()
-        #         await ctx.send(embed=embed)
-        #         if resl[1] == 0:
-        #             return await ctx.send(
-        #                 f'game over. It was a tie! {ctx.author.mention}')
-        #         elif resl[1] == 1:
-        #             return await ctx.send(
-        #                 f'{ctx.author.mention} has one this game of tictactoe.'
-        #                 f'{mlsit[1].mention}')
-        #         else:
-        #             return await ctx.send(
-        #                 f'{mlsit[1].mention} has one this game of tictactoe. '
-        #                 f'{ctx.author.mention}')
-        #     else:
-
-        #         embed = discord.Embed(
-        #             title=f'TicTacToe DAGBOT vs {ctx.author.display_name}',
-        #             color=ctx.guild.me.color)
-        #         embed.description = 'Please use letters for rows (a,b,c) and' \
-        #                             'numbers for columns!' + \
-        #                             await game.gamegridprinter()
-                # await ctx.send(embed=embed)
-
+        view = TicTacToeVs(ctx, tmt, game, ctx.author._user, big_user)
+        await ctx.send(f"TicTacToe {ctx.author.display_name} VS {big_user.name}",view=view)
+    
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.channel)
-    async def fight(self, ctx, challenged: discord.Member):
+    async def fight(self, ctx: MyContext, *, big_user: discord.User):
+
+        if ctx.author.id == big_user.id:
+            return await ctx.send("You cannot play against yourself.")
+
         mlsit = []
-        mlsit.append(ctx.author)
-        msg = await ctx.send(
-            f'{challenged.mention}.  {ctx.author.mention} has challenged you '
-            f'to a fight! React to accept')
-        await msg.add_reaction('<a:giftick:734746863340748892>')
+        mlsit.append(ctx.author._user)
+        msg = await ctx.confirm(
+            f'{big_user.mention}.  {ctx.author.mention} has challenged you '
+            f'to a fight! React to accept', user=big_user)
 
-        def check(reaction, user):
-            # print('reaction')
-
-            return reaction.message.id == msg.id and not user.bot and str(
-                reaction.emoji) == '<a:giftick:734746863340748892>' and \
-                   user.id == challenged.id
-
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add',
-                                                     check=check, timeout=60.0)
-
-        except asyncio.TimeoutError:
+        if not msg:
             return await ctx.send(
                 'sorry no onw wants to play with you. '
                 'Maybe play with me? `ttt ai`')
 
-        mlsit.append(challenged)
+        mlsit.append(big_user)
         try:
             await ctx.author.send('Game will begin shortly')
         except BaseException:
@@ -1721,21 +1564,21 @@ class games(commands.Cog):
         hpb = 100
         damdict = {"kick": 25, "bite": 20, "punch": 15}
         movelist = ["kick", "block", "punch", "bite"]
-        embed = discord.Embed(
-            title=f"Ultimate fight {ctx.author.mention} vs {user.mention}")
-        embed.description = "Please DM your move to the bot\n" \
+        embed = discord.Embed()
+        post = "Please DM your move to the bot\n" \
                             "There is a fight going on. Please choose on of " \
                             "the following moves " \
                             "to use.\n**bite**: 20 damage (may miss " \
                             "(50% accuracy))\n**kick**: 25 damage " \
                             "(You loose 10 damage while attacking)\n" \
                             "**punch**: 15 damage\n**block**: blocks an attack"
+        embed.description = f"Ultimate fight {ctx.author.mention} vs {big_user.mention}" + post
         embed.add_field(
             name=f"{ctx.author.display_name} HP",
             value=hpa,
             inline=True)
         embed.add_field(
-            name=f"{challenged.display_name} HP",
+            name=f"{big_user.display_name} HP",
             value=hpb,
             inline=True)
         await ctx.send(embed=embed)
@@ -1747,7 +1590,7 @@ class games(commands.Cog):
 
         def p1check(message):
             return (
-                           message.author.id == challenged.id) and \
+                           message.author.id == big_user.id) and \
                    message.guild is None
 
         try:
@@ -1860,7 +1703,7 @@ class games(commands.Cog):
                                 name=f"{ctx.author.display_name} HP",
                                 value=hpa, inline=True)
                             embed.add_field(
-                                name=f"{challenged.display_name} HP",
+                                name=f"{big_user.display_name} HP",
                                 value=hpb, inline=True)
                             embed.add_field(
                                 name=f"Player A {ctx.author.display_name}",

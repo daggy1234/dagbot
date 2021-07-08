@@ -515,6 +515,12 @@ class misc(commands.Cog):
         # https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/meta.py#L328-L366
         if command is None:
             return await ctx.send(self.bot.repo)
+
+        if command == 'help':
+            src = type(self.bot.help_command)
+            module = src.__module__
+            filename = inspect.getsourcefile(src)
+            
         com = self.bot.get_command(command)
         if com is None:
             return await ctx.send(
@@ -523,7 +529,7 @@ class misc(commands.Cog):
         code = com.callback.__code__ #type: ignore
         filename = code.co_filename
         lines, firstline = inspect.getsourcelines(code)
-        old_path = os.path.relpath(filename).decode('utf-8')
+        old_path: str = str(os.path.relpath(filename))
         location = old_path.replace('\\', '/')
         final_url = (f'{self.bot.repo}/blob/master/{location}'
                      f'#L{firstline}-L{firstline + len(lines) - 1}')
