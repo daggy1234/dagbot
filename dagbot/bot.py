@@ -25,6 +25,7 @@ from .utils.logger import create_logger
 
 async def get_prefix(bot, message: discord.Message) -> List[str]:
     guild = message.guild
+    prefix = None
     if not guild:
         prefix = "do "
     else:
@@ -33,7 +34,9 @@ async def get_prefix(bot, message: discord.Message) -> List[str]:
             if e["server_id"] == str(g_id):
                 prefix = e["command_prefix"]
                 break
-    return commands.when_mentioned_or("dev")(bot, message)
+    if not prefix:
+        return commands.when_mentioned(bot, message)
+    return commands.when_mentioned_or(prefix)(bot, message)
 
 
 def make_intents() -> discord.Intents:
