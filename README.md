@@ -1,4 +1,7 @@
 # dagbot
+
+# NO LONGER ACTIVELY MAINTAINED. JOIN DISCORD FOR FULL ANNOUNCEMENT
+
 The official Repository for dagbot, the self proclaimed n1 meme bot. https://dagbot.daggy.tech
 ### SQL Data
 
