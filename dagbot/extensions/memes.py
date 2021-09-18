@@ -1,16 +1,19 @@
 import asyncio
+from dagbot.bot import Dagbot
+from dagbot.utils.context import MyContext
 import json
 from io import BytesIO
-from typing import List
+from typing import Dict, List, Optional
 
 import discord
 from asyncdagpi import ImageFeatures
+from dagbot.extensions.newimag import image
 from discord.ext import commands, menus
 
 from dagbot.utils.converters import BetterMemberConverter, UrlValidator
 
 
-def setup(client):
+def setup(client: Dagbot):
     client.add_cog(memes(client))
 
 
@@ -18,7 +21,7 @@ def setup(client):
 
 
 class Test:
-    def __init__(self, key, value):
+    def __init__(self, key: str, value: str):
         self.key = key
         self.value = value
 
@@ -53,8 +56,8 @@ class Source(menus.GroupByPageSource):
 class memes(commands.Cog):
     """Helps you craft wonderful memes worth sharing"""
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, client: Dagbot):
+        self.client: Dagbot = client
         topasslist: List[str] = []
         with open("./dagbot/data/imgfliptemplates.json", "r") as file:
             f = json.load(file)
@@ -64,14 +67,18 @@ class memes(commands.Cog):
                 topasslist.append(elstring)
         self.data = [Test(key=key, value=value) for key in [
             "Dagbot's meme generator"] for value in topasslist]
+        cog: Optional[image] = self.client.get_cog("image")
+        if not cog:
+            raise Exception("No Imaging Cog")
+        self.img_cog = cog
 
-    async def getgeneratedmeme(self, data):
+    async def getgeneratedmeme(self, data: Dict[str, str]):
         url = "https://api.imgflip.com/caption_image"
         r = await self.client.session.post(url, params=data)
         js = await r.json()
         return js
 
-    async def cog_check(self, ctx):
+    async def cog_check(self, ctx: MyContext):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
             if str(e["serverid"]) == str(g_id):
@@ -80,7 +87,7 @@ class memes(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(3, commands.BucketType.channel)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def create(self, ctx, *, query: str = "none"):
+    async def create(self, ctx: MyContext, *, query: str = "none"):
         await ctx.trigger_typing()
         if query in ["none", "help"]:
             pages = menus.MenuPages(
@@ -133,13 +140,13 @@ class memes(commands.Cog):
                     embed.set_image(url=me["data"]["url"])
                     embed.set_footer(
                         text=f"Rendered by {ctx.author.display_name}",
-                        icon_url=ctx.author.avatar_url,
+                        icon_url=ctx.author.avatar.url,
                     )
                     return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)
-    async def motiv(self, ctx):
+    async def motiv(self, ctx: MyContext):
         await ctx.trigger_typing()
         await ctx.send(
             "Lets begin. Please send an image. "
@@ -154,7 +161,7 @@ class memes(commands.Cog):
             )
 
         try:
-            msg = await self.client.wait_for("message", timeout=60.0,
+            msg: discord.Message = await self.client.wait_for("message", timeout=60.0,
                                              check=check)
         except asyncio.TimeoutError:
             return await ctx.send(
@@ -179,7 +186,7 @@ class memes(commands.Cog):
                     )
             elif len(msg.mentions) != 0:
                 image_url = str(
-                    msg.mentions[0].avatar_url_as(format='png', size=1024))
+                    msg.mentions[0].avatar.with_format("png").with_size(1024))
             else:
                 source = msg.content
                 val_stat = await UrlValidator().validate(source)
@@ -223,11 +230,12 @@ class memes(commands.Cog):
             img = await self.client.dagpi.image_process(
                 ImageFeatures.motiv(), url=image_url, top_text=toptext,
                 bottom_text=bottomtext)
-            await self.client.get_cog("image").to_embed(ctx, img, "Retromeme")
+            
+            await self.img_cog.to_embed(ctx, img, "Retromeme")
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)
-    async def retromeme(self, ctx):
+    async def retromeme(self, ctx: MyContext):
         await ctx.trigger_typing()
         await ctx.send(
             "Lets begin. Please send an image. "
@@ -242,7 +250,7 @@ class memes(commands.Cog):
             )
 
         try:
-            msg = await self.client.wait_for("message", timeout=60.0,
+            msg: discord.Message = await self.client.wait_for("message", timeout=60.0,
                                              check=check)
         except asyncio.TimeoutError:
             return await ctx.reply(
@@ -267,7 +275,7 @@ class memes(commands.Cog):
                     )
             elif len(msg.mentions) != 0:
                 image_url = str(
-                    msg.mentions[0].avatar_url_as(format='png', size=1024))
+                    msg.mentions[0].avatar.with_format("png").with_size(1024))
             else:
                 source = msg.content
                 val_stat = await UrlValidator().validate(source)
@@ -311,12 +319,12 @@ class memes(commands.Cog):
             img = await self.client.dagpi.image_process(
                 ImageFeatures.retro_meme(), url=image_url, top_text=toptext,
                 bottom_text=bottomtext)
-            await self.client.get_cog("image").to_embed(ctx, img, "Retromeme")
+            await self.img_cog.to_embed(ctx, img, "Retromeme")
 
     @commands.command(cooldown_after_parsing=True)
     async def drake(
             self,
-            ctx,
+            ctx: MyContext,
             *,
             text="I forgot to add text,split with a comma to "
                  "indicate top and bottom text",
@@ -340,7 +348,7 @@ class memes(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True, aliases=['mm'])
     @commands.max_concurrency(1, commands.BucketType.channel)
-    async def modernmeme(self, ctx):
+    async def modernmeme(self, ctx: MyContext):
         await ctx.trigger_typing()
         await ctx.send(
             "Lets begin. Please send an image. It can be a url or an "
@@ -355,7 +363,7 @@ class memes(commands.Cog):
             )
 
         try:
-            msg = await self.client.wait_for("message", timeout=60.0,
+            msg: discord.Message = await self.client.wait_for("message", timeout=60.0,
                                              check=check)
         except asyncio.TimeoutError:
             return await ctx.reply(
@@ -377,9 +385,9 @@ class memes(commands.Cog):
                     return await msg.reply(
                         "I was unable to use the attachment you provided"
                     )
-            elif len(msg.mentions) != 0:
+            elif len(msg.mentions) > 0:
                 image_url = str(
-                    msg.mentions[0].avatar_url_as(format='png', size=1024))
+                    msg.mentions[0].avatar.with_format("png").with_size(1024))
             else:
                 source = msg.content
                 val_stat = await UrlValidator().validate(source)
@@ -404,4 +412,4 @@ class memes(commands.Cog):
                 toptext = tm.content
                 img = await self.client.dagpi.image_process(
                     ImageFeatures.modern_meme(), url=image_url, text=toptext)
-                await self.client.get_cog("image").to_embed(ctx, img, "Meme")
+                await self.img_cog.to_embed(ctx, img, "Meme")

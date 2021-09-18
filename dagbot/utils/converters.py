@@ -2,26 +2,23 @@ from contextlib import suppress
 from time import process_time
 
 from discord import message, sticker
-from discord.ext.commands.converter import EmojiConverter, UserConverter
+from discord.ext.commands.converter import EmojiConverter, UserConverter, Converter
 from dagbot.utils.context import MyContext
-
 import discord
-from typing import Any, Optional
+from typing import Any, Optional, List
 from discord.ext import commands
 from validator_collection import checkers
 
 from dagbot.utils.exceptions import NoImageFound, NoMemberFound
-
-
 
 class UrlValidator:
     async def validate(self, url):
         return checkers.is_url(str(url))
 
 
-class BetterMemberConverter(commands.Converter):
+class BetterMemberConverter(Converter):
     async def convert(self, ctx: MyContext, argument: Any) -> discord.User:
-        member_converter: UserConverter = commands.UserConverter()
+        member_converter: UserConverter = UserConverter()
         with suppress(Exception):
             mem = await member_converter.convert(ctx, argument)
             ctx.bot.logger.info(mem)
@@ -32,7 +29,7 @@ class BetterMemberConverter(commands.Converter):
         raise NoMemberFound(str(argument))
 
 
-class ImageConverter(commands.Converter):
+class ImageConverter(Converter):
 
 
 
@@ -41,31 +38,26 @@ class ImageConverter(commands.Converter):
         if message.attachments and (len(message.attachments) > 0) and (message.attachments[0].height):
             with suppress(Exception):
                 return message.attachments[0].url.replace(".webp", ".png")
-
         if len(message.stickers) >= 1:
-            sticker_asset = message.stickers[0].image
+            sticker_asset = message.stickers[0].url
             if sticker_asset:
-                return sticker_asset.with_static_format("png").with_size(1024).url
+                return sticker_asset
 
         raise NoImageFound('')
 
 
     async def convert(self, ctx: MyContext, argument) -> str:
-        emoji_converter: EmojiConverter = commands.EmojiConverter()
+        emoji_converter: EmojiConverter = EmojiConverter()
         message = ctx.message
         ref = message.reference
-        ctx.bot.logger.info("Ready to convert gg")
-        print("Converter is poggers")
 
         with suppress(NoMemberFound):
             mem = await BetterMemberConverter().convert(ctx, argument)
             print(mem)
             av = str(mem.avatar.with_static_format("png").with_size(1024).url)
             return av
-        ctx.bot.logger.info("No member moment")
         with suppress(Exception):
             return await self.process_msg(ctx, message)
-        ctx.bot.logger.info("Message sucked")
         with suppress(Exception):
             emoji = await emoji_converter.convert(ctx, str(argument))
             return (str(emoji.url))
@@ -84,7 +76,7 @@ class ImageConverter(commands.Converter):
         
 
 
-class StaticImageConverter(commands.Converter):
+class StaticImageConverter(Converter):
 
     async def process_msg(self, ctx: MyContext, message: discord.Message) -> str:
         if message.attachments and (len(message.attachments) > 0) and (message.attachments[0].height):
@@ -92,16 +84,16 @@ class StaticImageConverter(commands.Converter):
                     return message.attachments[0].url.replace(".webp", ".png")
 
         if len(message.stickers) >= 1:
-            sticker_asset = message.stickers[0].image
+            sticker_asset = message.stickers[0].url
             if sticker_asset:
-                return sticker_asset.with_static_format("png").with_size(1024).url
+                return sticker_asset
 
         raise NoImageFound('')
 
     async def convert(self, ctx, argument):
-        emoji_converter: EmojiConverter = commands.EmojiConverter()
-        message = ctx.message
-        ref = message.reference
+        emoji_converter: EmojiConverter = EmojiConverter()
+        message: discord.Message = ctx.message
+        ref: Optional[discord.MessageReference] = message.reference
         with suppress(NoMemberFound):
             mem = await BetterMemberConverter().convert(ctx, argument)
             av = str(mem.avatar.with_format("png").with_static_format("png").with_size(1024).url)
@@ -121,7 +113,6 @@ class StaticImageConverter(commands.Converter):
                 if chan and isinstance(chan, discord.TextChannel):
                     msg = await chan.fetch_message(ref.message_id)
                     return await self.process_msg(ctx, msg)
-
 
         
         raise NoImageFound('')

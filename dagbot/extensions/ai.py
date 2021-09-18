@@ -141,7 +141,7 @@ class ai(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 30, commands.BucketType.user)
-    async def caption(self, ctx, *, image: ImageConverter):
+    async def caption(self, ctx, *, image: ImageConverter = ""):
         f = await self.captioni(str(image))
         if not f:
             return await ctx.send("No results as of now. Shit be wonky")
@@ -162,7 +162,7 @@ class ai(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 20, commands.BucketType.user)
-    async def ocr(self, ctx, *, image: ImageConverter):
+    async def ocr(self, ctx, *, image: ImageConverter = ""):
         f, desc = await self.ocra(str(image))
         if not f:
             return await ctx.send("No results rn")
@@ -176,7 +176,7 @@ class ai(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def label(self, ctx, *, image: ImageConverter):
+    async def label(self, ctx, *, image: ImageConverter = ""):
         y, desc = await self.labela(str(image))
         if not y:
             return await ctx.send("No results as of now. Shit be wonky")

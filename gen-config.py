@@ -1,7 +1,6 @@
 import os
 import yaml
 env_vars = os.environ
-
 dictionary = {}
 
 for var in env_vars:
