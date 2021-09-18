@@ -8,7 +8,7 @@ license = "AGPLv3"
 [tool.poetry.dependencies]
 python = "^3.8"
 toml = "^0.10.1"
-aiohttp = "3.7.3"
+aiohttp = "3.7.4"
 "discord.py" = {git = "https://github.com/rapptz/discord.py", branch="master"}
 art = "^5.1"
 sr-api = "^1.1.3"
