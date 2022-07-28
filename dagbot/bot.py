@@ -96,13 +96,15 @@ class Dagbot(commands.AutoShardedBot):
         
         self.before_invoke(self.starttyping)
         
-        self.loop.create_task(self.startdagbot())
         self.socket_stats: Dict[str, int] = {}
         self.sentry = sentry_sdk.init(
             dsn=self.data['sentryurl'],
             integrations=[AioHttpIntegration()],
             release="dagbot@3.0.0"
         )
+
+    async def startup_hook(self) -> None:
+        await self.startdagbot()
 
     async def load_extensionsa(self) -> None:
         await self.load_extension("jishaku")
