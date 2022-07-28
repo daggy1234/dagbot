@@ -420,5 +420,5 @@ Use the help command to get smart enough to use me: `{prefix}help` """,
                        "For more issues join the support server")
 
 
-def setup(bot):
-    bot.add_cog(settings(bot))
+async def setup(bot):
+    await bot.add_cog(settings(bot))

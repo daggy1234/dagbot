@@ -276,5 +276,5 @@ class tags(commands.Cog):
             return await ctx.send("gay")
 
 
-def setup(bot):
-    bot.add_cog(tags(bot))
+async def setup(bot):
+    await bot.add_cog(tags(bot))

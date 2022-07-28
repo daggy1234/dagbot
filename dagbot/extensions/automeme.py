@@ -27,5 +27,5 @@ class automeme(commands.Cog):
         await asyncio.sleep(30)
 
 
-def setup(bot):
-    bot.add_cog(automeme(bot))
+async def setup(bot):
+    await bot.add_cog(automeme(bot))

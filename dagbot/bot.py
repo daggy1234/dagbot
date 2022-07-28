@@ -5,6 +5,7 @@ from typing import List, Dict, Optional
 
 import aiohttp
 import asyncpg
+from asyncpg import pool
 import discord
 from discord.enums import MessageType
 import sentry_sdk
@@ -44,13 +45,13 @@ def make_intents() -> discord.Intents:
     intents.guilds = True
     intents.messages = True
     intents.reactions = True
+    intents.message_content = True
     return intents
 
 
 class Dagbot(commands.AutoShardedBot):
 
     session: aiohttp.ClientSession
-    pool: asyncpg.pool.Pool
     dagpi: Client
     user: discord.User
 
@@ -89,13 +90,22 @@ class Dagbot(commands.AutoShardedBot):
         self.bwordchecker.loadbword()
         self.useage: Dict[str, int] = {}
         self.sr_api = sr_api.Client()
+        self.pool: Optional[asyncpg.pool.Pool]
         self.dictionary = PyDictionary()
         self.commands_called: int = 0
+        
+        self.before_invoke(self.starttyping)
+        
+        self.loop.create_task(self.startdagbot())
+        self.socket_stats: Dict[str, int] = {}
+        self.sentry = sentry_sdk.init(
+            dsn=self.data['sentryurl'],
+            integrations=[AioHttpIntegration()],
+            release="dagbot@3.0.0"
+        )
 
-        # self.add_cog(Help(bot))
-
-        self.load_extension("jishaku")
-
+    async def load_extensionsa(self) -> None:
+        await self.load_extension("jishaku")
         extensions = [
             "text", "fun", "newimag",
             "reddit", "games", "util",
@@ -106,22 +116,12 @@ class Dagbot(commands.AutoShardedBot):
         ]
         for extension in extensions:
             try:
-                self.load_extension(f"dagbot.extensions.{extension}")
+                await self.load_extension(f"dagbot.extensions.{extension}")
                 self.logger.info(f"loaded extension {extension}")
             except Exception as error:
                 self.logger.critical(
                     f"{extension} cannot be loaded due to {error}")
 
-        self.before_invoke(self.starttyping)
-        self.logger.info("Initialising Stuff")
-        self.loop.create_task(self.startdagbot())
-        self.socket_stats: Dict[str, int] = {}
-        self.sentry = sentry_sdk.init(
-            dsn=self.data['sentryurl'],
-            integrations=[AioHttpIntegration()],
-            release="dagbot@3.0.0"
-        )
-        self.logger.info("Ready to roll")
 
     async def process_commands(self, message: discord.Message):
 
@@ -141,9 +141,10 @@ class Dagbot(commands.AutoShardedBot):
         return await super().get_context(message, cls=cls)
 
     async def startdagbot(self):
+        self.logger.info("Initialising Stuff")
+        await self.load_extensionsa()
         await self.makesession()
         await self.dbconnect()
-
         self.launch_time = datetime.utcnow()
         self.logger.info("Started DAGBOT")
         await self.caching.prefixcache()
@@ -155,17 +156,17 @@ class Dagbot(commands.AutoShardedBot):
         reddit_cog = self.get_cog("reddit")
         if not reddit_cog:
             raise Exception("Reddit Cog not loaded")
-        self.reddit_cog: reddit = reddit_cog
+        self.reddit_cog: commands.Cog = reddit_cog
         await self.reddit_cog.memcache()
         await self.session.post(
             "https://dagbot-site.herokuapp.com/api/newstats",
             headers={"Token": self.data["stats"]})
-
+        self.logger.info("Ready to roll")
+        
     async def makesession(self):
-        self.session = aiohttp.ClientSession(loop=self.loop)
+        self.session = aiohttp.ClientSession()
         self.logger.info('made session')
         self.dagpi = Client(self.data['dagpitoken'],
-                            loop=self.loop,
                             session=self.session)
         self.logger.info("Dagpi Initialised")
 

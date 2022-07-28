@@ -18,8 +18,8 @@ from ..utils.converters import  ImageConverter, StaticImageConverter, BetterMemb
 # atMoMn2Pg3EUmZ065QBvdJN4IcjNxCQRMv1oZTZWg98i7HelIdvJwHtZFKPgCtf
 
 
-def setup(client):
-    client.add_cog(image(client))
+async def setup(client):
+    await client.add_cog(image(client))
 
 
 class image(commands.Cog):

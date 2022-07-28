@@ -197,8 +197,8 @@ class TicTacToe:
 
 
 
-def setup(bot):
-    bot.add_cog(games(bot))
+async def setup(bot):
+    await bot.add_cog(games(bot))
 
 
 class BaseDagbotGameView(discord.ui.View):
@@ -449,7 +449,7 @@ class MCQView(BaseDagbotGameView):
 
     
 
-    async def process_answer(self, opt: int,button: discord.ui.Button, interaction: discord.Interaction):
+    async def process_answer(self, opt: int, button: discord.ui.Button, interaction: discord.Interaction,):
         cal = self.file["mloc"] + 1
         if cal == opt:
             button.style = discord.ButtonStyle.green
@@ -477,19 +477,19 @@ class MCQView(BaseDagbotGameView):
         self.stop()
 
     @discord.ui.button(label="A", style=discord.ButtonStyle.blurple)
-    async def option_a(self,button: discord.ui.Button, interaction: discord.Interaction):
+    async def option_a(self,interaction: discord.Interaction, button: discord.ui.Button):
         await self.process_answer(1,button, interaction)
 
     @discord.ui.button(label="B", style=discord.ButtonStyle.blurple)
-    async def option_b(self,button: discord.ui.Button, interaction: discord.Interaction):
+    async def option_b(self,interaction: discord.Interaction, button: discord.ui.Button):
         await self.process_answer(2,button, interaction)
 
     @discord.ui.button(label="C", style=discord.ButtonStyle.blurple)
-    async def option_c(self,button: discord.ui.Button, interaction: discord.Interaction):
+    async def option_c(self,interaction: discord.Interaction, button: discord.ui.Button):
         await self.process_answer(3,button, interaction)
 
     @discord.ui.button(label="D", style=discord.ButtonStyle.blurple)
-    async def option_d(self,button: discord.ui.Button, interaction: discord.Interaction):
+    async def option_d(self,interaction: discord.Interaction, button: discord.ui.Button):
         await self.process_answer(4,button, interaction)
    
 class HeadlineGame(BaseDagbotGameView):
@@ -511,11 +511,11 @@ class HeadlineGame(BaseDagbotGameView):
         self.stop()
 
     @discord.ui.button(label="True", emoji="<a:giftick:734746863340748892>", style=discord.ButtonStyle.green)
-    async def true_answer(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def true_answer(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.process_answer(interaction, True)
 
     @discord.ui.button(label="False", emoji="<a:gifcross:734746864280404018>", style=discord.ButtonStyle.red)
-    async def false_answer(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def false_answer(self, interaction: discord.Interaction, button: discord.ui.Button):
         await self.process_answer(interaction, False)
 
 

@@ -353,5 +353,5 @@ class Developer(commands.Cog, command_attrs=dict(hidden=True)):
         return await ctx.send(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(Developer(bot))
+async def setup(bot):
+    await bot.add_cog(Developer(bot))

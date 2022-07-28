@@ -470,9 +470,11 @@ class fun(commands.Cog):
             'Deleting files...\n', 'Files deleted.\n',
             'Closing connection...\n',
             'Connection closed.\n', f'Exited port {j}\n')
-        message = await ctx.send("Hacking...")
+        sent_l = ["Hacking..."]
+        message = await ctx.send(sent_l[0])
         for i in hack_sequence:
-            await message.edit(content=f"\n" + message.content + f'\n{i}')
+            sent_l.append(i)
+            await message.edit(content=f"```css\n" + "\n".join(sent_l) + "\n```")
             await asyncio.sleep(2)
         return await ctx.send(
             f"Finished hacking user **{target.display_name}**.")
@@ -516,5 +518,5 @@ class fun(commands.Cog):
             f"Go get a music bot. I cannot play {song} because it sucks anyway ")
 
 
-def setup(bot):
-    bot.add_cog(fun(bot))
+async def setup(bot):
+    await bot.add_cog(fun(bot))

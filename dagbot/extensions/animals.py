@@ -75,5 +75,5 @@ class animals(commands.Cog):
         self.__cog_commands__ += (_command,) #type: ignore
 
 
-def setup(client: Dagbot):
-    client.add_cog(animals(client))
+async def setup(client: Dagbot):
+    await client.add_cog(animals(client))

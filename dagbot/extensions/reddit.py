@@ -475,5 +475,5 @@ class reddit(commands.Cog):
             os.remove(f"{pid}graph.png")
 
 
-def setup(client):
-    client.add_cog(reddit(client))
+async def setup(client):
+    await client.add_cog(reddit(client))

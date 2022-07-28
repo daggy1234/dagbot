@@ -11,8 +11,8 @@ from dagbot.utils.context import MyContext
 from vaporwavely import vaporize
 
 
-def setup(client: Dagbot):
-    client.add_cog(text(client))
+async def setup(client: Dagbot):
+    await client.add_cog(text(client))
 
 
 class text(commands.Cog):

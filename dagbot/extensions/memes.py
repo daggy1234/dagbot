@@ -13,8 +13,8 @@ from discord.ext import commands, menus
 from dagbot.utils.converters import BetterMemberConverter, UrlValidator
 
 
-def setup(client: Dagbot):
-    client.add_cog(memes(client))
+async def setup(client: Dagbot):
+    await client.add_cog(memes(client))
 
 
 

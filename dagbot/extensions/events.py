@@ -159,5 +159,5 @@ Run `@dagbotrepair`
             self.bot.socket_stats[stat] = 1
 
 
-def setup(bot):
-    bot.add_cog(EventHandler(bot))
+async def setup(bot):
+    await bot.add_cog(EventHandler(bot))

@@ -188,5 +188,5 @@ class ai(commands.Cog):
         return await ctx.send(embed=embed)
 
 
-def setup(client):
-    client.add_cog(ai(client))
+async def setup(client):
+    await client.add_cog(ai(client))

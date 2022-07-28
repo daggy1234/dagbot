@@ -537,5 +537,5 @@ class misc(commands.Cog):
             f"{final_url} is the source. Please follow the License used and don't forget to :star:")
 
 
-def setup(bot):
-    bot.add_cog(misc(bot))
+async def setup(bot):
+    await bot.add_cog(misc(bot))

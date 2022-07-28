@@ -11,7 +11,6 @@ from discord.ext import commands
 from discord.ext.commands import bot
 from typing import List, Optional
 
-from discord.types.interactions import ApplicationCommandInteractionData
 from dagbot.utils.context import MyContext
 from dagbot.data import textdata
 
@@ -304,5 +303,5 @@ class help(commands.Cog):
         await ctx.send(self._original_help_command)
 
 
-def setup(bot):
-    bot.add_cog(help(bot))
+async def setup(bot):
+    await bot.add_cog(help(bot))

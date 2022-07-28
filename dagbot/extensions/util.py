@@ -12,8 +12,8 @@ from jishaku.codeblocks import codeblock_converter, Codeblock
 from dagbot.utils.daggypag import DaggyPaginator
 
 
-def setup(client):
-    client.add_cog(util(client))
+async def setup(client):
+    await client.add_cog(util(client))
 
 
 class YtResponse(TypedDict):

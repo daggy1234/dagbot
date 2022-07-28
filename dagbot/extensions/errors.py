@@ -192,5 +192,5 @@ class ErrorHandler(commands.Cog, command_attrs=dict(hidden=True)):
         capture_exception(error)
 
 
-def setup(bot):
-    bot.add_cog(ErrorHandler(bot))
+async def setup(bot):
+    await bot.add_cog(ErrorHandler(bot))

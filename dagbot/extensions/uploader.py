@@ -36,5 +36,5 @@ class Uploader(commands.Cog):
         await asyncio.sleep(30)
 
 
-def setup(bot):
-    bot.add_cog(Uploader(bot))
+async def setup(bot):
+    await bot.add_cog(Uploader(bot))
