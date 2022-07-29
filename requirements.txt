@@ -57,7 +57,7 @@ pastel==0.2.1
 pexpect==4.8.0
 Pillow @ file:///home/codespace/.cache/pypoetry/artifacts/20/f7/9c/74cd479fb825d1b343c240941f51aaffec169a93384e2e48238c0af228/Pillow-8.1.1-cp38-cp38-manylinux1_x86_64.whl
 pkginfo==1.7.0
-poetry==1.1.7
+poetry==1.1.9
 poetry-core==1.0.3
 polaroid @ file:///home/codespace/.cache/pypoetry/artifacts/5e/b1/b7/e784d9a06977898e5c49f59f5bc68b870c111642ab15f093a79f2e331b/polaroid-0.3.2-cp38-cp38-manylinux2010_x86_64.whl
 psutil @ file:///home/codespace/.cache/pypoetry/artifacts/47/6f/b2/4d7c82a7efe4a37ca9b469182702366f314307a80f4db8c9b581afe3bc/psutil-5.8.0-cp38-cp38-manylinux2010_x86_64.whl
