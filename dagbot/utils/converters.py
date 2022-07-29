@@ -54,7 +54,7 @@ class ImageConverter(Converter):
         with suppress(NoMemberFound):
             mem = await BetterMemberConverter().convert(ctx, argument)
             print(mem)
-            av = str(mem.avatar.with_static_format("png").with_size(1024).url)
+            av = str(mem.display_avatar.with_static_format("png").with_size(1024).url)
             return av
         with suppress(Exception):
             return await self.process_msg(ctx, message)
@@ -90,13 +90,13 @@ class StaticImageConverter(Converter):
 
         raise NoImageFound('')
 
-    async def convert(self, ctx, argument):
+    async def convert(self, ctx: MyContext, argument):
         emoji_converter: EmojiConverter = EmojiConverter()
         message: discord.Message = ctx.message
         ref: Optional[discord.MessageReference] = message.reference
         with suppress(NoMemberFound):
             mem = await BetterMemberConverter().convert(ctx, argument)
-            av = str(mem.avatar.with_format("png").with_static_format("png").with_size(1024).url)
+            av = str(mem.display_avatar.with_format("png").with_static_format("png").with_size(1024).url)
             return av
         ctx.bot.logger.info("No member moment")
         with suppress(Exception):

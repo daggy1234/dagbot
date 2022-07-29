@@ -212,7 +212,7 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def comic(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         channel = ctx.channel
         guild = ctx.guild
         suc, meme = await self.randsub("comics")
@@ -232,7 +232,7 @@ class reddit(commands.Cog):
                       aliases=["pqmeme", "PrequelMemes"])
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def starwarsmeme(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         channel = ctx.channel
         guild = ctx.guild
         suc, meme = await self.randsub("PrequelMemes")
@@ -251,7 +251,7 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def aww(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         return await ctx.send(
             "Please use the animals instead. r/aww is pretty meh")
 
@@ -259,7 +259,7 @@ class reddit(commands.Cog):
                       aliases=["dankex", "exchange"], hidden=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def dex(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         channel = ctx.channel
         guild = ctx.guild
         suc, meme = await self.randsub("DankExchange")
@@ -354,7 +354,7 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True, aliases=["dm"])
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def discord(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         channel = ctx.channel
         guild = ctx.guild
         suc, meme = await self.randsub("discord")
@@ -373,7 +373,7 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def facepalm(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         channel = ctx.channel
         guild = ctx.guild
         suc, meme = await self.randsub("facepalm")
@@ -392,7 +392,7 @@ class reddit(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def meirl(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         channel = ctx.channel
         guild = ctx.guild
         suc, meme = await self.randsub("me_irl")
@@ -412,7 +412,7 @@ class reddit(commands.Cog):
                       aliases=["4chan", "fourchan"])
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def greentext(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         channel = ctx.channel
         guild = ctx.guild
         suc, meme = await self.randsub("greentext")

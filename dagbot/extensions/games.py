@@ -1327,7 +1327,7 @@ class games(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def textgame(self, ctx):
-        await ctx.trigger_typing()
+        await ctx.typing()
         sent = await self.getsent()
         ans = sent.lower()
         emo = " \u200b"
@@ -1453,7 +1453,7 @@ class games(commands.Cog):
     @commands.command(aliases=['wyr'])
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def wouldyourather(self, ctx):
-        await ctx.trigger_typing()
+        await ctx.typing()
         rdict = await self.geteither()
         rembed = discord.Embed(
             title='Would you rather?',

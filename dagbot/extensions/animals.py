@@ -49,7 +49,7 @@ class animals(commands.Cog):
         @commands.command(name=f"{animal}fact",
                           help=f"Get a random fact for {animal}")
         async def _command(_self, ctx: MyContext):
-            await ctx.trigger_typing()
+            await ctx.typing()
             fact = await self.srapi.get_fact(animal)
             embed = discord.Embed(
             title=f"{animal.title()} Fact!", description=fact, color=ctx.guild.me.color
@@ -63,7 +63,7 @@ class animals(commands.Cog):
         @commands.command(name=f"{animal}",
                           help=f"Get a random image for {animal}")
         async def _command(_self, ctx: MyContext):
-            await ctx.trigger_typing()
+            await ctx.typing()
             y = await self.srapi.get_image(animal)
             embed = discord.Embed(
             title=f"Cute {animal.title()}!", color=ctx.guild.me.color

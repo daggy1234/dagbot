@@ -46,6 +46,8 @@ def make_intents() -> discord.Intents:
     intents.messages = True
     intents.reactions = True
     intents.message_content = True
+    intents.presences = True
+    intents.members = True
     return intents
 
 
@@ -191,7 +193,7 @@ class Dagbot(commands.AutoShardedBot):
             self.logger.critical("DB COULDN'T CONNECT")
 
     async def starttyping(self, ctx):
-        await ctx.trigger_typing()
+        await ctx.typing()
 
     async def on_command_completion(self, ctx):
         self.commands_called += 1

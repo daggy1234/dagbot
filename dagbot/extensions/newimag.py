@@ -220,7 +220,7 @@ class image(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True, aliases=['av', 'pfp'])
     async def avatar(self, ctx: MyContext, *, user: Optional[Union[BetterMemberConverter, discord.User]] = None):
-        await ctx.trigger_typing()
+        await ctx.typing()
         user = user or ctx.author._user
         if not isinstance(user, discord.User):
             return await ctx.send("Error parsing user :(")

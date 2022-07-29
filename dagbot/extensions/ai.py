@@ -130,7 +130,7 @@ class ai(commands.Cog):
     @commands.command(cooldown_after_parsing=True,
                       aliases=["chatbot", "ask", "converse"])
     async def chat(self, ctx, *, query: str):
-        await ctx.trigger_typing()
+        await ctx.typing()
         try:
             r = await self.cleverbot.ask(query, ctx.author.id)
         except BaseException:

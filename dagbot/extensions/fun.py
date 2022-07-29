@@ -107,7 +107,7 @@ class fun(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     async def dadjoke(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         guild = ctx.guild
         y = await self.get_joke()
         embed = discord.Embed(
@@ -131,7 +131,7 @@ class fun(commands.Cog):
     )
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def askcorporate(self, ctx, *, query):
-        await ctx.trigger_typing()
+        await ctx.typing()
         y = await self.corp()
         guild = ctx.guild
         embed = discord.Embed(
@@ -239,7 +239,7 @@ class fun(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def advice(self, ctx: MyContext):
         guild = ctx.guild
-        await ctx.trigger_typing()
+        await ctx.typing()
         cn = await self.get_advice()
         embed = discord.Embed(title="DAGBOT - ADVICE", color=guild.me.color)
         embed.add_field(name="advice", value=cn)
@@ -250,7 +250,7 @@ class fun(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def chucknorris(self, ctx: MyContext):
         guild = ctx.guild
-        await ctx.trigger_typing()
+        await ctx.typing()
         cn = await self.chuck_norris()
         embed = discord.Embed(
             title="DAGBOT - CHUCK NORRIS",
@@ -362,7 +362,7 @@ class fun(commands.Cog):
                 f"in a Safe for Work channel\n{st}"
             )
 
-        await ctx.trigger_typing()
+        await ctx.typing()
         urllist = await self.get_giffy(query)
         if urllist[0] == 0:
             return await ctx.channel.send("NO GIF")
@@ -482,7 +482,7 @@ class fun(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def xkcd(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         res = await self.getcomi()
         if isinstance(res, bool):
             return await ctx.send("Error getting comics")

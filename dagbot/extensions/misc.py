@@ -6,6 +6,8 @@ import pathlib
 from discord import user
 from dagbot.bot import Dagbot
 import platform
+import humanize
+import time
 from datetime import datetime
 from dagbot.utils.context import MyContext
 
@@ -13,8 +15,8 @@ import discord
 from discord.ext import commands
 
 
-# from ..utils.converters import BetterMemberConverter
-# from ..utils.exceptions import NoMemberFound
+from ..utils.converters import BetterMemberConverter
+from ..utils.exceptions import NoMemberFound
 
 
 def linecount():
@@ -98,315 +100,312 @@ class misc(commands.Cog):
         await channel.send(embed=embed)
         return await ctx.send(embed=embed)
 
-    # @commands.command()
-    # async def serverinfo(self, ctx):
-    #     online = len(
-    #         [
-    #             member
-    #             for member in ctx.guild.members
-    #             if member.status == discord.Status.online
-    #         ]
-    #     )
-    #     offline = len(
-    #         [
-    #             member
-    #             for member in ctx.guild.members
-    #             if member.status == discord.Status.offline
-    #         ]
-    #     )
-    #     idle = len(
-    #         [
-    #             member
-    #             for member in ctx.guild.members
-    #             if member.status == discord.Status.idle
-    #         ]
-    #     )
-    #     dnd = len(
-    #         [
-    #             member
-    #             for member in ctx.guild.members
-    #             if member.status == discord.Status.dnd
-    #         ]
-    #     )
-    #     botno = len(
-    #         [member for member in ctx.guild.members if member.bot is True])
-    #     guild = ctx.guild
-    #     emojis = [emoji for emoji in ctx.guild.emojis]
-    #     em_list = []
-    #     for emoji in emojis:
-    #         em_list.append(str(emoji))
-    # text_channels = [text_channel for text_channel in guild.text_channels]
-    #     voice_channels = [
-    #         voice_channel for voice_channel in guild.voice_channels]
-    #     categories = [category for category in guild.categories]
-    #     emojis = [emoji for emoji in guild.emojis]
-    #     region = f"{str(guild.region)}"
-    #     roles = [role for role in ctx.guild.roles]
-    #     role_list = " ".join(
-    #         role.mention for role in roles[::-1][:10] if
-    #         role.id != ctx.guild.id
-    #     )
-    #     embed = discord.Embed(
-    #         colour=ctx.guild.me.color,
-    #         title=f"{guild}",
-    #  description=f"**Owner:** {ctx.guild.owner.mention}\n**Region:** \
-    #  {region}\n**Guild created**: \
-    #  {humanize.naturaltime(datetime.utcnow() - ctx.guild.created_at)}",
-    #     )
-    #     embed.set_thumbnail(url=guild.icon_url)
-    #     if len(roles) > 10:
-    #         msg = "Top 10 roles"
-    #     else:
-    #         msg = "Roles"
-    #     filstr = "█"
-    #     blankstr = "░"
-    #     blankchar = "\u2000"
-    #     boosts = int(guild.premium_subscription_count)
-    #     if boosts > 30:
-    #         boostcount = 30
-    #     else:
-    #         boostcount = boosts
-    #
-    #     bfrac = int((boostcount / 30) * 25)
-    #     bar = f"{boosts} | `{filstr * bfrac}{blankchar * (25 - bfrac)}` | 30"
-    #
-    #     embed.add_field(
-    #         name="Channels",
-    #     value=f"<:category:724330131421659206>: \
-    #     **{humanize.intcomma(len(categories))}**\n\
-    #     <:textchannel:724637677395116072>: \
-    #     **{humanize.intcomma(len(text_channels))}**\
-    #     \n<:voicechannel:724637677130875001>: \
-    #     **{humanize.intcomma(len(voice_channels))}**",
-    #         inline=False,
-    #     )
-    #     embed.add_field(
-    #         name="<:ppl:724330131233177632> Members",
-    #         value=f"<:online:724328584621064193>: \
-    #         **{humanize.intcomma(online)}**\n<:offline:724328584751349903>: \
-    #         **{humanize.intcomma(offline)}**\n<:dnd:724328585078243438>: \
-    #         **{humanize.intcomma(dnd)}**\n<:idle:724328584893956097>: \
-    #         **{humanize.intcomma(idle)}**",
-    #     )
-    #     embed.add_field(
-    #         name="<:bot:724330131426115674> Bots",
-    #         value=f"**{humanize.intcomma(botno)}**",
-    #     )
-    #     embed.add_field(
-    #         name="boosts",
-    #         value=f"Level {guild.premium_tier}\n\
-    #         {guild.premium_subscription_count} boosts\n{bar}",
-    #         inline=False,
-    #     )
-    #     embed.add_field(name=f"{msg} (Total {len(roles)})", value=role_list)
-    #     embed.add_field(
-    #         name=f"Emojis (Total {len(emojis)})",
-    #         value=" • ".join(em_list[:24]),
-    #         inline=False,
-    #     )
-    #     return await ctx.send(embed=embed)
+    @commands.command()
+    async def serverinfo(self, ctx):
+        online = len(
+            [
+                member
+                for member in ctx.guild.members
+                if member.status == discord.Status.online
+            ]
+        )
+        offline = len(
+            [
+                member
+                for member in ctx.guild.members
+                if member.status == discord.Status.offline
+            ]
+        )
+        idle = len(
+            [
+                member
+                for member in ctx.guild.members
+                if member.status == discord.Status.idle
+            ]
+        )
+        dnd = len(
+            [
+                member
+                for member in ctx.guild.members
+                if member.status == discord.Status.dnd
+            ]
+        )
+        botno = len(
+            [member for member in ctx.guild.members if member.bot is True])
+        guild = ctx.guild
+        emojis = [emoji for emoji in ctx.guild.emojis]
+        em_list = []
+        for emoji in emojis:
+            em_list.append(str(emoji))
+        text_channels = [text_channel for text_channel in guild.text_channels]
+        voice_channels = [
+            voice_channel for voice_channel in guild.voice_channels]
+        categories = [category for category in guild.categories]
+        emojis = [emoji for emoji in guild.emojis]
+        region = f"{str(guild.region)}"
+        roles = [role for role in ctx.guild.roles]
+        role_list = " ".join(
+            role.mention for role in roles[::-1][:10] if
+            role.id != ctx.guild.id
+        )
+        embed = discord.Embed(
+            colour=ctx.guild.me.color,
+            title=f"{guild}",
+            description=f"**Owner:** {ctx.guild.owner.mention}\n**Region:** \
+                        {region}\n**Guild created**: \
+                        {humanize.naturaltime(datetime.utcnow() - ctx.guild.created_at)}",
+        )
+        embed.set_thumbnail(url=guild.icon_url)
+        if len(roles) > 10:
+            msg = "Top 10 roles"
+        else:
+            msg = "Roles"
+        filstr = "█"
+        blankstr = "░"
+        blankchar = "\u2000"
+        boosts = int(guild.premium_subscription_count)
+        if boosts > 30:
+            boostcount = 30
+        else:
+            boostcount = boosts
+    
+        bfrac = int((boostcount / 30) * 25)
+        bar = f"{boosts} | `{filstr * bfrac}{blankchar * (25 - bfrac)}` | 30"
+    
+        embed.add_field(
+            name="Channels",
+        value=f"<:category:724330131421659206>: \
+        **{humanize.intcomma(len(categories))}**\n\
+        <:textchannel:724637677395116072>: \
+        **{humanize.intcomma(len(text_channels))}**\
+        \n<:voicechannel:724637677130875001>: \
+        **{humanize.intcomma(len(voice_channels))}**",
+            inline=False,
+        )
+        embed.add_field(
+            name="<:ppl:724330131233177632> Members",
+            value=f"<:online:724328584621064193>: \
+            **{humanize.intcomma(online)}**\n<:offline:724328584751349903>: \
+            **{humanize.intcomma(offline)}**\n<:dnd:724328585078243438>: \
+            **{humanize.intcomma(dnd)}**\n<:idle:724328584893956097>: \
+            **{humanize.intcomma(idle)}**",
+        )
+        embed.add_field(
+            name="<:bot:724330131426115674> Bots",
+            value=f"**{humanize.intcomma(botno)}**",
+        )
+        embed.add_field(
+            name="boosts",
+            value=f"Level {guild.premium_tier}\n\
+            {guild.premium_subscription_count} boosts\n{bar}",
+            inline=False,
+        )
+        embed.add_field(name=f"{msg} (Total {len(roles)})", value=role_list)
+        embed.add_field(
+            name=f"Emojis (Total {len(emojis)})",
+            value=" • ".join(em_list[:24]),
+            inline=False,
+        )
+        return await ctx.send(embed=embed)
 
-    # @commands.command(aliases=['ui'])
-    # async def userinfo(self, ctx: MyContext, user=None):
-    #     sl = {
-    #         "online": "<:online:724328584621064193>",
-    #         "offline": "<:offline:724328584751349903>",
-    #         "idle": "<:idle:724328584893956097>",
-    #         "dnd": "<:dnd:724328585078243438>",
-    #     }
-    #
-    #     mlsl = {
-    #         "online": "\U0001f4f1",
-    #         "offline": "\u200b",
-    #         "idle": "\U0001f4f1",
-    #         "dnd": "\U0001f4f1",
-    #     }
-    #
-    #     wlsl = {"online": "🌐", "offline": "\u200b", "idle": "🌐", "dnd": "🌐"}
-    #     # 🌐
-    #
-    #     dlsl = {
-    #         "online": ":desktop:",
-    #         "offline": "\u200b",
-    #         "idle": ":desktop:",
-    #         "dnd": ":desktop:",
-    #     }
-    #     if user is None:
-    #         user = ctx.author
-    #     else:
-    #         user = await BetterMemberConverter().convert(ctx, user)
-    #     badges = {
-    #         "staff": "<:staff:724588086318596137>",
-    #         "partner": "<:partner:724588086461202442>",
-    #         "hypesquad": "<:hypesquadevents:724328584789098639>",
-    #         "hypesquad_balance": "<:hypesquadbalance:724328585166454845>",
-    #         "hypesquad_bravery": "<:hypesquadbravery:724328585040625667>",
-    #         "hypesquad_brilliance":
-    # "<:hypesquadbrilliance:724328585363456070>",
-    #         "bug_hunter": "<:bughunt:724588087052861531>",
-    #         "bug_hunter_level_2": "<:bug2:699986097694048327>",
-    #         "verified_bot_developer": "<:verifiedbotdev:724328584872984607>",
-    #         "early_supporter": "<:earlysupporter:724588086646014034>",
-    #     }
-    #
-    #     if user.bot:
-    #         botthing = "<:bot:724330131426115674>"
-    #     else:
-    #         botthing = "\u0020"
-    #     status_list = (
-    #             f"{sl[str(user.status)]}\
-    #             {mlsl[str(user.mobile_status)]}{wlsl[str(user.web_status)]}\
-    #             {dlsl[str(user.desktop_status)]}"
-    #             + botthing
-    #     )
-    #     embed = discord.Embed(
-    #         title=f"{user.display_name}#{user.discriminator}",
-    #         color=ctx.guild.me.color)
-    #     realname = user.name + "#" + user.discriminator
-    #     description = f"Original Name: {realname}\nJoined guild: \
-    #     **{humanize.naturaltime(datetime.utcnow() - user.joined_at)}**\
-    #     \nCreated account: \
-    #
-    #     **{humanize.naturaltime(datetime.utcnow() - user.created_at)}** "
-    #     flags = [
-    #         flag for flag, value in dict(user.public_flags).items() if
-    #         value is True
-    #     ]
-    #     flagstr = ""
-    #     for badge in badges.keys():
-    #         if badge in flags:
-    #             flagstr += f" {badges[badge]} "
-    #     n = False
-    #     if user.is_avatar_animated():
-    #         n = True
-    #     elif user.discriminator == '#0001':
-    #         n = True
-    #     else:
-    #         for guild in self.bot.guilds:
-    #             if user in guild.members:
-    #                 if guild.get_member(user.id).premium_since is not None:
-    #                     n = True
-    #
-    #     if n:
-    #         flagstr += f" <:nitro:724328585418113134>"
-    #     if len(flagstr) != 0:
-    #         embed.add_field(name="Badges", value=flagstr)
-    #     embed.add_field(name="status", value=status_list, inline=False)
-    #     if len(description) != 0:
-    #         embed.add_field(name="stats", value=description, inline=False)
-    #
-    #     # add badges
-    #     try:
-    #         mst = ""
-    #         for a in user.activities:
-    #             if isinstance(a, discord.Spotify):
-    #                 activity = "Listening to **Spotify**"
-    #             elif isinstance(a, discord.CustomActivity):
-    #                 emoji = ""
-    #                 if a.emoji:
-    #                     if a.emoji.is_custom_emoji() and ctx.bot.get_emoji(
-    #                             a.emoji.id) == False:
-    #                         emoji = "<:crosss:720924220258779227>"
-    #                     else:
-    #                         emoji = a.emoji
-    #                 activity = f'{emoji} {a.name or ""}'
-    #             else:
-    #                 try:
-    #                     st = str(act.type).replace('ActivityType.', '')
-    #                     activity = ((st + ' ' + act.name).title() + '\n')
-    #                 except:
-    #                     activity = ''
-    #
-    #             mst += activity + "\n"
-    #
-    #         if len(mst) != 0:
-    #             embed.add_field(name="Activity", value=mst, inline=False)
-    #     except BaseException:
-    #         pass
-    #     embed.set_thumbnail(url=user.avatar_url_as(static_format="png"))
-    #     return await ctx.send(embed=embed)
-    #
-    # @commands.command(aliases=['spot'])
-    # async def spotify(self, ctx: MyContext, *, user=None):
-    #     if user is None:
-    #         user = ctx.author
-    #     else:
-    #         try:
-    #             user = await commands.MemberConverter().convert(ctx, user)
-    #         except BaseException:
-    #             raise NoMemberFound(user)
-    #     activities = user.activities
-    #     try:
-    #         act = [
-    #             activity for activity in activities if isinstance(
-    #                 activity, discord.Spotify)][0]
-    #     except IndexError:
-    #         return await ctx.send('No spotify was detected')
-    #     start = humanize.naturaltime(datetime.utcnow() - act.created_at)
-    #     print(start)
-    #     name = act.title
-    #     art = " ".join(act.artists)
-    #     album = act.album
-    #     duration = round(((act.end - act.start).total_seconds() / 60), 2)
-    #     minsecdur = time.strftime(
-    #         "%M:%S", time.gmtime(
-    #             (act.end - act.start).total_seconds()))
-    #     current = round(
-    #         ((datetime.utcnow() - act.start).total_seconds() / 60), 2)
-    #     minseccur = time.strftime("%M:%S", time.gmtime(
-    #         (datetime.utcnow() - act.start).total_seconds()))
-    #     embed = discord.Embed(color=ctx.guild.me.color)
-    #     embed.set_author(
-    #         name=user.display_name,
-    #         icon_url='https://netsbar.com/wp-content/uploads/2018/10/Spotify_Icon.png')
-    #     embed.description = f"Listening To  [**{name}**]\
-    # (https://open.spotify.com/track/{act.track_id})"
-    #     embed.add_field(name="Artist", value=art, inline=True)
-    #     embed.add_field(name="Album", value=album, inline=True)
-    #     embed.set_thumbnail(url=act.album_cover_url)
-    #     embed.add_field(name="Started Listening", value=start, inline=True)
-    #     pcent = int((current / duration) * 25)
-    #     # old bar: █ ░
-    #     pbar = f"`{minseccur}`| {(pcent - 1) * '─'}⚪️{(25 - pcent) * '─'} | \
-    # `{minsecdur}`"
-    #     embed.add_field(name="Progress", value=pbar)
-    #     await ctx.send(embed=embed)
-    #
-    # @commands.command(aliases=['vsc'])
-    # async def visualstudiocode(self, ctx: MyContext, *, user=None):
-    #     if user is None:
-    #         user = ctx.author
-    #     else:
-    #         try:
-    #             user = await commands.MemberConverter().convert(ctx, user)
-    #         except BaseException:
-    #             raise NoMemberFound(user)
-    #     activities = user.activities
-    #     try:
-    #         l = []
-    #         for activitiy in activities:
-    #             try:
-    #                 apid = activitiy.application_id
-    #                 if apid == 383226320970055681:
-    #                     l.append(activitiy)
-    #             except BaseException:
-    #                 continue
-    #         act = l[0]
-    #     except IndexError:
-    #         return await ctx.send(
-    #             'We could not detect VisualStudioCode Activity')
-    #     file_url = act.large_image_url
-    #     file_name = act.details
-    #     vsclogo = act.small_image_url
-    #     embed = discord.Embed(color=ctx.guild.me.color)
-    #     embed.set_author(name=user.display_name, icon_url=vsclogo)
-    #     embed.set_thumbnail(url=file_url)
-    #     embed.description = file_name
-    #     if file_name != "Idling":
-    #         time = humanize.naturaltime(datetime.utcnow() - act.start)
-    #         embed.add_field(name="Started", value=str(time))
-    #         embed.add_field(name='details', value=str(act.state))
-    #     return await ctx.send(embed=embed)
+    @commands.command(aliases=['ui'])
+    async def userinfo(self, ctx: MyContext, user=None):
+        sl = {
+            "online": "<:online:724328584621064193>",
+            "offline": "<:offline:724328584751349903>",
+            "idle": "<:idle:724328584893956097>",
+            "dnd": "<:dnd:724328585078243438>",
+        }
+    
+        mlsl = {
+            "online": "\U0001f4f1",
+            "offline": "\u200b",
+            "idle": "\U0001f4f1",
+            "dnd": "\U0001f4f1",
+        }
+    
+        wlsl = {"online": "🌐", "offline": "\u200b", "idle": "🌐", "dnd": "🌐"}
+        # 🌐
+    
+        dlsl = {
+            "online": ":desktop:",
+            "offline": "\u200b",
+            "idle": ":desktop:",
+            "dnd": ":desktop:",
+        }
+        if user is None:
+            user = ctx.author
+        else:
+            user = await  commands.MemberConverter().convert(ctx, user)
+        badges = {
+            "staff": "<:staff:724588086318596137>",
+            "partner": "<:partner:724588086461202442>",
+            "hypesquad": "<:hypesquadevents:724328584789098639>",
+            "hypesquad_balance": "<:hypesquadbalance:724328585166454845>",
+            "hypesquad_bravery": "<:hypesquadbravery:724328585040625667>",
+            "hypesquad_brilliance":
+    "<:hypesquadbrilliance:724328585363456070>",
+            "bug_hunter": "<:bughunt:724588087052861531>",
+            "bug_hunter_level_2": "<:bug2:699986097694048327>",
+            "verified_bot_developer": "<:verifiedbotdev:724328584872984607>",
+            "early_supporter": "<:earlysupporter:724588086646014034>",
+        }
+    
+        if user.bot:
+            botthing = "<:bot:724330131426115674>"
+        else:
+            botthing = "\u0020"
+        status_list = (
+                f"{sl[str(user.status)]}\
+                {mlsl[str(user.mobile_status)]}{wlsl[str(user.web_status)]}\
+                {dlsl[str(user.desktop_status)]}"
+                + botthing
+        )
+        embed = discord.Embed(
+            title=f"{user.display_name}#{user.discriminator}",
+            color=ctx.guild.me.color)
+        realname = user.name + "#" + user.discriminator
+        description = f"Original Name: {realname}\nJoined guild: **{humanize.naturaltime(datetime.utcnow() - user.joined_at)}**\nCreated account: **{humanize.naturaltime(datetime.utcnow() - user.created_at)}** "
+        flags = [
+            flag for flag, value in dict(user.public_flags).items() if
+            value is True
+        ]
+        flagstr = ""
+        for badge in badges.keys():
+            if badge in flags:
+                flagstr += f" {badges[badge]} "
+        n = False
+        if user.display_avatar.is_animated():
+            n = True
+        elif user.discriminator == '#0001':
+            n = True
+        else:
+            for guild in self.bot.guilds:
+                if user in guild.members:
+                    if mem := guild.get_member(user.id):
+                        if mem.premium_since is not None:
+                            n = True
+    
+        if n:
+            flagstr += f" <:nitro:724328585418113134>"
+        if len(flagstr) != 0:
+            embed.add_field(name="Badges", value=flagstr)
+        embed.add_field(name="status", value=status_list, inline=False)
+        if len(description) != 0:
+            embed.add_field(name="stats", value=description, inline=False)
+    
+        # add badges
+        try:
+            mst = ""
+            for a in user.activities:
+                if isinstance(a, discord.Spotify):
+                    activity = "Listening to **Spotify**"
+                elif isinstance(a, discord.CustomActivity):
+                    emoji = ""
+                    if a.emoji and a.emoji.id:
+                        if a.emoji.is_custom_emoji() and ctx.bot.get_emoji(
+                                a.emoji.id) == False:
+                            emoji = "<:crosss:720924220258779227>"
+                        else:
+                            emoji = a.emoji
+                    activity = f'{emoji} {a.name or ""}'
+                else:
+                    try:
+                        st = str(act.type).replace('ActivityType.', '')
+                        activity = ((st + ' ' + act.name).title() + '\n')
+                    except:
+                        activity = ''
+    
+                mst += activity + "\n"
+    
+            if len(mst) != 0:
+                embed.add_field(name="Activity", value=mst, inline=False)
+        except BaseException:
+            pass
+        embed.set_thumbnail(url=user.display_avatar.with_static_format("png").url)
+        return await ctx.send(embed=embed)
+    
+    @commands.command(aliases=['spot'])
+    async def spotify(self, ctx: MyContext, *, user=None):
+        if user is None:
+            user = ctx.author
+        else:
+            try:
+                user = await commands.MemberConverter().convert(ctx, user)
+            except BaseException:
+                raise NoMemberFound(user)
+        activities = user.activities
+        try:
+            act = [
+                activity for activity in activities if isinstance(
+                    activity, discord.Spotify)][0]
+        except IndexError:
+            return await ctx.send('No spotify was detected')
+        name = act.title
+        art = " ".join(act.artists)
+        album = act.album
+        duration = round(((act.end - act.start).total_seconds() / 60), 2)
+        minsecdur = time.strftime(
+            "%M:%S", time.gmtime(
+                (act.end - act.start).total_seconds()))
+        current = round(
+            ((datetime.utcnow() - act.start).total_seconds() / 60), 2)
+        minseccur = time.strftime("%M:%S", time.gmtime(
+            (datetime.utcnow() - act.start).total_seconds()))
+        embed = discord.Embed(color=ctx.guild.me.color)
+        embed.set_author(
+            name=user.display_name,
+            icon_url='https://netsbar.com/wp-content/uploads/2018/10/Spotify_Icon.png')
+        embed.description = f"Listening To  [**{name}**]\
+    (https://open.spotify.com/track/{act.track_id})"
+        embed.add_field(name="Artist", value=art, inline=True)
+        embed.add_field(name="Album", value=album, inline=True)
+        embed.set_thumbnail(url=act.album_cover_url)
+        if act.created_at:
+            start = humanize.naturaltime(datetime.utcnow() - act.created_at)
+            embed.add_field(name="Started Listening", value=start, inline=True)
+        pcent = int((current / duration) * 25)
+        # old bar: █ ░
+        pbar = f"`{minseccur}`| {(pcent - 1) * '─'}⚪️{(25 - pcent) * '─'} | \
+    `{minsecdur}`"
+        embed.add_field(name="Progress", value=pbar)
+        await ctx.send(embed=embed)
+    
+    @commands.command(aliases=['vsc'])
+    async def visualstudiocode(self, ctx: MyContext, *, user=None):
+        if user is None:
+            user = ctx.author
+        else:
+            try:
+                user = await commands.MemberConverter().convert(ctx, user)
+            except BaseException:
+                raise NoMemberFound(user)
+        activities = user.activities
+        try:
+            l = []
+            for activitiy in activities:
+                try:
+                    apid = activitiy.application_id
+                    if apid == 383226320970055681:
+                        l.append(activitiy)
+                except BaseException:
+                    continue
+            act = l[0]
+        except IndexError:
+            return await ctx.send(
+                'We could not detect VisualStudioCode Activity')
+        file_url = act.large_image_url
+        file_name = act.details
+        vsclogo = act.small_image_url
+        embed = discord.Embed(color=ctx.guild.me.color)
+        embed.set_author(name=user.display_name, icon_url=vsclogo)
+        embed.set_thumbnail(url=file_url)
+        embed.description = file_name
+        if file_name != "Idling":
+            time = humanize.naturaltime(datetime.utcnow() - act.start)
+            embed.add_field(name="Started", value=str(time))
+            embed.add_field(name='details', value=str(act.state))
+        return await ctx.send(embed=embed)
 
     @commands.command()
     async def invite(self, ctx):

@@ -88,7 +88,7 @@ class memes(commands.Cog):
     @commands.max_concurrency(3, commands.BucketType.channel)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def create(self, ctx: MyContext, *, query: str = "none"):
-        await ctx.trigger_typing()
+        await ctx.typing()
         if query in ["none", "help"]:
             pages = menus.MenuPages(
                 source=Source(self.data, key=lambda t: t.key, per_page=10),
@@ -147,7 +147,7 @@ class memes(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def motiv(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         await ctx.send(
             "Lets begin. Please send an image. "
             "It can be a url or an attachment or a mention of a member!"
@@ -226,7 +226,7 @@ class memes(commands.Cog):
                 )
             else:
                 bottomtext = bm.content
-            await ctx.trigger_typing()
+            await ctx.typing()
             img = await self.client.dagpi.image_process(
                 ImageFeatures.motiv(), url=image_url, top_text=toptext,
                 bottom_text=bottomtext)
@@ -236,7 +236,7 @@ class memes(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def retromeme(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         await ctx.send(
             "Lets begin. Please send an image. "
             "It can be a url or an attachment or a mention of a member!"
@@ -315,7 +315,7 @@ class memes(commands.Cog):
                 )
             else:
                 bottomtext = bm.content
-            await ctx.trigger_typing()
+            await ctx.typing()
             img = await self.client.dagpi.image_process(
                 ImageFeatures.retro_meme(), url=image_url, top_text=toptext,
                 bottom_text=bottomtext)
@@ -349,7 +349,7 @@ class memes(commands.Cog):
     @commands.command(cooldown_after_parsing=True, aliases=['mm'])
     @commands.max_concurrency(1, commands.BucketType.channel)
     async def modernmeme(self, ctx: MyContext):
-        await ctx.trigger_typing()
+        await ctx.typing()
         await ctx.send(
             "Lets begin. Please send an image. It can be a url or an "
             "attachment or a mention of a member!"

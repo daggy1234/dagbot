@@ -218,7 +218,7 @@ pressure:              {}hPa```""".format(
     )
     async def taco(self, ctx):
         guild = ctx.guild
-        await ctx.trigger_typing()
+        await ctx.typing()
         tcor = await self.gettaco()
         if isinstance(tcor, bool):
             return await ctx.send("Error parsing taco")
@@ -239,7 +239,7 @@ pressure:              {}hPa```""".format(
                 f"Safe for Work channel\n{st}"
             )
 
-        await ctx.trigger_typing()
+        await ctx.typing()
         resp = await self.get_wiki(query)
         color = ctx.guild.me.color
         title = resp["title"]
@@ -261,7 +261,7 @@ pressure:              {}hPa```""".format(
                 f"Safe for Work channel\n{st}"
             )
 
-        await ctx.trigger_typing()
+        await ctx.typing()
         y = await self.ytget(query)
         if isinstance(y, bool):
             return await ctx.send("No results")

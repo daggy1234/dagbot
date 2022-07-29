@@ -150,7 +150,7 @@ class smart(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     async def yoda(self, ctx, *, string: str):
-        await ctx.trigger_typing()
+        await ctx.typing()
         guild = ctx.guild
         embed = discord.Embed(title="DAGBOT - YODISH", color=guild.me.color)
         channel = ctx.channel
@@ -363,7 +363,7 @@ class smart(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     async def define(self, ctx: MyContext, *, word: str):
-        await ctx.trigger_typing()
+        await ctx.typing()
         fn = functools.partial(self.client.dictionary.meaning, word)
         dict_ =  await self.client.loop.run_in_executor(None, fn)
         if not dict_:
