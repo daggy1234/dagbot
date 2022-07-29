@@ -147,18 +147,31 @@ class reddit(commands.Cog):
 
     @tasks.loop(seconds=7200)
     async def memcache(self):
-        with open("./dagbot/data/memes.json", "r") as file:
-            jsdict = json.load(file)
-            jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist(
-                "dankmemes")
-            await asyncio.sleep(1)
-            jsdict["memes"] = jsdict["memes"] + await self.sublist("memes")
-            await asyncio.sleep(1)
-            jsdict["wholesome"] = jsdict["wholesome"] + await self.sublist(
-                "wholesomememes"
-            )
-        with open("./dagbot/data/memes.json", "w") as file:
-            json.dump(jsdict, file)
+        try:
+            with open("./dagbot/data/memes.json", "r") as file:
+                jsdict = json.load(file)
+                jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist(
+                    "dankmemes")
+                await asyncio.sleep(1)
+                jsdict["memes"] = jsdict["memes"] + await self.sublist("memes")
+                await asyncio.sleep(1)
+                jsdict["wholesome"] = jsdict["wholesome"] + await self.sublist(
+                    "wholesomememes"
+                )
+            with open("./dagbot/data/memes.json", "w") as file:
+                json.dump(jsdict, file)
+        except FileNotFoundError:
+            with open("./dagbot/data/memes.json", "w") as file:
+                jsdict = {"dankmemes": [],"memes": [], "wholesome": []}
+                jsdict["dankmemes"] = jsdict["dankmemes"] + await self.sublist(
+                    "dankmemes")
+                await asyncio.sleep(1)
+                jsdict["memes"] = jsdict["memes"] + await self.sublist("memes")
+                await asyncio.sleep(1)
+                jsdict["wholesome"] = jsdict["wholesome"] + await self.sublist(
+                    "wholesomememes"
+                )
+                json.dump(jsdict, file)
         self.client.logger.debug("MEMES CACHED")
 
     @memcache.before_loop

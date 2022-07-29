@@ -11,7 +11,7 @@ from discord.enums import MessageType
 import sentry_sdk
 import yaml
 from PyDictionary import PyDictionary
-from asyncdagpi import Client
+from asyncdagpi.client import Client
 from discord import Webhook
 from dagbot.extensions.reddit import reddit
 from discord.ext import commands
