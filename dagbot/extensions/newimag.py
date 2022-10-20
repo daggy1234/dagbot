@@ -80,8 +80,10 @@ class image(commands.Cog):
         ]
         for command in self.dynamic:
             self.make_fn(command[0], command[1])
-        self.make_fn_alex("salty", StaticImageConverter())
-        self.make_fn_alex("jokeoverhead", StaticImageConverter())
+#Commenting Since alexflipnote api no longer have these 
+
+        #self.make_fn_alex("salty", StaticImageConverter())
+       # self.make_fn_alex("jokeoverhead", StaticImageConverter())
 
     def make_fn(self, feature: asyncdagpi.ImageFeatures,
                 converter: Union
