@@ -49,7 +49,7 @@ class smart(commands.Cog):
     async def cog_check(self, ctx: MyContext):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(g_id):
+            if str(e["serverid"]) == g_id:
                 return bool(e["smart"])
 
     # async def characterhpget(self, y: str) -> Tuple[bool, str]:
@@ -143,9 +143,7 @@ class smart(commands.Cog):
             return await message.send("Error while processing command")
         quote = str(bdy.find("dt", attrs={"class": "quote"}).text)
         author = str(bdy.find("b").text)
-        embed.add_field(
-            name="QUOTE", value=("{}\n{}".format(quote, author)), inline=True
-        )
+        embed.add_field(name="QUOTE", value=f"{quote}\n{author}", inline=True)
         await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
@@ -287,8 +285,7 @@ class smart(commands.Cog):
             description=js['explanation'],
             color=ctx.guild.me.color)
 
-        hd_url = js.get('hdurl')
-        if hd_url:
+        if hd_url := js.get('hdurl'):
             embed.set_image(url=hd_url)
             return await ctx.send(embed=embed)
         return await ctx.send(str(js.get("url")),embed=embed)
@@ -403,7 +400,7 @@ class smart(commands.Cog):
         embed = discord.Embed(
             title="DAGBOT - NUMBER FACT FOR NUMBER", color=guild.me.color
         )
-        url = "http://numbersapi.com/{}/math".format(num)
+        url = f"http://numbersapi.com/{num}/math"
         response = await self.client.session.get(url)
         fact = await response.text()
         embed.add_field(name="NUMBER", value=str(num), inline=True)

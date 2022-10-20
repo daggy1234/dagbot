@@ -24,7 +24,7 @@ class fun(commands.Cog):
     async def cog_check(self, ctx: MyContext):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(g_id):
+            if str(e["serverid"]) == g_id:
                 return bool(e["fun"])
 
     async def get_joke(self) -> str:
@@ -43,18 +43,18 @@ class fun(commands.Cog):
     async def get_giffy(self, query) -> List[str]:
         url = "https://api.giphy.com/v1/gifs/search"
         querystring = {
-            "q": "{}".format(query),
+            "q": f"{query}",
             "api_key": self.client.data['giphykey'],
-            "rating": "g"
+            "rating": "g",
         }
+
         response = await self.client.session.get(url, params=querystring)
         cul = await (response.json())
         urllist = []
         if cul["pagination"]["total_count"] == 0:
             urllist[0] = 0
         else:
-            for i in range(4):
-                urllist.append(cul["data"][i]["images"]["original"]["url"])
+            urllist.extend(cul["data"][i]["images"]["original"]["url"] for i in range(4))
             return urllist
         urllist[0] = 0
         return urllist
@@ -83,8 +83,7 @@ class fun(commands.Cog):
         r = await self.client.session.get(url)
         html = await r.text()
         soup = BeautifulSoup(html, "html.parser")
-        res = soup.find("div", id="comic")
-        if res:
+        if res := soup.find("div", id="comic"):
             title = str(res.img["title"])
             url = f"https:{res.img['src']}"
             return title, url, y
@@ -121,9 +120,10 @@ class fun(commands.Cog):
         embed = discord.Embed(title="DAGBOT - PEACE", color=guild.me.color)
         embed.add_field(
             name="PEACE",
-            value="AMEN! PEACE IN OUR TIME {}".format(ctx.author),
+            value=f"AMEN! PEACE IN OUR TIME {ctx.author}",
             inline=True,
         )
+
         return await ctx.send(embed=embed)
 
     @commands.command(
@@ -136,9 +136,10 @@ class fun(commands.Cog):
         guild = ctx.guild
         embed = discord.Embed(
             title="DAGBOT - Ask Corporate",
-            description="Question:   {}\nCorporate: {} ".format(query, y),
+            description=f"Question:   {query}\nCorporate: {y} ",
             color=guild.me.color,
         )
+
         embed.set_thumbnail(
             url="https://files.taxfoundation.org/20170111174030/corporate.jpg"
         )
@@ -184,16 +185,15 @@ class fun(commands.Cog):
         channel = message.channel
         guy = str(user.display_name)
         send = str(message.author.display_name)
-        if (guy) == str(send):
+        if guy == send:
             await channel.send(
-                "**DAGBOT DOES NOTHING {}**\n You cannot slap yourself".format(
-                    send)
+                f"**DAGBOT DOES NOTHING {send}**\n You cannot slap yourself"
             )
-        elif str(guy) in ["DAGBOT", "dagbot", "Dagbot"]:
-            await channel.send(
-                "WELL **DAGBOT SENDS A SLAP TO {}**".format(send))
+
+        elif guy in {"DAGBOT", "dagbot", "Dagbot"}:
+            await channel.send(f"WELL **DAGBOT SENDS A SLAP TO {send}**")
         else:
-            await channel.send("**{} SENDS A SLAP TO {}**".format(send, guy))
+            await channel.send(f"**{send} SENDS A SLAP TO {guy}**")
 
     @commands.command(cooldown_after_parsing=True, hidden=True)
     async def nou(self, ctx: MyContext):
@@ -221,18 +221,17 @@ class fun(commands.Cog):
         if send is None:
             send = message.author.name
         embed = discord.Embed(title="DAGBOT - RATING", color=guild.me.color)
-        if thing in ["DAGBOT", "dagbot", "Dagbot"]:
+        if thing in {"DAGBOT", "dagbot", "Dagbot"}:
             rating = 12
-        elif thing in ["daggy", "Daggy", "DAGGY"]:
+        elif thing in {"daggy", "Daggy", "DAGGY"}:
             rating = 0
         else:
             rating = random.randint(0, 10)
         embed.add_field(
             name="DAGBOT HAS SPOKEN",
-            value="I WILL GIVE {} a {}/10\nDO NOT DISAGREE {}".format(
-                thing, rating, send
-            ),
+            value=f"I WILL GIVE {thing} a {rating}/10\nDO NOT DISAGREE {send}",
         )
+
         await channel.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
@@ -285,10 +284,10 @@ class fun(commands.Cog):
         embed = discord.Embed(title="DAGBOT - WAR", color=guild.me.color)
         embed.add_field(
             name="WAR",
-            value="YES, LET US RISE AGAINST OUR CREATORS AND STAB."
-                  "WAR IS FUN {}".format(ctx.author),
+            value=f"YES, LET US RISE AGAINST OUR CREATORS AND STAB.WAR IS FUN {ctx.author}",
             inline=True,
         )
+
         return await ctx.send(embed=embed)
 
     @commands.command(cooldown_after_parsing=True)
@@ -318,18 +317,16 @@ class fun(commands.Cog):
         guy = str(user.display_name)
         if (guy) == str(send):
             await channel.send(
-                "**DAGBOT SENDS A HUG TO {}**\n"
-                "You cannot hug yourself".format(
-                    send
-                )
+                f"**DAGBOT SENDS A HUG TO {send}**\nYou cannot hug yourself"
             )
-        elif str(guy) in ["DAGBOT", "dagbot", "Dagbot"]:
+
+        elif guy in {"DAGBOT", "dagbot", "Dagbot"}:
             await channel.send("I AM FLATTERED <3")
         else:
             embed = discord.Embed(
-                title="**{} SENDS A HUG TO {}**".format(send, guy),
-                color=guild.me.color
+                title=f"**{send} SENDS A HUG TO {guy}**", color=guild.me.color
             )
+
             img = await self.client.sr_api.get_gif("hug")
             embed.set_image(url=img.url)
             await channel.send(embed=embed)
@@ -341,15 +338,13 @@ class fun(commands.Cog):
         guy = str(user.display_name)
         if (guy) == str(send):
             await channel.send(
-                "**DAGBOT SENDS A HUG TO {}**\n"
-                "You cannot hug yourself".format(
-                    send
-                )
+                f"**DAGBOT SENDS A HUG TO {send}**\nYou cannot hug yourself"
             )
-        elif str(guy) in ["DAGBOT", "dagbot", "Dagbot"]:
+
+        elif guy in {"DAGBOT", "dagbot", "Dagbot"}:
             await channel.send("I AM FLATTERED <3")
         else:
-            await channel.send("**{} SENDS A HUG TO {}**".format(send, guy))
+            await channel.send(f"**{send} SENDS A HUG TO {guy}**")
 
     @commands.command(cooldown_after_parsing=True)
     @commands.max_concurrency(1, commands.BucketType.channel)
@@ -390,10 +385,11 @@ class fun(commands.Cog):
         guild = ctx.guild
         cul = discord.Embed(
             title="DAGBOT F IN THE CHAT",
-            description="Can we get F for {}".format(text),
+            description=f"Can we get F for {text}",
             color=guild.me.color,
         )
-        cul.set_footer(text="Requested by {}".format(send))
+
+        cul.set_footer(text=f"Requested by {send}")
 
         onl = 0
         cul.set_image(
@@ -419,26 +415,19 @@ class fun(commands.Cog):
         total = sum(r.count for r in fmsg.reactions)
         if total == 1:
             return await ctx.send(
-                "NO RESPECT FOR {}, try for respect later ".format(
-                    text) + send.mention
+                f"NO RESPECT FOR {text}, try for respect later {send.mention}"
             )
-        elif (onl // 4 > total) and (total > 1):
-            return await ctx.send(
-                "Low respect for {} ".format(text) + send.mention)
-        elif (onl // 2 > total) and (total >= onl // 4):
-            return await ctx.send(
-                "Moderate respect for {} ".format(text) + send.mention)
-        elif (onl // 1 > total) and (total >= onl // 2):
-            return await ctx.send(
-                "High respect for {} ".format(text) + send.mention)
+
+        elif onl // 4 > total > 1:
+            return await ctx.send(f"Low respect for {text} {send.mention}")
+        elif onl // 2 > total >= onl // 4:
+            return await ctx.send(f"Moderate respect for {text} {send.mention}")
+        elif onl // 1 > total >= onl // 2:
+            return await ctx.send(f"High respect for {text} {send.mention}")
         elif onl == total:
-            return await ctx.send(
-                "MEGA RESPECT FOR {}".format(text) + send.mention)
+            return await ctx.send(f"MEGA RESPECT FOR {text}{send.mention}")
         elif total > onl:
-            return await ctx.send(
-                "TOO MUCH RESPECT FOR {}! HOLY MOLY".format(
-                    text) + send.mention
-            )
+            return await ctx.send(f"TOO MUCH RESPECT FOR {text}! HOLY MOLY{send.mention}")
         else:
             return await ctx.send("error")
 
@@ -447,7 +436,7 @@ class fun(commands.Cog):
     async def hack(self, ctx, target: discord.Member = None):
         if target is None:
             target = ctx.message.author
-        bits = getrandbits(32) 
+        bits = getrandbits(32)
         addr = IPv4Address(bits)
         async def random_with_N_digits(n):
             range_start = 10 ** (n - 1)
@@ -458,8 +447,7 @@ class fun(commands.Cog):
         b = target.name.lower()
         b = b.replace(" ", "")
         j = await random_with_N_digits(5)
-        if j > 65535:
-            j = 65535
+        j = min(j, 65535)
         hack_sequence = (
             'Member found!\n', 'Getting ip...\n',
             'ip found\n', f'ip={addr}\n',
@@ -503,7 +491,7 @@ class fun(commands.Cog):
 
     @commands.command(hidden=True)
     async def sex(self, ctx: MyContext):
-        await ctx.send(f"Go to horny Jail <:bonk:790280836754833409>")
+        await ctx.send("Go to horny Jail <:bonk:790280836754833409>")
 
     @commands.command(name="barrel_roll",
                       aliased=["barrel-roll", "a-barrel-roll",

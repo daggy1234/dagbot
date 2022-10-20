@@ -124,7 +124,7 @@ class image(commands.Cog):
     async def cog_check(self, ctx):
         g_id = str(ctx.guild.id)
         for e in self.client.cogdata:
-            if str(e["serverid"]) == str(g_id):
+            if str(e["serverid"]) == g_id:
                 return bool(e["image"])
 
     async def to_embed(self, ctx: MyContext, img: Image, feature: str):
