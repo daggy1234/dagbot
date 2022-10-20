@@ -261,7 +261,7 @@ class fun(commands.Cog):
     @commands.command(cooldown_after_parsing=True)
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def joke(self, message):
-        await message.trigger_typing()
+        await message.typing()
         guild = message.guild
         embed = discord.Embed(title="DAGBOT - JOKE", color=guild.me.color)
         channel = message.channel

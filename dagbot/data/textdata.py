@@ -192,7 +192,7 @@ missingargs: List[str] = [
     "Stop making errors on purpose! I'm running out of witty one-liners for "
     "errors",
     "If do not have arguments, I wonder what else you do not have",
-    "Oh boy! Here I go teaching humands how to type again",
+    "Oh boy! Here I go teaching humans how to type again",
 ]
 cooldowncom: List[str] = [
     "Bruh chill tf out I need a break gimme about ",
@@ -207,7 +207,7 @@ missingperms: List[str] = [
     "Are you really in charge here?",
     "I will wait for the  return of the king",
     "Hmmm stop acting like my boss",
-    "Ngl I am not wasting my time  on you.Come back with more power",
+    "Ngl I am not wasting my time on you.Come back with more power",
 ]
 concur: List[str] = [
     "I am running at 100%",

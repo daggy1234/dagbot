@@ -80,15 +80,17 @@ class image(commands.Cog):
         ]
         for command in self.dynamic:
             self.make_fn(command[0], command[1])
-        self.make_fn_alex("salty", StaticImageConverter())
-        self.make_fn_alex("jokeoverhead", StaticImageConverter())
+#Commenting Since alexflipnote api no longer have these 
+
+        #self.make_fn_alex("salty", StaticImageConverter())
+       # self.make_fn_alex("jokeoverhead", StaticImageConverter())
 
     def make_fn(self, feature: asyncdagpi.ImageFeatures,
                 converter: Union
                 [ImageConverter, StaticImageConverter]):
         @commands.command(name=feature.value.replace("/", ""),
                           help=feature.description)
-        async def _command(_self, ctx: MyContext, *, to_convert: str = ""):
+        async def _command(ctx: MyContext, *, to_convert: str = ""):
             source = await converter.convert(ctx, to_convert)
             if source is None:
                 raise NoImageFound('Please provide a valid image')
@@ -97,27 +99,27 @@ class image(commands.Cog):
 
             await self.to_embed(ctx, img, feature.value.replace("/", ""))
 
-        _command.cog = self
-        self.__cog_commands__ += (_command,) # type: ignore
+        
+        self.client.add_command(_command)
 
     async def process_alex(self, url: str) -> BytesIO:
         out = await self.client.session.get(url, headers={
             "Authorization": self.client.data["alex"]})
         return BytesIO(await out.read())
 
-    def make_fn_alex(self, feature: str, converter: Union
-    [ImageConverter, StaticImageConverter]):
-        @commands.command(name=feature)
-        async def _command(_self, ctx: MyContext, *, to_convert: str = ""):
-            source = await converter.convert(ctx, to_convert)
-            start = time.perf_counter()
-            url = f"https://api.alexflipnote.dev/{feature}?image={source}"
-            img = await self.process_alex(url)
-            end = time.perf_counter()
-            await self.to_embed_alex(ctx, img, end - start, feature)
+#     def make_fn_alex(self, feature: str, converter: Union
+#     [ImageConverter, StaticImageConverter]):
+#         @commands.command(name=feature)
+#         async def _command(_self, ctx: MyContext, *, to_convert: str = ""):
+#             source = await converter.convert(ctx, to_convert)
+#             start = time.perf_counter()
+#             url = f"https://api.alexflipnote.dev/{feature}?image={source}"
+#             img = await self.process_alex(url)
+#             end = time.perf_counter()
+#             await self.to_embed_alex(ctx, img, end - start, feature)
 
-        _command.cog = self
-        self.__cog_commands__ += (_command,) # type: ignore
+#         _command.cog = self
+#         self.__cog_commands__ += (_command,) # type: ignore
 
     async def cog_check(self, ctx):
         g_id = str(ctx.guild.id)
@@ -139,22 +141,22 @@ class image(commands.Cog):
                              text=f"Called by {ctx.author.display_name}")
             await ctx.reply(embed=embed, file=file)
 
-    async def to_embed_alex(self, ctx: MyContext, img: BytesIO,
-                            time: Optional[float], feature: str):
-        async with ctx.typing():
-            embed = discord.Embed(color=ctx.guild.me.color)
-            filename = f"dagbot=process-image-{feature}.png"
-            file = discord.File(fp=img, filename=filename)
-            if time:
-                embed.description = f"Image Processed in {round(time, 2)}s | " \
-                                    f"Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
-            else:
-                embed.description = "Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
-            embed.timestamp = datetime.utcnow()
-            embed.title = f"Processed Image {feature}"
-            embed.set_footer(icon_url=str(ctx.author.avatar.url),
-                             text=f"Called by {ctx.author.display_name}")
-            await ctx.reply(embed=embed, file=file)
+#     async def to_embed_alex(self, ctx: MyContext, img: BytesIO,
+#                             time: Optional[float], feature: str):
+#         async with ctx.typing():
+#             embed = discord.Embed(color=ctx.guild.me.color)
+#             filename = f"dagbot=process-image-{feature}.png"
+#             file = discord.File(fp=img, filename=filename)
+#             if time:
+#                 embed.description = f"Image Processed in {round(time, 2)}s | " \
+#                                     f"Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
+#             else:
+#                 embed.description = "Powered by [AlexFlipnote](https://api.alexflipnote.dev/)"
+#             embed.timestamp = datetime.utcnow()
+#             embed.title = f"Processed Image {feature}"
+#             embed.set_footer(icon_url=str(ctx.author.avatar.url),
+#                              text=f"Called by {ctx.author.display_name}")
+#             await ctx.reply(embed=embed, file=file)
 
     @commands.command(cooldown_after_parsing=True)
     async def special(self, ctx: MyContext, *, to_convert: str = ""):
@@ -232,72 +234,72 @@ class image(commands.Cog):
         embed.set_image(url=url)
         return await ctx.send(embed=embed)
 
-    @commands.command(cooldown_after_parsing=True)
-    async def achievement(self, ctx: MyContext, *, text: str):
-        url = f"https://api.alexflipnote.dev/achievement?text={text}&icon={random.randint(1, 44)}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None,
-                                 "achievement")
+#     @commands.command(cooldown_after_parsing=True)
+#     async def achievement(self, ctx: MyContext, *, text: str):
+#         url = f"https://api.alexflipnote.dev/achievement?text={text}&icon={random.randint(1, 44)}"
+#         await self.to_embed_alex(ctx, await self.process_alex(url), None,
+#                                  "achievement")
 
-    @commands.command(cooldown_after_parsing=True)
-    async def challenge(self, ctx: MyContext, *, text: str):
-        url = f"https://api.alexflipnote.dev/challenge?text={text}&icon={random.randint(1, 44)}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None,
-                                 "challenge")
+#     @commands.command(cooldown_after_parsing=True)
+#     async def challenge(self, ctx: MyContext, *, text: str):
+#         url = f"https://api.alexflipnote.dev/challenge?text={text}&icon={random.randint(1, 44)}"
+#         await self.to_embed_alex(ctx, await self.process_alex(url), None,
+#                                  "challenge")
 
-    @commands.command(cooldown_after_parsing=True)
-    async def didyoumean(
-            self,
-            ctx,
-            *,
-            text=None,
-    ):
-        txtl = str(text).split(
-            ",") if text else "Oops I forgot to add text, Seperated by a comma"
-        try:
-            ttop = txtl[0]
-            tbot = txtl[1]
-        except IndexError:
-            return await ctx.send(
-                "Please use a comma to split top and bottom text")
+#     @commands.command(cooldown_after_parsing=True)
+#     async def didyoumean(
+#             self,
+#             ctx,
+#             *,
+#             text=None,
+#     ):
+#         txtl = str(text).split(
+#             ",") if text else "Oops I forgot to add text, Seperated by a comma"
+#         try:
+#             ttop = txtl[0]
+#             tbot = txtl[1]
+#         except IndexError:
+#             return await ctx.send(
+#                 "Please use a comma to split top and bottom text")
 
-        url = f"https://api.alexflipnote.dev/didyoumean?top={ttop}" \
-              f"&bottom={tbot}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None,
-                                 "didyoumean")
+#         url = f"https://api.alexflipnote.dev/didyoumean?top={ttop}" \
+#               f"&bottom={tbot}"
+#         await self.to_embed_alex(ctx, await self.process_alex(url), None,
+#                                  "didyoumean")
 
-    @commands.command(cooldown_after_parsing=True)
-    async def pornhub(
-            self,
-            ctx,
-            *,
-            text=None
-    ):
-        txtl = str(text).split(
-            ",") if text else "Oops I forgot to add text, Seperated by comma"
-        try:
-            ttop = txtl[0]
-            tbot = txtl[1]
-        except IndexError:
-            return await ctx.send(
-                "Please use a comma to split top and bottom text")
+#     @commands.command(cooldown_after_parsing=True)
+#     async def pornhub(
+#             self,
+#             ctx,
+#             *,
+#             text=None
+#     ):
+#         txtl = str(text).split(
+#             ",") if text else "Oops I forgot to add text, Seperated by comma"
+#         try:
+#             ttop = txtl[0]
+#             tbot = txtl[1]
+#         except IndexError:
+#             return await ctx.send(
+#                 "Please use a comma to split top and bottom text")
 
-        url = f"https://api.alexflipnote.dev/pornhub?top={ttop}" \
-              f"&bottom={tbot}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None,
-                                 "pornhub")
+#         url = f"https://api.alexflipnote.dev/pornhub?top={ttop}" \
+#               f"&bottom={tbot}"
+#         await self.to_embed_alex(ctx, await self.process_alex(url), None,
+#                                  "pornhub")
 
-    @commands.command(cooldown_after_parsing=True)
-    async def ship(self, ctx: MyContext, user: Optional[Union[BetterMemberConverter, discord.User]],
-                  usert: Union[BetterMemberConverter, discord.User]):
-        if not (isinstance(user, discord.User) and isinstance(usert, discord.User)):
-            return await ctx.send("Not User's")
-        urla = str(user.avatar.with_format("png").with_size(1024))
-        guya = user.display_name
-        urlb = str(usert.avatar.with_format("png").with_size(1024))
-        guyb = usert.display_name
-        if guya == guyb:
-            return await ctx.send("Thats just loving yourself.")
-        url = f"https://api.alexflipnote.dev//ship?user={urla}" \
-              f"&user2={urlb}"
-        await self.to_embed_alex(ctx, await self.process_alex(url), None,
-                                 "ship")
+#     @commands.command(cooldown_after_parsing=True)
+#     async def ship(self, ctx: MyContext, user: Optional[Union[BetterMemberConverter, discord.User]],
+#                   usert: Union[BetterMemberConverter, discord.User]):
+#         if not (isinstance(user, discord.User) and isinstance(usert, discord.User)):
+#             return await ctx.send("Not User's")
+#         urla = str(user.avatar.with_format("png").with_size(1024))
+#         guya = user.display_name
+#         urlb = str(usert.avatar.with_format("png").with_size(1024))
+#         guyb = usert.display_name
+#         if guya == guyb:
+#             return await ctx.send("Thats just loving yourself.")
+#         url = f"https://api.alexflipnote.dev//ship?user={urla}" \
+#               f"&user2={urlb}"
+#         await self.to_embed_alex(ctx, await self.process_alex(url), None,
+#                                  "ship")

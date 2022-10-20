@@ -345,7 +345,7 @@ class smart(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     async def fact(self, message: MyContext):
-        await message.trigger_typing()
+        await message.typing()
         channel = message.channel
         guild = message.guild
         url = "https://www.kickassfacts.com/random-facts/"
@@ -384,7 +384,7 @@ class smart(commands.Cog):
 
     @commands.command(cooldown_after_parsing=True)
     async def numfact(self, message: MyContext):
-        await message.trigger_typing()
+        await message.typing()
         channel = message.channel
         guild = message.guild
         url = "http://numbersapi.com/random/trivia"
