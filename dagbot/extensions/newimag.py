@@ -88,7 +88,7 @@ class image(commands.Cog):
                 [ImageConverter, StaticImageConverter]):
         @commands.command(name=feature.value.replace("/", ""),
                           help=feature.description)
-        async def _command(_self, ctx: MyContext, *, to_convert: str = ""):
+        async def _command(ctx: MyContext, *, to_convert: str = ""):
             source = await converter.convert(ctx, to_convert)
             if source is None:
                 raise NoImageFound('Please provide a valid image')
@@ -97,8 +97,8 @@ class image(commands.Cog):
 
             await self.to_embed(ctx, img, feature.value.replace("/", ""))
 
-        _command.cog = self
-        self.__cog_commands__ += (_command,) # type: ignore
+        
+        self.client.add_command(_command)
 
     async def process_alex(self, url: str) -> BytesIO:
         out = await self.client.session.get(url, headers={
