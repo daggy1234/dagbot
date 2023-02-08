@@ -24,7 +24,7 @@ zalgoify = "^1.1"
 PyYAML = "^6.0.0"
 sentry-sdk = "^1.9.0"
 discord-ext-menus = {git = "https://github.com/Rapptz/discord-ext-menus"}
-cryptography = "37.0.4"
+cryptography = "39.0.1"
 vaporwavely = "^1.0.1"
 PyDictionary = "^2.0.1"
 validator-collection = "^1.5.0"
